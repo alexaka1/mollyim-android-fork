@@ -1,0 +1,69 @@
+name: Android CI
+
+on:
+  workflow_dispatch
+env:
+  HAVE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE != '' }}
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: read # to fetch code (actions/checkout)
+
+    env:
+      GRADLE_OPTS: "-Dorg.gradle.project.kotlin.compiler.execution.strategy=in-process"
+      CI_ENV_FILE: ${{ vars.CI_ENV_FILE || 'beta-stable.env' }}
+      CI_MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up builder image
+        run: docker-compose build
+        working-directory: reproducible-builds
+
+      - name: Extract signing keys
+        if: "env.HAVE_KEYSTORE == 'true'"
+        run: printenv KEYSTORE | base64 -d > certs/keystore.jks
+        working-directory: reproducible-builds
+        env:
+          KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+
+      - name: Build without signing
+        if: "env.HAVE_KEYSTORE == 'false'"
+        run: docker-compose --env-file "ci/$CI_ENV_FILE" run assemble
+        working-directory: reproducible-builds
+
+      - name: Build and sign
+        if: "env.HAVE_KEYSTORE == 'true'"
+        run: docker-compose --env-file "ci/$CI_ENV_FILE" run assemble
+        working-directory: reproducible-builds
+        env:
+          CI_KEYSTORE_PATH: certs/keystore.jks
+          CI_KEYSTORE_ALIAS: release
+          CI_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+
+      - name: Clean up keystore
+        if: "always()"
+        run: rm -f certs/keystore.jks
+        working-directory: reproducible-builds
+
+      - name: Log APK and AAB checksums
+        run: find outputs \( -name "*.aab" -o -name "*.apk" \) -exec sha256sum '{}' +
+        working-directory: reproducible-builds
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: apk
+          path: reproducible-builds/outputs/apk/*/release/*.apk
+          if-no-files-found: error
+
+      - name: Upload Bundles
+        uses: actions/upload-artifact@v3
+        with:
+          name: bundle
+          path: reproducible-builds/outputs/bundle/*Release/*.aab
+          if-no-files-found: error
