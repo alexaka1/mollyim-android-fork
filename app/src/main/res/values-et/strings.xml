@@ -85,6 +85,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">Luba ligipääs</string>
     <string name="AttachmentKeyboard_payment">Makse</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">Halda</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">Vali veel fotosid</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">Mine sätetesse</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string name="AttachmentKeyboard_signal_has_limited_access">Mollyil on fotodele või videotele piiratud ligipääs</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">Ühtegi fotot ei leitud – vali fotod või videod siin kuvamiseks või muuda lube</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">Fotosid ega videoid ei leitud. Signalil on ligipääs ainult sinu valitud fotodele ja videotele.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">Ei leia rakendust meediafaili valimiseks.</string>
@@ -105,7 +119,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">Fotode ja videote näitamiseks:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string name="AttachmentManager_signal_needs_storage_access">Molly vajab su fotode ja videote näitamiseks ligipääsu salvestusruumile.</string>
+    <string name="AttachmentManager_signal_needs_storage_access">Molly vajab su fotode ja videote näitamiseks ligipääsu.</string>
 
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s ei ole makseid aktiveerinud </string>
@@ -328,6 +342,8 @@
     <string name="CommunicationActions_invalid_link">Vigane link</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">See ei ole kehtiv kõnelink. Kontrolli, kas kogu link on korrektne ja vajadusel paranda enne liitumiskatset.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -460,7 +476,7 @@
     <!-- Dialog title asking users for microphone permission -->
     <string name="ConversationActivity_allow_access_microphone">Anna ligipääs oma mikrofonile</string>
     <!-- Dialog description that will explain the steps needed to give microphone permissions -->
-    <string name="ConversationActivity_signal_to_send_audio_messages">Häälsõnumite saatmiseks toimi järgmiselt.</string>
+    <string name="ConversationActivity_signal_to_send_audio_messages">Häälsõnumite saatmiseks:</string>
     <!-- Alert dialog description asking for microphone permission in order to send voice messages -->
     <string name="ConversationActivity_to_send_voice_messages_allow_signal_access_to_your_microphone">Häälsõnumite saatmiseks luba Mollyil kasutada oma mikrofoni.</string>
     <!-- Toast text explaining Signal\'s need for microphone access -->
@@ -798,6 +814,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">Varunda kohe</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">Meediat ei saa taastada</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">Sinu seadmes ei ole piisavalt vaba ruumi. Meedia taastamiseks vabasta salvestusruumi.\n\nKui valid „Jäta taastamine vahele“, kustutatakse su varukoopias olev meedia järgmisel korral, kui su seade uue varukoopia loob.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">Sinu seadmes ei ole piisavalt vaba ruumi. Oma meedia taastamiseks vabasta %1$s ruumi.\n\nKui valid „Jäta taastamine vahele“, kustutatakse su varukoopias olev meedia järgmisel korral, kui su seade uue varukoopia loob.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">OK</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">Jäta taastamine vahele</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">Varundamisvea ikoon</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">Meedia taastamiseks vabasta salvestusruumi.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">Oma meedia taastamiseks vabasta %1$s ruumi.</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">Meedia taastamine</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%1$s kogumahust %2$s (%3$d%%)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">Meedia taastamine on pausil</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">WiFi ootel …</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">Internetiühenduse ootel …</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">Akutase on madal. Lae oma seadet.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">Meedia taastamiseks vabasta %1$s salvestusruumi.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">Jäta taastamine vahele</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">Vestluste varukoopiad</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">Varukoopiad on parooliga krüptitud ja salvestatud sinu seadmesse.</string>
@@ -899,9 +950,9 @@
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">Kogu sõnumivahetus lingitud seadmetes on privaatne</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
-    <string name="LinkDeviceFragment__signal_messages_are_synchronized">Mollyi sõnumid sünkroonitakse Mollyiga sinu mobiiltelefonis pärast selle linkimist. Sinu eelnevat sõnumiajalugu ei kuvata.</string>
+    <string name="LinkDeviceFragment__signal_messages_are_synchronized">Signali sõnumid sünkroonitakse Signaliga sinu mobiiltelefonis pärast selle linkimist. Sinu eelnevat sõnumiajalugu ei kuvata.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string name="LinkDeviceFragment__on_other_device_visit_signal">Mollyi paigaldamiseks külasta oma teises seadmes lehte %1$s</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">Signali paigaldamiseks külasta seadmes, mida soovid siduda, lehte %1$s</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string> -->
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">Minu lingitud seadmed</string>
@@ -919,6 +970,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">Lingitud seadmeid pole</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">Seadme linkimiseks tee lukust lahti</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">Enne sidumist kinnita oma isik</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">Toksa, et jätkata ning sisesta kinnitamiseks oma telefoni lukustuskood. Ära sisesta oma Signali PIN-koodi.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">Jätka</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1348,7 +1405,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">Grupilink</string>
     <string name="ShareableGroupLinkDialogFragment__share">Jaga</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">Lähtesta link</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">Võta uued liikmed vastu</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">Nõua grupilingi kaudu liituvate uute liikmete administraatori poolt kinnitamist.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">Kas sa tõesti soovid vestluse linki lähtestada? Inimesed ei saa siis varasema lingi kaudu enam vestlusega liituda.</string>
 
@@ -2046,6 +2103,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">Mine tagasi</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">Kõne teave</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">Sinu kaamera on väljas</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">Klõpsa siia enda video käivitamiseks</string>
     <string name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">Molly vajab kasutajale %1$s helistamiseks juurdepääsu seadme kaamerale</string>
@@ -2195,6 +2262,8 @@
     <string name="WebRtcCallView__additional_actions">Lisategevused</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">Lõpeta kõne</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">Grupihelina sisse või välja lülitamine</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">Tekkis UI tõrge. Palun teavita arendajaid sellest veast.</string>
@@ -2575,6 +2644,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">Proovime hiljem uuesti.</string>
     <string name="ApkUpdateNotifications_auto_update_success_title">Molly on edukalt uuendatud</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">Sinu versioon on automaatselt uuendatud versioonile %1$s.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">Saadad sõnumi?</string>
@@ -3232,6 +3302,8 @@
     <string name="EditAboutFragment_free_to_chat">Lobisemiseks vaba</string>
     <string name="EditAboutFragment_taking_a_break">Puhkepaus</string>
     <string name="EditAboutFragment_working_on_something_new">Töötan millegi uue kallal</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">Muuda gruppi</string>
@@ -3727,6 +3799,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. Toksa all \"Sätted\"</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %1$s Anna luba</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. Toksa „Load“</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3. %1$s Anna „Fotode ja videote“ luba</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">Sätted</string>
 
@@ -4253,6 +4329,8 @@
     <string name="preferences_app_protection__screen_lock">Ekraanilukk</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">Lukusta Signalile juurdepääs Androidi lukustuskuva või sõrmejäljega</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">Ekraaniluku ebaaktiivsuse ajalõpp</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">Ekraanilukustuse kasutamiseks seadista selles seadmes PIN-kood, muster või parool.</string>
     <string name="preferences_app_protection__signal_pin">Signali PIN-kood</string>
     <string name="preferences_app_protection__create_a_pin">Loo PIN-kood</string>
     <string name="preferences_app_protection__change_your_pin">Muuda enda PIN-koodi</string>
@@ -4273,8 +4351,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">Oled sooritanud liiga palju katseid. Palun proovi hiljem uuesti.</string>
     <string name="RegistrationActivity_error_connecting_to_service">Teenusega ühendamisel esines viga</string>
     <string name="preferences_chats__backups">Varukoopiad</string>
-    <string name="prompt_passphrase_activity__signal_is_locked">Molly on lukus</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">KOPUTA AVAMISEKS</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string name="prompt_passphrase_activity__unlock_signal">Lukusta Molly lahti</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string name="prompt_passphrase_activity__use_your_android_device">Kasuta Mollyi avamiseks Android-seadme lukustussätteid.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string name="prompt_passphrase_activity__screen_lock_is_on">Ekraanilukk on sisse lülitatud ning Molly on sinu seadme lukustussätete abil turvatud. Ava Molly samamoodi nagu tavaliselt telefoni avad, nt näotuvastuse, sõrmejäljega avamise, PIN-koodi, parooli või mustri abil.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">Võta ühendust kasutajatoega</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">Proovi uuesti</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">Väljas</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">Kasuta ekraanilukku</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string name="ScreenLockSettingsFragment__your_android_device">Kui lahkud või äppi vahetad, on Mollyi avamiseks vaja sinu Android-seadme lukustussätteid. Lukustatud olekus ei näita sõnumiteavitused sõnumite sisu.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">Käivita ekraanilukk</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">Kohe</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">1 minuti pärast</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">5 minuti pärast</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">30 minuti pärast</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">Kohandatud aeg</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string name="ScreenLockSettingsFragment__use_signal_screen_lock">Kasuta Mollyi ekraanilukku</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string name="ScreenLockSettingsFragment__turn_off_signal_lock">Lülita Mollyi ekraanilukk välja</string>
+
     <string name="Recipient_unknown">Tundmatu</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">Kustutatud konto</string>
@@ -4901,7 +5012,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">Klaviatuur</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">Sisestusklahv saadab</string>
+    <string name="ChatsSettingsFragment__send_with_enter">Saada Enter-klahviga</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">Sõnumid</string>
@@ -4925,8 +5036,8 @@
     <string name="PrivacySettingsFragment__blocked">Blokeeritud</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="one">%1$d kontakt</item>
-        <item quantity="other">%1$d kontakti</item>
+        <item quantity="one">%1$d kontakt või grupp</item>
+        <item quantity="other">%1$d kontakti või gruppi</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">Sõnumside</string>
     <string name="PrivacySettingsFragment__disappearing_messages">Kaduvad sõnumid</string>
@@ -5131,7 +5242,7 @@
     <string name="PermissionsSettingsFragment__only_admins">Ainult administraatorid</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">Kes saavad uusi liikmeid lisada?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">Kes saab selle grupi infot muuta?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">Kes saab saata sõnumeid?</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">Kes saavad sõnumeid saata ja kõnesid alustada?</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">Vaigista teavitused</string>
@@ -6835,7 +6946,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">Muuda kõne nime</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">Võta uued liikmed vastu</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">Küsi administraatori nõusolekut</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">Jaga linki Signali kaudu</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -6891,7 +7002,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">Lisa kõne nimi</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">Võta uued liikmed vastu</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">Küsi administraatori nõusolekut</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">Jaga linki</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -7142,12 +7253,22 @@
     <string name="BackupAlertBottomSheet__download_later">Lae hiljem alla</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">Ära lae meediat alla</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">Meedia kustutatakse</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">Sinu varukoopiasse salvestatud meedia kustutatakse täna jäädavalt. See on su viimane võimalus see alla laadida.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">Laadi alla</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">Ära laadi alla</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">Meedia allalaadimiseks vabasta %1$s ruumi.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">Krediit- või deebetkaart</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7184,6 +7305,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">Rakenda piiranguid lingitud seadmetele</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">Kui see on sisse lülitatud, kustutavad vestluse pikkuse piirangud sõnumid ka sinu lingitud seadmetest.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">Seadmesisene salvestusruum</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimeeri seadmesisest salvestusruumi</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">Kasutamata meedia laaditakse maha, kuid saad neid igal ajal oma varukoopiast alla laadida.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">Selle funktsiooni lubamiseks on vajalik uuendamine</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">Salvestusruumi saab optimeerida ainult Signali tasulise varundamise tasemega. Selle funktsiooni kasutamiseks uuenda oma varundamisplaani.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">Uuenda kohe</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">Kustutamine on nüüd kõigi su seadmete üleselt sünkroniseeritud</string>
@@ -7229,6 +7364,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">Tellimus tühistatud</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">Allalaadimine on lõpetatud</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">Varukoopia luuakse öösel.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">Varukoopia tüüp</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7270,12 +7407,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">Sisesta oma seadme PIN-kood, salasõna või muster.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">Maksa Signalile %1$s kuus</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">Saad:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">Varunda oma sõnumid ja meedia Signali turvalise otspunktkrüptitud salvestusteenuse abil. Nii ei kaota sa ühtki sõnumit, kui uue telefoni saad või Signali uuesti paigaldad.</string>
@@ -7290,27 +7421,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">Rohkem teavet</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">Sisesta enda PIN-kood</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">Varundamise võimaldamiseks sisesta oma Signali PIN-kood</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">Edasi</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">Vaheta klaviatuuri</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">PIN-koodid kaitsevad sinu varukoopiat</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">Oma Signali PIN-koodiga saad varukoopia taastada, kui Signali uuesti paigaldad. Soovitame kasutada vähemalt %1$d numbri pikkust PIN-koodi.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">Kui oma PIN-koodi unustad, ei ole sul võimalik oma varukoopiat taastada. Saad oma PIN-koodi sätete alt igal ajal muuta.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">Kasuta praegust Signali PIN-koodi</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">Loo uus PIN-kood</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7325,6 +7464,30 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">Muuda varundamise tüüpi</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">Tühista tellimus</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">Tasuta</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s/kuu</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">Tekstsõnumid + kogu su meedia</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="one">Tekst + %1$d päev meediat</item>
+        <item quantity="other">Tekst + %1$d päeva meediat</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">Kõigi tekstsõnumite varundamine</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">Kogu meedia varundamine</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">%1$s salvestusruumist (%2$s fotot)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">Aitäh, et toetad Signalit!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="one">Viimane päev meediat</item>
+        <item quantity="other">Viimased %1$d päeva meediat</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7337,5 +7500,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">Kinnita ja lae hiljem alla</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">Säilita tellimus</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">Meeldetuletuse ikoon</string>
     <!-- EOF -->
 </resources>

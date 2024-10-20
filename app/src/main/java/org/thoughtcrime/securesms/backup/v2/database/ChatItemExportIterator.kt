@@ -20,15 +20,12 @@ import org.signal.core.util.requireLong
 import org.signal.core.util.requireLongOrNull
 import org.signal.core.util.requireString
 import org.thoughtcrime.securesms.attachments.AttachmentId
-import org.thoughtcrime.securesms.attachments.Cdn
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment
-import org.thoughtcrime.securesms.backup.v2.BackupRepository.getMediaName
 import org.thoughtcrime.securesms.backup.v2.proto.ChatItem
 import org.thoughtcrime.securesms.backup.v2.proto.ChatUpdateMessage
 import org.thoughtcrime.securesms.backup.v2.proto.ContactAttachment
 import org.thoughtcrime.securesms.backup.v2.proto.ContactMessage
 import org.thoughtcrime.securesms.backup.v2.proto.ExpirationTimerChatUpdate
-import org.thoughtcrime.securesms.backup.v2.proto.FilePointer
 import org.thoughtcrime.securesms.backup.v2.proto.GroupCall
 import org.thoughtcrime.securesms.backup.v2.proto.IndividualCall
 import org.thoughtcrime.securesms.backup.v2.proto.LearnedProfileChatUpdate
@@ -46,6 +43,7 @@ import org.thoughtcrime.securesms.backup.v2.proto.Sticker
 import org.thoughtcrime.securesms.backup.v2.proto.StickerMessage
 import org.thoughtcrime.securesms.backup.v2.proto.Text
 import org.thoughtcrime.securesms.backup.v2.proto.ThreadMergeChatUpdate
+import org.thoughtcrime.securesms.backup.v2.util.toRemoteFilePointer
 import org.thoughtcrime.securesms.contactshare.Contact
 import org.thoughtcrime.securesms.database.AttachmentTable
 import org.thoughtcrime.securesms.database.CallTable
@@ -95,7 +93,7 @@ import org.thoughtcrime.securesms.backup.v2.proto.GiftBadge as BackupGiftBadge
  *
  * All of this complexity is hidden from the user -- they just get a normal iterator interface.
  */
-class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: Int, private val archiveMedia: Boolean) : Iterator<ChatItem?>, Closeable {
+class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: Int, private val mediaArchiveEnabled: Boolean) : Iterator<ChatItem?>, Closeable {
 
   companion object {
     private val TAG = Log.tag(ChatItemExportIterator::class.java)
@@ -131,7 +129,7 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
       }
     }
 
-    val reactionsById: Map<Long, List<ReactionRecord>> = SignalDatabase.reactions.getReactionsForMessages(records.keys)
+    val reactionsById: Map<Long, List<ReactionRecord>> = SignalDatabase.reactions.getReactionsForMessages(records.keys).map { entry -> entry.key to entry.value.sortedBy { it.dateReceived } }.toMap()
     val mentionsById: Map<Long, List<Mention>> = SignalDatabase.mentions.getMentionsForMessages(records.keys)
     val attachmentsById: Map<Long, List<DatabaseAttachment>> = SignalDatabase.attachments.getAttachmentsForMessages(records.keys)
     val groupReceiptsById: Map<Long, List<GroupReceiptTable.GroupReceiptInfo>> = SignalDatabase.groupReceipts.getGroupReceiptInfoForMessages(records.keys)
@@ -182,8 +180,17 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
         MessageTypes.isReportedSpam(record.type) -> {
           builder.updateMessage = simpleUpdate(SimpleChatUpdate.Type.REPORTED_SPAM)
         }
+        MessageTypes.isMessageRequestAccepted(record.type) -> {
+          builder.updateMessage = simpleUpdate(SimpleChatUpdate.Type.MESSAGE_REQUEST_ACCEPTED)
+        }
+        MessageTypes.isBlocked(record.type) -> {
+          builder.updateMessage = simpleUpdate(SimpleChatUpdate.Type.BLOCKED)
+        }
+        MessageTypes.isUnblocked(record.type) -> {
+          builder.updateMessage = simpleUpdate(SimpleChatUpdate.Type.UNBLOCKED)
+        }
         MessageTypes.isExpirationTimerUpdate(record.type) -> {
-          builder.updateMessage = ChatUpdateMessage(expirationTimerChange = ExpirationTimerChatUpdate(record.expiresIn.toInt()))
+          builder.updateMessage = ChatUpdateMessage(expirationTimerChange = ExpirationTimerChatUpdate(record.expiresIn))
           builder.expiresInMs = 0
         }
         MessageTypes.isProfileChange(record.type) -> {
@@ -275,7 +282,7 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
         directionless = ChatItem.DirectionlessMessageDetails()
       } else if (MessageTypes.isOutgoingMessageType(record.type)) {
         outgoing = ChatItem.OutgoingMessageDetails(
-          sendStatus = record.toBackupSendStatus(groupReceipts)
+          sendStatus = record.toRemoteSendStatus(groupReceipts)
         )
       } else {
         incoming = ChatItem.IncomingMessageDetails(
@@ -422,7 +429,7 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
             ChatUpdateMessage(
               groupCall = GroupCall(
                 state = GroupCall.State.GENERIC,
-                startedCallRecipientId = recipients.getByAci(ACI.from(UuidUtil.parseOrThrow(groupCallUpdateDetails.startedCallUuid))).getOrNull()?.toLong(),
+                startedCallRecipientId = UuidUtil.parseOrNull(groupCallUpdateDetails.startedCallUuid)?.let { recipients.getByAci(ACI.from(it)).getOrNull()?.toLong() },
                 startedCallTimestamp = groupCallUpdateDetails.startedCallTimestamp,
                 endedCallTimestamp = groupCallUpdateDetails.endedCallTimestamp
               )
@@ -496,7 +503,7 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
       PaymentNotification(
         amountMob = payment.amount.serializeAmountString(),
         feeMob = payment.fee.serializeAmountString(),
-        note = payment.note,
+        note = payment.note.takeUnless { it.isEmpty() },
         transactionDetails = payment.getTransactionDetails()
       )
     }
@@ -581,7 +588,7 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
     return org.thoughtcrime.securesms.backup.v2.proto.LinkPreview(
       url = url,
       title = title,
-      image = (thumbnail.orNull() as? DatabaseAttachment)?.toBackupAttachment()?.pointer,
+      image = (thumbnail.orNull() as? DatabaseAttachment)?.toRemoteMessageAttachment()?.pointer,
       description = description,
       date = date
     )
@@ -593,7 +600,7 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
     val contacts = sharedContacts.map {
       ContactAttachment(
         name = it.name.toBackup(),
-        avatar = (it.avatar?.attachment as? DatabaseAttachment)?.toBackupAttachment()?.pointer,
+        avatar = (it.avatar?.attachment as? DatabaseAttachment)?.toRemoteMessageAttachment()?.pointer,
         organization = it.organization,
         number = it.phoneNumbers.map { phone ->
           ContactAttachment.Phone(
@@ -636,8 +643,7 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
       familyName = familyName,
       prefix = prefix,
       suffix = suffix,
-      middleName = middleName,
-      displayName = displayName
+      middleName = middleName
     )
   }
 
@@ -679,16 +685,18 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
     val linkPreviews = parseLinkPreviews(attachments)
     val linkPreviewAttachments = linkPreviews.mapNotNull { it.thumbnail.orElse(null) }.toSet()
     val quotedAttachments = attachments?.filter { it.quote } ?: emptyList()
+    val longTextAttachment = attachments?.firstOrNull { it.contentType == "text/x-signal-plain" }
     val messageAttachments = attachments
       ?.filterNot { it.quote }
       ?.filterNot { linkPreviewAttachments.contains(it) }
+      ?.filterNot { it == longTextAttachment }
       ?: emptyList()
     return StandardMessage(
       quote = this.toQuote(quotedAttachments),
       text = text,
       attachments = messageAttachments.toBackupAttachments(),
       linkPreview = linkPreviews.map { it.toBackupLinkPreview() },
-      longText = null,
+      longText = longTextAttachment?.toRemoteFilePointer(mediaArchiveEnabled),
       reactions = reactionRecords.toBackupReactions()
     )
   }
@@ -699,9 +707,13 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
       Quote(
         targetSentTimestamp = this.quoteTargetSentTimestamp.takeIf { !this.quoteMissing && it != MessageTable.QUOTE_TARGET_MISSING_ID },
         authorId = this.quoteAuthor,
-        text = this.quoteBody,
+        text = this.quoteBody?.let { body ->
+          Text(
+            body = body,
+            bodyRanges = this.quoteBodyRanges?.toBackupBodyRanges() ?: emptyList()
+          )
+        },
         attachments = attachments?.toBackupQuoteAttachments() ?: emptyList(),
-        bodyRanges = this.quoteBodyRanges?.toBackupBodyRanges() ?: emptyList(),
         type = when (type) {
           QuoteModel.Type.NORMAL -> Quote.Type.NORMAL
           QuoteModel.Type.GIFT_BADGE -> Quote.Type.GIFTBADGE
@@ -739,7 +751,7 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
         packKey = Hex.fromStringCondensed(stickerLocator.packKey).toByteString(),
         stickerId = stickerLocator.stickerId,
         emoji = stickerLocator.emoji,
-        data_ = this.toBackupAttachment().pointer
+        data_ = this.toRemoteMessageAttachment().pointer
       ),
       reactions = reactions.toBackupReactions()
     )
@@ -750,81 +762,47 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
       Quote.QuotedAttachment(
         contentType = attachment.contentType,
         fileName = attachment.fileName,
-        thumbnail = attachment.toBackupAttachment()
+        thumbnail = attachment.toRemoteMessageAttachment().takeUnless { it.pointer?.invalidAttachmentLocator != null }
       )
     }
   }
 
-  private fun DatabaseAttachment.toBackupAttachment(): MessageAttachment {
-    val builder = FilePointer.Builder()
-    builder.contentType = contentType
-    builder.incrementalMac = incrementalDigest?.toByteString()
-    builder.incrementalMacChunkSize = incrementalMacChunkSize
-    builder.fileName = fileName
-    builder.width = width
-    builder.height = height
-    builder.caption = caption
-    builder.blurHash = blurHash?.hash
-
-    if (remoteKey.isNullOrBlank() || remoteDigest == null || size == 0L) {
-      builder.invalidAttachmentLocator = FilePointer.InvalidAttachmentLocator()
-    } else {
-      if (archiveMedia) {
-        builder.backupLocator = FilePointer.BackupLocator(
-          mediaName = archiveMediaName ?: this.getMediaName().toString(),
-          cdnNumber = if (archiveMediaName != null) archiveCdn else Cdn.CDN_3.cdnNumber, // TODO (clark): Update when new proto with optional cdn is landed
-          key = Base64.decode(remoteKey).toByteString(),
-          size = this.size.toInt(),
-          digest = remoteDigest.toByteString()
-        )
-      } else {
-        if (remoteLocation.isNullOrBlank()) {
-          builder.invalidAttachmentLocator = FilePointer.InvalidAttachmentLocator()
-        } else {
-          builder.attachmentLocator = FilePointer.AttachmentLocator(
-            cdnKey = this.remoteLocation,
-            cdnNumber = this.cdn.cdnNumber,
-            uploadTimestamp = this.uploadTimestamp,
-            key = Base64.decode(remoteKey).toByteString(),
-            size = this.size.toInt(),
-            digest = remoteDigest.toByteString()
-          )
-        }
-      }
-    }
+  private fun DatabaseAttachment.toRemoteMessageAttachment(): MessageAttachment {
     return MessageAttachment(
-      pointer = builder.build(),
+      pointer = this.toRemoteFilePointer(mediaArchiveEnabled),
       wasDownloaded = this.transferState == AttachmentTable.TRANSFER_PROGRESS_DONE || this.transferState == AttachmentTable.TRANSFER_NEEDS_RESTORE,
-      flag = if (voiceNote) {
+      flag = if (this.voiceNote) {
         MessageAttachment.Flag.VOICE_MESSAGE
-      } else if (videoGif) {
+      } else if (this.videoGif) {
         MessageAttachment.Flag.GIF
-      } else if (borderless) {
+      } else if (this.borderless) {
         MessageAttachment.Flag.BORDERLESS
       } else {
         MessageAttachment.Flag.NONE
       },
-      clientUuid = uuid?.let { UuidUtil.toByteString(uuid) }
+      clientUuid = this.uuid?.let { UuidUtil.toByteString(uuid) }
     )
   }
 
   private fun List<DatabaseAttachment>.toBackupAttachments(): List<MessageAttachment> {
     return this.map { attachment ->
-      attachment.toBackupAttachment()
+      attachment.toRemoteMessageAttachment()
     }
   }
 
   private fun PaymentTable.PaymentTransaction.getTransactionDetails(): PaymentNotification.TransactionDetails? {
-    if (failureReason != null || state == State.FAILED) {
-      return PaymentNotification.TransactionDetails(failedTransaction = PaymentNotification.TransactionDetails.FailedTransaction(reason = failureReason.toBackupFailureReason()))
+    if (this.failureReason != null || this.state == State.FAILED) {
+      return PaymentNotification.TransactionDetails(failedTransaction = PaymentNotification.TransactionDetails.FailedTransaction(reason = this.failureReason.toBackupFailureReason()))
     }
     return PaymentNotification.TransactionDetails(
       transaction = PaymentNotification.TransactionDetails.Transaction(
         status = this.state.toBackupState(),
-        timestamp = timestamp,
-        blockIndex = blockIndex,
-        blockTimestamp = blockTimestamp,
-        mobileCoinIdentification = paymentMetaData.mobileCoinTxoIdentification?.toBackup()
+        timestamp = this.timestamp,
+        blockIndex = this.blockIndex,
+        blockTimestamp = this.blockTimestamp,
+        mobileCoinIdentification = this.paymentMetaData.mobileCoinTxoIdentification?.toBackup(),
+        transaction = this.transaction?.toByteString(),
+        receipt = this.receipt?.toByteString()
       )
     )
   }
@@ -873,11 +851,18 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
     }
 
     return decoded.ranges.map {
+      val mention = it.mentionUuid?.let { uuid -> UuidUtil.parseOrThrow(uuid) }?.toByteArray()?.toByteString()
+      val style = if (mention == null) {
+        it.style?.toBackupBodyRangeStyle() ?: BackupBodyRange.Style.NONE
+      } else {
+        null
+      }
+
       BackupBodyRange(
         start = it.start,
         length = it.length,
-        mentionAci = it.mentionUuid?.let { uuid -> UuidUtil.parseOrThrow(uuid) }?.toByteArray()?.toByteString(),
-        style = it.style?.toBackupBodyRangeStyle()
+        mentionAci = mention,
+        style = style
       )
     }
   }
@@ -899,62 +884,125 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
           emoji = it.emoji,
           authorId = it.author.toLong(),
           sentTimestamp = it.dateSent,
-          receivedTimestamp = it.dateReceived
+          sortOrder = it.dateReceived
         )
       } ?: emptyList()
   }
 
-  private fun BackupMessageRecord.toBackupSendStatus(groupReceipts: List<GroupReceiptTable.GroupReceiptInfo>?): List<SendStatus> {
+  private fun BackupMessageRecord.toRemoteSendStatus(groupReceipts: List<GroupReceiptTable.GroupReceiptInfo>?): List<SendStatus> {
     if (!MessageTypes.isOutgoingMessageType(this.type)) {
       return emptyList()
     }
 
     if (!groupReceipts.isNullOrEmpty()) {
-      return groupReceipts.toBackupSendStatus(this.networkFailureRecipientIds, this.identityMismatchRecipientIds)
+      return groupReceipts.toRemoteSendStatus(this, this.networkFailureRecipientIds, this.identityMismatchRecipientIds)
     }
 
-    val status: SendStatus.Status = when {
-      this.viewed -> SendStatus.Status.VIEWED
-      this.hasReadReceipt -> SendStatus.Status.READ
-      this.hasDeliveryReceipt -> SendStatus.Status.DELIVERED
-      this.baseType == MessageTypes.BASE_SENT_TYPE -> SendStatus.Status.SENT
-      MessageTypes.isFailedMessageType(this.type) -> SendStatus.Status.FAILED
-      else -> SendStatus.Status.PENDING
+    val statusBuilder = SendStatus.Builder()
+      .recipientId(this.toRecipientId)
+      .timestamp(this.receiptTimestamp)
+
+    when {
+      this.identityMismatchRecipientIds.contains(this.toRecipientId) -> {
+        statusBuilder.failed = SendStatus.Failed(
+          reason = SendStatus.Failed.FailureReason.IDENTITY_KEY_MISMATCH
+        )
+      }
+      this.networkFailureRecipientIds.contains(this.toRecipientId) -> {
+        statusBuilder.failed = SendStatus.Failed(
+          reason = SendStatus.Failed.FailureReason.NETWORK
+        )
+      }
+      this.viewed -> {
+        statusBuilder.viewed = SendStatus.Viewed(
+          sealedSender = this.sealedSender
+        )
+      }
+      this.hasReadReceipt -> {
+        statusBuilder.read = SendStatus.Read(
+          sealedSender = this.sealedSender
+        )
+      }
+      this.hasDeliveryReceipt -> {
+        statusBuilder.delivered = SendStatus.Delivered(
+          sealedSender = this.sealedSender
+        )
+      }
+      this.baseType == MessageTypes.BASE_SENT_FAILED_TYPE -> {
+        statusBuilder.failed = SendStatus.Failed(
+          reason = SendStatus.Failed.FailureReason.UNKNOWN
+        )
+      }
+      this.baseType == MessageTypes.BASE_SENDING_SKIPPED_TYPE -> {
+        statusBuilder.skipped = SendStatus.Skipped()
+      }
+      this.baseType == MessageTypes.BASE_SENT_TYPE -> {
+        statusBuilder.sent = SendStatus.Sent(
+          sealedSender = this.sealedSender
+        )
+      }
+      else -> {
+        statusBuilder.pending = SendStatus.Pending()
+      }
     }
 
-    return listOf(
-      SendStatus(
-        recipientId = this.toRecipientId,
-        deliveryStatus = status,
-        lastStatusUpdateTimestamp = this.receiptTimestamp,
-        sealedSender = this.sealedSender,
-        networkFailure = this.networkFailureRecipientIds.contains(this.toRecipientId),
-        identityKeyMismatch = this.identityMismatchRecipientIds.contains(this.toRecipientId)
-      )
-    )
+    return listOf(statusBuilder.build())
   }
 
-  private fun List<GroupReceiptTable.GroupReceiptInfo>.toBackupSendStatus(networkFailureRecipientIds: Set<Long>, identityMismatchRecipientIds: Set<Long>): List<SendStatus> {
+  private fun List<GroupReceiptTable.GroupReceiptInfo>.toRemoteSendStatus(messageRecord: BackupMessageRecord, networkFailureRecipientIds: Set<Long>, identityMismatchRecipientIds: Set<Long>): List<SendStatus> {
     return this.map {
-      SendStatus(
-        recipientId = it.recipientId.toLong(),
-        deliveryStatus = it.status.toBackupDeliveryStatus(),
-        sealedSender = it.isUnidentified,
-        lastStatusUpdateTimestamp = it.timestamp,
-        networkFailure = networkFailureRecipientIds.contains(it.recipientId.toLong()),
-        identityKeyMismatch = identityMismatchRecipientIds.contains(it.recipientId.toLong())
-      )
-    }
-  }
+      val statusBuilder = SendStatus.Builder()
+        .recipientId(it.recipientId.toLong())
+        .timestamp(it.timestamp)
 
-  private fun Int.toBackupDeliveryStatus(): SendStatus.Status {
-    return when (this) {
-      GroupReceiptTable.STATUS_UNDELIVERED -> SendStatus.Status.PENDING
-      GroupReceiptTable.STATUS_DELIVERED -> SendStatus.Status.DELIVERED
-      GroupReceiptTable.STATUS_READ -> SendStatus.Status.READ
-      GroupReceiptTable.STATUS_VIEWED -> SendStatus.Status.VIEWED
-      GroupReceiptTable.STATUS_SKIPPED -> SendStatus.Status.SKIPPED
-      else -> SendStatus.Status.SKIPPED
+      when {
+        identityMismatchRecipientIds.contains(it.recipientId.toLong()) -> {
+          statusBuilder.failed = SendStatus.Failed(
+            reason = SendStatus.Failed.FailureReason.IDENTITY_KEY_MISMATCH
+          )
+        }
+        networkFailureRecipientIds.contains(it.recipientId.toLong()) -> {
+          statusBuilder.failed = SendStatus.Failed(
+            reason = SendStatus.Failed.FailureReason.NETWORK
+          )
+        }
+        messageRecord.baseType == MessageTypes.BASE_SENT_FAILED_TYPE -> {
+          statusBuilder.failed = SendStatus.Failed(
+            reason = SendStatus.Failed.FailureReason.UNKNOWN
+          )
+        }
+        it.status == GroupReceiptTable.STATUS_UNKNOWN -> {
+          statusBuilder.pending = SendStatus.Pending()
+        }
+        it.status == GroupReceiptTable.STATUS_UNDELIVERED -> {
+          statusBuilder.sent = SendStatus.Sent(
+            sealedSender = it.isUnidentified
+          )
+        }
+        it.status == GroupReceiptTable.STATUS_DELIVERED -> {
+          statusBuilder.delivered = SendStatus.Delivered(
+            sealedSender = it.isUnidentified
+          )
+        }
+        it.status == GroupReceiptTable.STATUS_READ -> {
+          statusBuilder.read = SendStatus.Read(
+            sealedSender = it.isUnidentified
+          )
+        }
+        it.status == GroupReceiptTable.STATUS_VIEWED -> {
+          statusBuilder.viewed = SendStatus.Viewed(
+            sealedSender = it.isUnidentified
+          )
+        }
+        it.status == GroupReceiptTable.STATUS_SKIPPED -> {
+          statusBuilder.skipped = SendStatus.Skipped()
+        }
+        else -> {
+          statusBuilder.pending = SendStatus.Pending()
+        }
+      }
+
+      statusBuilder.build()
     }
   }
 
@@ -1023,7 +1071,10 @@ class ChatItemExportIterator(private val cursor: Cursor, private val batchSize: 
       MessageTypes.isPaymentsActivated(this) ||
       MessageTypes.isPaymentsRequestToActivate(this) ||
       MessageTypes.isUnsupportedMessageType(this) ||
-      MessageTypes.isReportedSpam(this)
+      MessageTypes.isReportedSpam(this) ||
+      MessageTypes.isMessageRequestAccepted(this) ||
+      MessageTypes.isBlocked(this) ||
+      MessageTypes.isUnblocked(this)
   }
 
   private fun String.e164ToLong(): Long? {

@@ -93,7 +93,7 @@ class LinkDeviceFragment : ComposeFragment() {
 
     biometricDeviceLockLauncher = registerForActivityResult(BiometricDeviceLockContract()) { result: Int ->
       if (result == BiometricDeviceAuthentication.AUTHENTICATED) {
-        findNavController().safeNavigate(R.id.action_linkDeviceFragment_to_addLinkDeviceFragment)
+        findNavController().safeNavigate(R.id.action_linkDeviceFragment_to_linkDeviceIntroBottomSheet)
       }
     }
 
@@ -133,6 +133,13 @@ class LinkDeviceFragment : ComposeFragment() {
       }
     }
 
+    LaunchedEffect(state.seenEducationSheet) {
+      if (state.seenEducationSheet) {
+        biometricAuth.authenticate(requireContext(), true) { biometricDeviceLockLauncher.launch(getString(R.string.LinkDeviceFragment__unlock_to_link)) }
+        viewModel.markEducationSheetSeen(false)
+      }
+    }
+
     Scaffolds.Settings(
       title = stringResource(id = R.string.preferences__linked_devices),
       onNavigationClick = { navController.popOrFinish() },
@@ -145,10 +152,10 @@ class LinkDeviceFragment : ComposeFragment() {
         modifier = Modifier.padding(contentPadding),
         onLearnMore = { navController.safeNavigate(R.id.action_linkDeviceFragment_to_linkDeviceLearnMoreBottomSheet) },
         onLinkDevice = {
-          if (biometricAuth.canAuthenticate()) {
-            biometricAuth.authenticate(requireContext(), true) { biometricDeviceLockLauncher.launch(getString(R.string.LinkDeviceFragment__unlock_to_link)) }
+          if (biometricAuth.canAuthenticate(requireContext())) {
+            navController.safeNavigate(R.id.action_linkDeviceFragment_to_linkDeviceEducationSheet)
           } else {
-            navController.safeNavigate(R.id.action_linkDeviceFragment_to_addLinkDeviceFragment)
+            navController.safeNavigate(R.id.action_linkDeviceFragment_to_linkDeviceIntroBottomSheet)
           }
         },
         setDeviceToRemove = { device -> viewModel.setDeviceToRemove(device) },
@@ -171,7 +178,7 @@ class LinkDeviceFragment : ComposeFragment() {
 
     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
       Log.i(TAG, "Authentication succeeded")
-      findNavController().safeNavigate(R.id.action_linkDeviceFragment_to_addLinkDeviceFragment)
+      findNavController().safeNavigate(R.id.action_linkDeviceFragment_to_linkDeviceIntroBottomSheet)
     }
 
     override fun onAuthenticationFailed() {
@@ -218,7 +225,7 @@ fun DeviceDescriptionScreen(
       tint = Color.Unspecified
     )
     Text(
-      text = stringResource(id = R.string.LinkDeviceFragment__use_signal_on_desktop_ipad),
+      text = stringResource(id = R.string.LinkDeviceFragment__use_molly_on_another_devices),
       textAlign = TextAlign.Center,
       modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 4.dp)
     )

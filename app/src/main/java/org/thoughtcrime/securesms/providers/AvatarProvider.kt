@@ -5,6 +5,7 @@
 
 package org.thoughtcrime.securesms.providers
 
+import android.app.Application
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Intent
@@ -14,11 +15,20 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import org.signal.core.util.concurrent.SignalExecutors
+import org.signal.core.util.logging.AndroidLogger
 import org.signal.core.util.logging.Log
+import org.thoughtcrime.securesms.ApplicationContext
 import org.thoughtcrime.securesms.BuildConfig
+import org.thoughtcrime.securesms.crypto.AttachmentSecretProvider
+import org.thoughtcrime.securesms.crypto.DatabaseSecretProvider
 import org.thoughtcrime.securesms.database.SignalDatabase
+import org.thoughtcrime.securesms.database.SqlCipherLibraryLoader
+import org.thoughtcrime.securesms.dependencies.AppDependencies
+import org.thoughtcrime.securesms.dependencies.ApplicationDependencyProvider
+import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.profiles.AvatarHelper
 import org.thoughtcrime.securesms.recipients.Recipient
+import org.thoughtcrime.securesms.recipients.RecipientCreator
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.service.KeyCachingService
 import org.thoughtcrime.securesms.util.AdaptiveBitmapMetrics
@@ -54,6 +64,33 @@ class AvatarProvider : BaseContentProvider() {
     }
   }
 
+  private fun init(): Application? {
+    if (KeyCachingService.isLocked()) {
+      Log.w(TAG, "masterSecret was null, abandoning.")
+      return null
+    }
+
+    val application = context as? ApplicationContext ?: return null
+
+    SqlCipherLibraryLoader.load()
+    SignalDatabase.init(
+      application,
+      DatabaseSecretProvider.getOrCreateDatabaseSecret(application),
+      AttachmentSecretProvider.getInstance(application).getOrCreateAttachmentSecret()
+    )
+
+    SignalStore.init(application)
+
+    Log.initialize(AndroidLogger)
+
+    if (!AppDependencies.isInitialized) {
+      Log.i(TAG, "Initializing AppDependencies.")
+      AppDependencies.init(application, ApplicationDependencyProvider(application))
+    }
+
+    return application
+  }
+
   override fun onCreate(): Boolean {
     if (VERBOSE) Log.i(TAG, "onCreate called")
     return true
@@ -63,10 +100,7 @@ class AvatarProvider : BaseContentProvider() {
   override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
     if (VERBOSE) Log.i(TAG, "openFile() called!")
 
-    if (KeyCachingService.isLocked()) {
-      Log.w(TAG, "masterSecret was null, abandoning.")
-      return null
-    }
+    val application = init() ?: return null
 
     if (SignalDatabase.instance == null) {
       Log.w(TAG, "SignalDatabase unavailable")
@@ -76,7 +110,7 @@ class AvatarProvider : BaseContentProvider() {
     if (uriMatcher.match(uri) == AVATAR) {
       if (VERBOSE) Log.i(TAG, "Loading avatar.")
       try {
-        val recipient = getRecipientId(uri)?.let { Recipient.resolved(it) } ?: return null
+        val recipient = getRecipientId(uri)?.let { RecipientCreator.forRecord(application, SignalDatabase.recipients.getRecord(it)) } ?: return null
         return getParcelFileDescriptorForAvatar(recipient)
       } catch (ioe: IOException) {
         Log.w(TAG, ioe)
@@ -91,6 +125,8 @@ class AvatarProvider : BaseContentProvider() {
   override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? {
     if (VERBOSE) Log.i(TAG, "query() called: $uri")
 
+    val application = init() ?: return null
+
     if (SignalDatabase.instance == null) {
       Log.w(TAG, "SignalDatabase unavailable")
       return null
@@ -99,8 +135,8 @@ class AvatarProvider : BaseContentProvider() {
     if (uriMatcher.match(uri) == AVATAR) {
       val recipientId = getRecipientId(uri) ?: return null
 
-      if (AvatarHelper.hasAvatar(context!!, recipientId)) {
-        val file: File = AvatarHelper.getAvatarFile(context!!, recipientId)
+      if (AvatarHelper.hasAvatar(application, recipientId)) {
+        val file: File = AvatarHelper.getAvatarFile(application, recipientId)
         if (file.exists()) {
           return createCursor(projection, file.name, file.length())
         }
@@ -114,6 +150,8 @@ class AvatarProvider : BaseContentProvider() {
 
   override fun getType(uri: Uri): String? {
     if (VERBOSE) Log.i(TAG, "getType() called: $uri")
+
+    init() ?: return null
 
     if (SignalDatabase.instance == null) {
       Log.w(TAG, "SignalDatabase unavailable")

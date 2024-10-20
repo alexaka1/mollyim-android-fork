@@ -85,6 +85,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">Gee toegang</string>
     <string name="AttachmentKeyboard_payment">Betaling</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">Bestuur</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">Kies meer foto\'s</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">Gaan na Instellings</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string name="AttachmentKeyboard_signal_has_limited_access">Molly het beperkte toegang tot foto\'s of video\'s</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">Geen foto\'s gevind nie, kies foto\'s en video\'s om hier te verskyn of verander toestemmings</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">Geen foto\'s of video\'s gevind nie. Signal het slegs toegang tot foto\'s en video\'s wat jy gekies het.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">Kan nie \'n program vind om media te kies nie.</string>
@@ -105,7 +119,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">Om foto\'s en video\'s te wys:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string name="AttachmentManager_signal_needs_storage_access">Molly benodig stoorruimtetoegang om jou foto\'s en videos te wys.</string>
+    <string name="AttachmentManager_signal_needs_storage_access">Molly benodig toegang om jou foto\'s en videos te wys.</string>
 
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s het nie Betalings geaktiveer nie </string>
@@ -328,6 +342,8 @@
     <string name="CommunicationActions_invalid_link">Ongeldige skakel</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">Hierdie is nie ’n geldige oproepskakel nie. Maak seker die volledige skakel is heel en korrek voor jy probeer aansluit.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -460,7 +476,7 @@
     <!-- Dialog title asking users for microphone permission -->
     <string name="ConversationActivity_allow_access_microphone">Laat toegang tot jou mikrofoon toe</string>
     <!-- Dialog description that will explain the steps needed to give microphone permissions -->
-    <string name="ConversationActivity_signal_to_send_audio_messages">Om oudioboodskappe te stuur:</string>
+    <string name="ConversationActivity_signal_to_send_audio_messages">Om stemboodskappe te stuur:</string>
     <!-- Alert dialog description asking for microphone permission in order to send voice messages -->
     <string name="ConversationActivity_to_send_voice_messages_allow_signal_access_to_your_microphone">Om stemboodskappe te stuur, laat Molly toegang tot jou mikrofoon toe.</string>
     <!-- Toast text explaining Signal\'s need for microphone access -->
@@ -798,6 +814,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">Rugsteun nou</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">Kan nie media herstel nie</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">Jou toestel het nie genoeg stoorruimte beskikbaar nie. Stel stoorruimte beskikbaar om jou media te herstel.\n\nAs jy \"Slaan herstel oor\" kies, sal die media in jou rugsteun geskrap word die volgende keer wanneer jou toestel \'n nuwe rugsteun voltooi.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">Jou toestel het nie genoeg stoorruimte beskikbaar nie. Stel %1$s stoorruimte beskikbaar om jou media af te laai.\n\nAs jy \"Slaan herstel oor\" kies, sal die media in jou rugsteun geskrap word die volgende keer wanneer jou toestel \'n nuwe rugsteun voltooi.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">Goed</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">Slaan herstel oor</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">Rugsteunfout-ikoon</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">Stel stoorruimte beskikbaar om jou media te herstel.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">Stel %1$s stoorruimte beskikbaar om jou media af te laai.</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">Besig om media te herstel</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%1$s van %2$s (%3$d%%)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">Herstel van media is onderbreek</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">Wag tans vir WiFi…</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">Wag tans vir Internetverbinding…</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">Lae battery. Laai jou toestel.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">Stel %1$s spasie beskikbaar om jou media te herstel.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">Slaan herstel oor</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">Klets-rugsteunkopieë</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">Rugsteune word geënkripteer met \'n wagwoordfrase en op jou toestel gestoor.</string>
@@ -899,9 +950,9 @@
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">Alle boodskappe op gekoppelde toestelle is privaat</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
-    <string name="LinkDeviceFragment__signal_messages_are_synchronized">Molly-boodskappe word gesinchroniseer met Molly op jou selfoon nadat dit gekoppel is. Jou geskiedenis van vorige boodskappe sal nie verskyn nie.</string>
+    <string name="LinkDeviceFragment__signal_messages_are_synchronized">Signal-boodskappe word gesinchroniseer met Signal op jou selfoon nadat dit gekoppel is. Jou geskiedenis van vorige boodskappe sal nie verskyn nie.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string name="LinkDeviceFragment__on_other_device_visit_signal">Op jou ander toestel, besoek %1$s om Molly te installeer</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">Op die toestel wat jy wil koppel, besoek %1$s om Signal te installeer</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string> -->
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">My gekoppelde toestelle</string>
@@ -919,6 +970,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">Geen gekoppelde toestelle nie</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">Ontsluit om \'n toestel te koppel</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">Voordat jy \'n toestel koppel, bevestig dat dit jy is</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">Tik op \"gaan voort\" en ontsluit jou foon om te bevestig. Moenie jou Signal-PIN invoer nie.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">Gaan voort</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1348,7 +1405,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">Groepskakel</string>
     <string name="ShareableGroupLinkDialogFragment__share">Deel</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">Stel skakel terug</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">Keur nuwe lede goed</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">’n Admin moet nuwe lede goedkeur wat d.m.v. die groepskakel aansluit.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">Is jy seker jy wil die groepskakel terugstel? Mense sal nie meer met die huidige skakel by die groep kan aansluit nie.</string>
 
@@ -2046,6 +2103,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">Gaan terug</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">Oproepinligting</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">Jou kamera is af</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">Tik hier om video aan te skakel</string>
     <string name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">Om %1$s te skakel, het Molly toegang tot jou kamera nodig</string>
@@ -2195,6 +2262,8 @@
     <string name="WebRtcCallView__additional_actions">Bykomende aksies</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">Beëindig oproep</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">Groeplui aan/af</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">\'n Gebruikerskoppelvlak-fout het voorgekom. Rapporteer asseblief hierdie fout aan die ontwikkelaars.</string>
@@ -2575,6 +2644,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">Ons sal later weer probeer.</string>
     <string name="ApkUpdateNotifications_auto_update_success_title">Molly suksesvol opgedateer</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">Jy is outomaties na weergawe %1$s opgedateer.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">Stuur boodskap?</string>
@@ -3232,6 +3302,8 @@
     <string name="EditAboutFragment_free_to_chat">Kan nou klets</string>
     <string name="EditAboutFragment_taking_a_break">Ek rus tans</string>
     <string name="EditAboutFragment_working_on_something_new">Werk tans aan iets nuuts</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">Redigeer groep</string>
@@ -3727,6 +3799,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. Tik op \"Instellings\" hier onder</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %1$s Laat die toestemming toe</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. Tik op \"Toestemmings\"</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3. %1$s Laat die \"Foto\'s en video\'s\"-toestemming toe</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">Instellings</string>
 
@@ -4253,6 +4329,8 @@
     <string name="preferences_app_protection__screen_lock">Skermslot</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">Sluit Signal-toegang met Android-skermslot of vingerafdruk</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">Skermslot-onaktiwiteitsluiting</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">Om skermslot te gebruik, stel \'n PIN, patroon of wagwoord op hierdie toestel op.</string>
     <string name="preferences_app_protection__signal_pin">Signal-PIN</string>
     <string name="preferences_app_protection__create_a_pin">Skep ’n PIN</string>
     <string name="preferences_app_protection__change_your_pin">Verander jou PIN</string>
@@ -4273,8 +4351,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">Jy het te veel keer probeer. Probeer later weer.</string>
     <string name="RegistrationActivity_error_connecting_to_service">Kon nie aan die diens koppel nie</string>
     <string name="preferences_chats__backups">Rugsteunkopieë</string>
-    <string name="prompt_passphrase_activity__signal_is_locked">Molly is gesluit</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">TIK OM TE ONTSLUIT</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string name="prompt_passphrase_activity__unlock_signal">Ontsluit Molly</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string name="prompt_passphrase_activity__use_your_android_device">Gebruik jou Android-toestel se sluitinstellings om Molly te ontsluit.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string name="prompt_passphrase_activity__screen_lock_is_on">Skermslot is aan en Molly is behoorlik met jou toestel se sluitinstellings beveilig. Ontsluit Molly op dieselfde manier as wat jy normaalweg jou foon sal ontsluit, byvoorbeeld met Gesigontsluiting, Vingerafdrukontsluiting, \'n PIN, \'n wagwoord of \'n patroon.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">Kontak Steundiens</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">Probeer weer</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">Af</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">Gebruik skermslot</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string name="ScreenLockSettingsFragment__your_android_device">Jou Android-toestel se slotinstellings sal vereis word om Molly te ontsluit wanneer jy toepassings verlaat of verander. Indien dit gesluit is, sal die kennisgewingvoorskou nie die boodskapinhoud wys nie.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">Begin skermslot</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">Onmiddellik</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">Ná 1 minuut</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">Ná 5 minute</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">Ná 30 minute</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">Pasgemaakte tyd</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string name="ScreenLockSettingsFragment__use_signal_screen_lock">Gebruik Molly-skermslot</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string name="ScreenLockSettingsFragment__turn_off_signal_lock">Skakel Molly-skermslot af</string>
+
     <string name="Recipient_unknown">Onbekend</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">Geskrapte rekening</string>
@@ -4901,7 +5012,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">Toetsbord</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">Invoersleutel stuur</string>
+    <string name="ChatsSettingsFragment__send_with_enter">Stuur met Enter-sleutel</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">Boodskappe</string>
@@ -4925,8 +5036,8 @@
     <string name="PrivacySettingsFragment__blocked">Versper</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="one">%1$d kontak</item>
-        <item quantity="other">%1$d kontakte</item>
+        <item quantity="one">%1$d kontak of groep</item>
+        <item quantity="other">%1$d kontakte of groepe</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">Boodskappe</string>
     <string name="PrivacySettingsFragment__disappearing_messages">Verdwynboodskappe</string>
@@ -5131,7 +5242,7 @@
     <string name="PermissionsSettingsFragment__only_admins">Slegs admins</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">Wie kan nuwe lede toevoeg?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">Wie kan hierdie groep se inligting wysig?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">Wie kan boodskappe stuur</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">Wie kan boodskappe stuur en oproepe begin?</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">Demp kennisgewings</string>
@@ -6835,7 +6946,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">Wysig oproepnaam</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">Keur alle lede goed</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">Vereis admin-goedkeuring</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">Deel skakel d.m.v. Signal</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -6891,7 +7002,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">Voeg oproepnaam by</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">Keur alle lede goed</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">Vereis admin-goedkeuring</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">Deel skakel</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -7142,12 +7253,22 @@
     <string name="BackupAlertBottomSheet__download_later">Laai later af</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">Moenie media aflaai nie</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">Media sal geskrap word</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">Die media wat in jou rugsteun gestoor is, sal vandag permanent geskrap word. Hierdie is jou laaste kans om dit af te laai.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">Laai af</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">Moenie aflaai nie</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">Stel %1$s ruimte beskikbaar om jou media af te laai.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">Krediet- of debietkaart</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7184,6 +7305,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">Pas beperkings toe op gekoppelde toestelle</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">Indien geaktiveer, sal kletsgetalbeperkings ook boodskappe op jou gekoppelde toestelle skrap.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">Stoorruimte op toestel</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimaliseer stoorruimte op toestel</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">Ongebruikte media sal afgelaai word, maar kan enige tyd van jou rugsteun af teruggelaai word.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">Gradeer op om hierdie kenmerk te aktiveer</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">Stoorruimte-optimalisering kan slegs gebruik word met die betaalde vlak van Signal-rugsteun. Gradeer jou rugsteunplan op om hierdie kenmerk te begin gebruik.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">Gradeer nou op</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">Skrapping is nou oor al jou toestelle gesinchroniseer</string>
@@ -7229,6 +7364,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">Intekening gekanselleer</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">Aflaai voltooi</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">Rugsteun sal oornag geskep word.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">Rugsteuntipe</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7270,12 +7407,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">Voer asseblief jou toestel se pin, wagwoord of patroon in.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">Betaal %1$s/maand aan Signal</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">Jy kry die volgende:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">Rugsteun jou boodskappe en media met gebruik van Signal se veilige, end-tot-end-geënkripteerde stoorruimtediens. Moet nooit \'n boodskap verloor wanneer jy \'n nuwe foon kry of Signal herinstalleer nie.</string>
@@ -7290,27 +7421,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">Vind meer uit</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">Voer jou PIN in</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">Voer jou Signal-PIN in om rugsteun te aktiveer</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">Volgende</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">Verander sleutelbord</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">PIN\'s beskerm jou rugsteun</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">Jou Signal-PIN maak dit vir jou moontlik om jou rugsteun te herwin wanneer jy Signal herinstalleer. Ons beveel aan dat \'n PIN van minstens %1$d syfers gebruik word.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">As jy jou PIN vergeet, sal jy nie jou rugsteun kan herwin nie. Jy kan jou PIN te eniger tyd in instellings verander.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">Gebruik huidige Signal-PIN</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">Skep nuwe PIN</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7325,6 +7464,30 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">Verander rugsteuntipe</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">Kanselleer Intekening</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">Gratis</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s/maand</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">Teks + al jou media</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="one">Teks + %1$d dag se media</item>
+        <item quantity="other">Teks + %1$d dae se media</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">Volledige teksboodskap-rugsteun</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">Volledige mediarugsteun</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">%1$s stoorruimte (%2$s foto\'s)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">Dankie vir jou ondersteuning van Signal!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="one">Laaste %1$d dag se media</item>
+        <item quantity="other">Laaste %1$d dae se media</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7337,5 +7500,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">Bevestig en laai later af</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">Behou intekening</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">Herinnering-ikoon</string>
     <!-- EOF -->
 </resources>

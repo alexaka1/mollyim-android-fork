@@ -152,7 +152,7 @@ class FastJobStorage(private val jobDatabase: JobDatabase) : JobStorage {
   override fun getJobsInQueue(queue: String): List<JobSpec> {
     return minimalJobs
       .filter { it.queueKey == queue }
-      .map { it.toJobSpec() }
+      .mapNotNull { it.toJobSpec() }
   }
 
   @Synchronized
@@ -200,12 +200,14 @@ class FastJobStorage(private val jobDatabase: JobDatabase) : JobStorage {
     if (job == null || !job.isMemoryOnly) {
       jobDatabase.updateJobAfterRetry(id, currentTime, runAttempt, nextBackoffInterval, serializedData)
 
-      // Note: All other fields are accounted for in the min spec. We only need to update from disk if serialized data changes.
+      // Note: Serialized data and run attempt are the only JobSpec-specific fields that need to be updated -- the rest are in MinimalJobSpec and will be
+      //       updated below.
       val cached = jobSpecCache[id]
-      if (cached != null && !cached.serializedData.contentEquals(serializedData)) {
-        jobDatabase.getJobSpec(id)?.let {
-          jobSpecCache[id] = it
-        }
+      if (cached != null) {
+        jobSpecCache[id] = cached.copy(
+          serializedData = serializedData,
+          runAttempt = runAttempt
+        )
       }
     }
 
@@ -289,19 +291,17 @@ class FastJobStorage(private val jobDatabase: JobDatabase) : JobStorage {
 
   @Synchronized
   override fun deleteJobs(ids: List<String>) {
-    val jobsToDelete: Set<JobSpec> = ids
-      .mapNotNull { getJobSpec(it) }
+    val jobsToDelete: Set<MinimalJobSpec> = ids
+      .mapNotNull { id ->
+        minimalJobs.firstOrNull { it.id == id }
+      }
       .toSet()
 
     val durableJobIdsToDelete: List<String> = jobsToDelete
       .filterNot { it.isMemoryOnly }
       .map { it.id }
 
-    val minimalJobsToDelete: Set<MinimalJobSpec> = jobsToDelete
-      .map { it.toMinimalJobSpec() }
-      .toSet()
-
-    val affectedQueues: Set<String> = minimalJobsToDelete.mapNotNull { it.queueKey }.toSet()
+    val affectedQueues: Set<String> = jobsToDelete.mapNotNull { it.queueKey }.toSet()
 
     if (durableJobIdsToDelete.isNotEmpty()) {
       jobDatabase.deleteJobs(durableJobIdsToDelete)
@@ -310,8 +310,8 @@ class FastJobStorage(private val jobDatabase: JobDatabase) : JobStorage {
     val deleteIds: Set<String> = ids.toSet()
     minimalJobs.removeIf { deleteIds.contains(it.id) }
     jobSpecCache.keys.removeAll(deleteIds)
-    eligibleJobs.removeAll(minimalJobsToDelete)
-    migrationJobs.removeAll(minimalJobsToDelete)
+    eligibleJobs.removeIf { deleteIds.contains(it.id) }
+    migrationJobs.removeIf { deleteIds.contains(it.id) }
 
     mostEligibleJobForQueue.keys.removeAll(affectedQueues)
 
@@ -422,7 +422,7 @@ class FastJobStorage(private val jobDatabase: JobDatabase) : JobStorage {
         // We only want a single job from each queue. It should be the oldest job with the highest priority.
         if (job.priority > existingJobInQueue.priority || (job.priority == existingJobInQueue.priority && job.createTime < existingJobInQueue.createTime)) {
           mostEligibleJobForQueue[job.queueKey] = job
-          eligibleJobs.remove(existingJobInQueue)
+          eligibleJobs.removeIf { it.id == existingJobInQueue.id }
         } else {
           // There's a more eligible job in the queue already, so no need to put it in the eligible list
           jobToPlace = null
@@ -453,10 +453,10 @@ class FastJobStorage(private val jobDatabase: JobDatabase) : JobStorage {
     }
 
     if (updated.queueKey == Job.Parameters.MIGRATION_QUEUE_KEY) {
-      migrationJobs.remove(current)
+      migrationJobs.removeIf { it.id == current.id }
       migrationJobs += updated
     } else {
-      eligibleJobs.remove(current)
+      eligibleJobs.removeIf { current.id == it.id }
       current.queueKey?.let { queueKey ->
         if (mostEligibleJobForQueue[queueKey] == current) {
           mostEligibleJobForQueue.remove(queueKey)
@@ -514,9 +514,9 @@ class FastJobStorage(private val jobDatabase: JobDatabase) : JobStorage {
    * Converts a [MinimalJobSpec] to a [JobSpec]. We prefer using the cache, but if it's not found, we'll hit the database.
    * We consider this a "recent access" and will cache it for future use.
    */
-  private fun MinimalJobSpec.toJobSpec(): JobSpec {
+  private fun MinimalJobSpec.toJobSpec(): JobSpec? {
     return jobSpecCache.getOrPut(this.id) {
-      jobDatabase.getJobSpec(this.id) ?: throw IllegalArgumentException("JobSpec not found for id: $id")
+      jobDatabase.getJobSpec(this.id) ?: return null
     }
   }
 

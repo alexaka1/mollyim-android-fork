@@ -48,7 +48,7 @@ class InAppPaymentRecurringContextJob private constructor(
 
     const val KEY = "InAppPurchaseRecurringContextJob"
 
-    private fun create(inAppPayment: InAppPaymentTable.InAppPayment): Job {
+    fun create(inAppPayment: InAppPaymentTable.InAppPayment): Job {
       return InAppPaymentRecurringContextJob(
         inAppPaymentId = inAppPayment.id,
         parameters = Parameters.Builder()
@@ -60,6 +60,10 @@ class InAppPaymentRecurringContextJob private constructor(
       )
     }
 
+    /**
+     * Creates a job chain using data from the given InAppPayment. This object is passed by ID to the job,
+     * meaning the job will always load the freshest data it can about the payment.
+     */
     fun createJobChain(inAppPayment: InAppPaymentTable.InAppPayment, makePrimary: Boolean = false): Chain {
       return AppDependencies.jobManager
         .startChain(create(inAppPayment))
@@ -238,8 +242,8 @@ class InAppPaymentRecurringContextJob private constructor(
         warning("Charge failure detected on active subscription: ${chargeFailure.code}: ${chargeFailure.message}")
       }
 
-      if (inAppPayment.data.redemption!!.keepAlive == true) {
-        warning("Payment failure during keep-alive, allow keep-alive to retry later.")
+      if (inAppPayment.data.redemption!!.keepAlive == true && !subscription.isCanceled) {
+        warning("Payment failure for uncanceled subscription during keep-alive, allow keep-alive to retry later.")
 
         SignalDatabase.inAppPayments.update(
           inAppPayment.copy(
@@ -247,7 +251,7 @@ class InAppPaymentRecurringContextJob private constructor(
             data = inAppPayment.data.copy(
               error = InAppPaymentData.Error(
                 type = InAppPaymentData.Error.Type.PAYMENT_PROCESSING,
-                data_ = "keep-alive"
+                data_ = InAppPaymentKeepAliveJob.KEEP_ALIVE
               )
             )
           )

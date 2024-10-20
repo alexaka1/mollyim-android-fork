@@ -6,7 +6,6 @@
 package org.whispersystems.signalservice.api;
 
 import org.signal.core.util.Base64;
-import org.signal.libsignal.metadata.certificate.SenderCertificate;
 import org.signal.libsignal.protocol.IdentityKey;
 import org.signal.libsignal.protocol.IdentityKeyPair;
 import org.signal.libsignal.protocol.InvalidKeyException;
@@ -24,6 +23,7 @@ import org.signal.libsignal.protocol.state.SessionRecord;
 import org.signal.libsignal.protocol.util.Pair;
 import org.signal.libsignal.zkgroup.groupsend.GroupSendFullToken;
 import org.signal.libsignal.zkgroup.profiles.ClientZkProfileOperations;
+import org.whispersystems.signalservice.api.attachment.AttachmentApi;
 import org.whispersystems.signalservice.api.crypto.AttachmentCipherStreamUtil;
 import org.whispersystems.signalservice.api.crypto.ContentHint;
 import org.whispersystems.signalservice.api.crypto.EnvelopeContent;
@@ -72,7 +72,6 @@ import org.whispersystems.signalservice.api.push.ServiceId;
 import org.whispersystems.signalservice.api.push.ServiceId.PNI;
 import org.whispersystems.signalservice.api.push.SignalServiceAddress;
 import org.whispersystems.signalservice.api.push.exceptions.AuthorizationFailedException;
-import org.whispersystems.signalservice.api.push.exceptions.MalformedResponseException;
 import org.whispersystems.signalservice.api.push.exceptions.NonSuccessfulResponseCodeException;
 import org.whispersystems.signalservice.api.push.exceptions.NotFoundException;
 import org.whispersystems.signalservice.api.push.exceptions.ProofRequiredException;
@@ -95,7 +94,6 @@ import org.whispersystems.signalservice.internal.crypto.AttachmentDigest;
 import org.whispersystems.signalservice.internal.crypto.PaddingInputStream;
 import org.whispersystems.signalservice.internal.push.AttachmentPointer;
 import org.whispersystems.signalservice.internal.push.AttachmentUploadForm;
-import org.whispersystems.signalservice.internal.push.AttachmentV2UploadAttributes;
 import org.whispersystems.signalservice.internal.push.BodyRange;
 import org.whispersystems.signalservice.internal.push.CallMessage;
 import org.whispersystems.signalservice.internal.push.Content;
@@ -173,6 +171,7 @@ public class SignalServiceMessageSender {
   private static final int RETRY_COUNT = 4;
 
   private final PushServiceSocket             socket;
+  private final SignalWebSocket               webSocket;
   private final SignalServiceAccountDataStore aciStore;
   private final SignalSessionLock             sessionLock;
   private final SignalServiceAddress          localAddress;
@@ -188,19 +187,18 @@ public class SignalServiceMessageSender {
   private final Scheduler       scheduler;
   private final long            maxEnvelopeSize;
 
-  public SignalServiceMessageSender(SignalServiceConfiguration urls,
-                                    CredentialsProvider credentialsProvider,
+  public SignalServiceMessageSender(PushServiceSocket pushServiceSocket,
                                     SignalServiceDataStore store,
                                     SignalSessionLock sessionLock,
-                                    String signalAgent,
                                     SignalWebSocket signalWebSocket,
                                     Optional<EventListener> eventListener,
-                                    ClientZkProfileOperations clientZkProfileOperations,
                                     ExecutorService executor,
-                                    long maxEnvelopeSize,
-                                    boolean automaticNetworkRetry)
+                                    long maxEnvelopeSize)
   {
-    this.socket            = new PushServiceSocket(urls, credentialsProvider, signalAgent, clientZkProfileOperations, automaticNetworkRetry);
+    CredentialsProvider credentialsProvider = pushServiceSocket.getCredentialsProvider();
+
+    this.socket            = pushServiceSocket;
+    this.webSocket         = signalWebSocket;
     this.aciStore          = store.aci();
     this.sessionLock       = sessionLock;
     this.localAddress      = new SignalServiceAddress(credentialsProvider.getAci(), credentialsProvider.getE164());
@@ -802,8 +800,8 @@ public class SignalServiceMessageSender {
   }
 
   public SignalServiceAttachmentPointer uploadAttachment(SignalServiceAttachmentStream attachment) throws IOException {
-    byte[]             attachmentKey    = attachment.getResumableUploadSpec().map(ResumableUploadSpec::getSecretKey).orElseGet(() -> Util.getSecretBytes(64));
-    byte[]             attachmentIV     = attachment.getResumableUploadSpec().map(ResumableUploadSpec::getIV).orElseGet(() -> Util.getSecretBytes(16));
+    byte[]             attachmentKey    = attachment.getResumableUploadSpec().map(ResumableUploadSpec::getAttachmentKey).orElseGet(() -> Util.getSecretBytes(64));
+    byte[]             attachmentIV     = attachment.getResumableUploadSpec().map(ResumableUploadSpec::getAttachmentIv).orElseGet(() -> Util.getSecretBytes(16));
     long               paddedLength     = PaddingInputStream.getPaddedSize(attachment.getLength());
     InputStream        dataStream       = new PaddingInputStream(attachment.getInputStream(), attachment.getLength());
     long               ciphertextLength = AttachmentCipherStreamUtil.getCiphertextLength(paddedLength);
@@ -814,7 +812,7 @@ public class SignalServiceMessageSender {
                                                                  new AttachmentCipherOutputStreamFactory(attachmentKey, attachmentIV),
                                                                  attachment.getListener(),
                                                                  attachment.getCancelationSignal(),
-                                                                 attachment.getResumableUploadSpec().orElse(null));
+                                                                 attachment.getResumableUploadSpec().get());
 
     if (attachment.getResumableUploadSpec().isEmpty()) {
       throw new IllegalStateException("Attachment must have a resumable upload spec.");
@@ -1062,6 +1060,7 @@ public class SignalServiceMessageSender {
     if (message.getExpiresInSeconds() > 0) {
       builder.expireTimer(message.getExpiresInSeconds());
     }
+    builder.expireTimerVersion(message.getExpireTimerVersion());
 
     if (message.getProfileKey().isPresent()) {
       builder.profileKey(ByteString.of(message.getProfileKey().get()));
@@ -2258,32 +2257,46 @@ public class SignalServiceMessageSender {
 
       return Single.error(t);
     }).onErrorResumeNext(t -> {
-      if (t instanceof UntrustedIdentityException) {
-        Log.w(TAG, "[" + timestamp + "] Hit identity mismatch: " + recipient.getIdentifier(), t);
-        return Single.just(SendMessageResult.identityFailure(recipient, ((UntrustedIdentityException) t).getIdentityKey()));
-      } else if (t instanceof UnregisteredUserException) {
-        Log.w(TAG, "[" + timestamp + "] Hit unregistered user: " + recipient.getIdentifier());
-        return Single.just(SendMessageResult.unregisteredFailure(recipient));
-      } else if (t instanceof PushNetworkException) {
-        Log.w(TAG, "[" + timestamp + "] Hit network failure: " + recipient.getIdentifier(), t);
-        return Single.just(SendMessageResult.networkFailure(recipient));
-      } else if (t instanceof ServerRejectedException) {
-        Log.w(TAG, "[" + timestamp + "] Hit server rejection: " + recipient.getIdentifier(), t);
-        return Single.error(t);
-      } else if (t instanceof ProofRequiredException) {
-        Log.w(TAG, "[" + timestamp + "] Hit proof required: " + recipient.getIdentifier(), t);
-        return Single.just(SendMessageResult.proofRequiredFailure(recipient, (ProofRequiredException) t));
-      } else if (t instanceof RateLimitException) {
-        Log.w(TAG, "[" + timestamp + "] Hit rate limit: " + recipient.getIdentifier(), t);
-        return Single.just(SendMessageResult.rateLimitFailure(recipient, (RateLimitException) t));
-      } else if (t instanceof InvalidPreKeyException) {
-        Log.w(TAG, "[" + timestamp + "] Hit invalid prekey: " + recipient.getIdentifier(), t);
-        return Single.just(SendMessageResult.invalidPreKeyFailure(recipient));
-      } else {
-        Log.w(TAG, "[" + timestamp + "] Hit unknown exception: " + recipient.getIdentifier(), t);
-        return Single.error(new IOException(t));
+      try {
+        SendMessageResult result = mapSendErrorToSendResult(t, timestamp, recipient);
+        return Single.just(result);
+      } catch (IOException e) {
+        return Single.error(e);
       }
     });
+  }
+
+  /**
+   * Converts common exceptions thrown during message sending to the appropriate {@link SendMessageResult}.
+   * <p>
+   * Exceptions that cannot be mapped will be rethrown as wrapped {@link IOException}s.
+   */
+  public static @Nonnull SendMessageResult mapSendErrorToSendResult(@Nonnull Throwable t, long timestamp, @Nonnull SignalServiceAddress recipient) throws IOException {
+    if (t instanceof UntrustedIdentityException) {
+      Log.w(TAG, "[" + timestamp + "] Hit identity mismatch: " + recipient.getIdentifier(), t);
+      return SendMessageResult.identityFailure(recipient, ((UntrustedIdentityException) t).getIdentityKey());
+    } else if (t instanceof UnregisteredUserException) {
+      Log.w(TAG, "[" + timestamp + "] Hit unregistered user: " + recipient.getIdentifier());
+      return SendMessageResult.unregisteredFailure(recipient);
+    } else if (t instanceof PushNetworkException) {
+      Log.w(TAG, "[" + timestamp + "] Hit network failure: " + recipient.getIdentifier(), t);
+      return SendMessageResult.networkFailure(recipient);
+    } else if (t instanceof ServerRejectedException) {
+      Log.w(TAG, "[" + timestamp + "] Hit server rejection: " + recipient.getIdentifier(), t);
+      throw (ServerRejectedException) t;
+    } else if (t instanceof ProofRequiredException) {
+      Log.w(TAG, "[" + timestamp + "] Hit proof required: " + recipient.getIdentifier(), t);
+      return SendMessageResult.proofRequiredFailure(recipient, (ProofRequiredException) t);
+    } else if (t instanceof RateLimitException) {
+      Log.w(TAG, "[" + timestamp + "] Hit rate limit: " + recipient.getIdentifier(), t);
+      return SendMessageResult.rateLimitFailure(recipient, (RateLimitException) t);
+    } else if (t instanceof InvalidPreKeyException) {
+      Log.w(TAG, "[" + timestamp + "] Hit invalid prekey: " + recipient.getIdentifier(), t);
+      return SendMessageResult.invalidPreKeyFailure(recipient);
+    } else {
+      Log.w(TAG, "[" + timestamp + "] Hit unknown exception: " + recipient.getIdentifier(), t);
+      throw new IOException(t);
+    }
   }
 
   /**

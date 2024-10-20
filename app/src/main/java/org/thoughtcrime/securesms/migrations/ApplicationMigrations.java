@@ -12,7 +12,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.jobmanager.JobManager;
-import org.thoughtcrime.securesms.jobmanager.migrations.RetrieveProfileJobMigration;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.stickers.BlessedPacks;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
@@ -139,9 +138,17 @@ public class ApplicationMigrations {
     static final int SUBSCRIBER_ID                 = 105;
     static final int CONTACT_LINK_REBUILD          = 106;
     static final int DELETE_SYNC_CAPABILITY        = 107;
+    static final int REBUILD_MESSAGE_FTS_INDEX_5   = 108;
+    static final int EXPIRE_TIMER_CAPABILITY       = 109;
+    static final int REBUILD_MESSAGE_FTS_INDEX_6   = 110;
+    static final int EXPIRE_TIMER_CAPABILITY_2     = 111;
+//    static final int BACKFILL_DIGESTS              = 112;
+    static final int BACKFILL_DIGESTS_V2           = 113;
+    static final int CALL_LINK_STORAGE_SYNC        = 114;
+    static final int WALLPAPER_MIGRATION           = 115;
   }
 
-  public static final int CURRENT_VERSION = 107;
+  public static final int CURRENT_VERSION = 115;
 
  /**
    * This *must* be called after the {@link JobManager} has been instantiated, but *before* the call
@@ -622,6 +629,34 @@ public class ApplicationMigrations {
 
     if (lastSeenVersion < Version.DELETE_SYNC_CAPABILITY) {
       jobs.put(Version.DELETE_SYNC_CAPABILITY, new AttributesMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.REBUILD_MESSAGE_FTS_INDEX_5) {
+      jobs.put(Version.REBUILD_MESSAGE_FTS_INDEX_5, new RebuildMessageSearchIndexMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.EXPIRE_TIMER_CAPABILITY) {
+      jobs.put(Version.EXPIRE_TIMER_CAPABILITY, new AttributesMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.REBUILD_MESSAGE_FTS_INDEX_6) {
+      jobs.put(Version.REBUILD_MESSAGE_FTS_INDEX_6, new RebuildMessageSearchIndexMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.EXPIRE_TIMER_CAPABILITY_2) {
+      jobs.put(Version.EXPIRE_TIMER_CAPABILITY_2, new AttributesMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.BACKFILL_DIGESTS_V2) {
+      jobs.put(Version.BACKFILL_DIGESTS_V2, new BackfillDigestsMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.CALL_LINK_STORAGE_SYNC) {
+      jobs.put(Version.CALL_LINK_STORAGE_SYNC, new SyncCallLinksMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.WALLPAPER_MIGRATION) {
+      jobs.put(Version.WALLPAPER_MIGRATION, new WallpaperStorageMigrationJob());
     }
 
     return jobs;

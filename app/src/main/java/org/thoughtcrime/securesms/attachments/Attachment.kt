@@ -23,7 +23,7 @@ import java.util.UUID
  */
 abstract class Attachment(
   @JvmField
-  val contentType: String,
+  val contentType: String?,
   @JvmField
   val transferState: Int,
   @JvmField
@@ -36,6 +36,8 @@ abstract class Attachment(
   val remoteLocation: String?,
   @JvmField
   val remoteKey: String?,
+  @JvmField
+  val remoteIv: ByteArray?,
   @JvmField
   val remoteDigest: ByteArray?,
   @JvmField
@@ -86,6 +88,7 @@ abstract class Attachment(
     cdn = Cdn.deserialize(parcel.readInt()),
     remoteLocation = parcel.readString(),
     remoteKey = parcel.readString(),
+    remoteIv = ParcelUtil.readByteArray(parcel),
     remoteDigest = ParcelUtil.readByteArray(parcel),
     incrementalDigest = ParcelUtil.readByteArray(parcel),
     fastPreflightId = parcel.readString(),

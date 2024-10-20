@@ -85,6 +85,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">அணுகலை அனுமதிக்கவும்</string>
     <string name="AttachmentKeyboard_payment">கட்டணம்</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">நிர்வகி</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">மேலும் புகைப்படங்களைத் தேர்வுசெய்க</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">அமைப்புகளுக்குச் செல்லவும்</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string name="AttachmentKeyboard_signal_has_limited_access">புகைப்படங்கள் அல்லது வீடியோக்களுக்கு வரையறுக்கப்பட்ட அணுகலை சிக்னல் கொண்டுள்ளது</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">எந்தப் புகைப்படங்களும் இல்லை, இங்கே தோன்றச் செய்ய புகைப்படங்கள் மற்றும் வீடியோக்களைத் தேர்வு செய்யவும் அல்லது அனுமதிகளை மாற்றவும்</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">புகைப்படங்கள் அல்லது வீடியோக்கள் எதுவும் இல்லை. நீங்கள் தேர்ந்தெடுத்த புகைப்படங்கள் மற்றும் வீடியோக்களுக்கான அணுகலை மட்டும் சிக்னல் கொண்டுள்ளது.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">மீடியாவை தேர்வுசெய்யும் ஒரு பயன்பாட்டை கண்டுபிடிக்க முடியவில்லை.</string>
@@ -105,7 +119,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">புகைப்படங்களையும் வீடியோக்களையும் காட்ட:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string name="AttachmentManager_signal_needs_storage_access">உங்கள் படங்களையும் வீடியோக்களையும் காட்ட சிக்னலுக்கு சேமிப்பக அணுகல் தேவை.</string>
+    <string name="AttachmentManager_signal_needs_storage_access">உங்கள் புகைப்படங்கள் மற்றும் வீடியோக்களைக் காண்பிக்க சிக்னலுக்கு அணுகல் தேவை.</string>
 
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s கட்டணங்களைச் செயல்படுத்தவில்லை </string>
@@ -328,6 +342,8 @@
     <string name="CommunicationActions_invalid_link">தவறானது இணைப்பு</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">இது சரியான அழைப்பு இணைப்பு அல்ல. சேர முயலும் முன் முழு இணைப்பும் அப்படியே உள்ளதா என்றும் சரியானதா என்றும் உறுதி செய்து கொள்ளவும்.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -460,7 +476,7 @@
     <!-- Dialog title asking users for microphone permission -->
     <string name="ConversationActivity_allow_access_microphone">உங்கள் மைக்ரோஃபோனை அணுக அனுமதிக்கவும்</string>
     <!-- Dialog description that will explain the steps needed to give microphone permissions -->
-    <string name="ConversationActivity_signal_to_send_audio_messages">ஆடியோ மெசேஜ்களை அனுப்ப:</string>
+    <string name="ConversationActivity_signal_to_send_audio_messages">வாய்ஸ் மெசேஜ்களை அனுப்ப:</string>
     <!-- Alert dialog description asking for microphone permission in order to send voice messages -->
     <string name="ConversationActivity_to_send_voice_messages_allow_signal_access_to_your_microphone">வாய்ஸ் மெசேஜ்களை அனுப்ப, உங்கள் மைக்ரோஃபோனை அணுக சிக்னலை அனுமதிக்கவும்.</string>
     <!-- Toast text explaining Signal\'s need for microphone access -->
@@ -798,6 +814,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">இப்பொழது பாதுகாப்பிற்காக சேமித்து வை காப்புப்பதிவு பயனர் தரவு</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">மீடியாவை மீட்டமைக்க முடியவில்லை</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">உங்கள் சாதனத்தில் போதுமான இடம் இல்லை. உங்கள் மீடியாவை மீட்டமைக்க சேமிப்பிடத்தைக் காலியாக்கவும்.\n\n“மீட்டமைப்பதைத் தவிர்” என்பதை நீங்கள் தேர்வு செய்தால், அடுத்த முறை உங்கள் டிவைஸ் புதிய காப்புப்பிரதியை முடிக்கும்போது, உங்கள் பழைய காப்புப்பிரதியில் உள்ள மீடியா அழிக்கப்படும்.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">உங்கள் டிவைஸில் போதுமான இடம் இல்லை. உங்கள் மீடியாவை மீட்டமைக்க %1$s இடத்தைக் காலியக்கவும்.\n\n“மீட்டமைப்பதைத் தவிர்” என்பதை நீங்கள் தேர்வு செய்தால், அடுத்த முறை உங்கள் டிவைஸ் புதிய காப்புப்பிரதியை முடிக்கும்போது, உங்கள் பழைய காப்புப்பிரதியில் உள்ள மீடியா அழிக்கப்படும்.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">சரி</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">மீட்டமைப்பதைத் தவிர்</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">காப்புப்பிரதியில் பிழை ஐகான்</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">உங்கள் மீடியாவை மீட்டமைக்க சேமிப்பிடத்தைக் காலியக்கவும்.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">உங்கள் மீடியாவை மீட்டமைக்க %1$s இடத்தைக் காலியக்கவும்.</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">மீடியாவை மீட்டமைக்கிறது</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%2$s இல் %1$s (%3$d%%)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">மீடியாவை மீட்டமைப்பது இடைநிறுத்தப்பட்டது</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">வை-ஃபைக்காக காத்திருக்கிறது…</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">இணைய இணைப்பிற்காக காத்திருக்கிறது…</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">குறைவான பேட்டரி. உங்கள் டிவைஸை சார்ஜ் செய்யவும்.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">மீடியாவை மீட்டமைக்க %1$s இடத்தைக் காலியாக்கவும்.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">மீட்டமைப்பதைத் தவிர்</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">சாட் காப்புப்பிரதிகள்</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">காப்புப்பிரதிகள் கடவுத்தொடருடன் குறியாக்கம் செய்யப்பட்டு உங்கள் சாதனத்தில் சேமிக்கப்படும்.</string>
@@ -901,7 +952,7 @@
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
     <string name="LinkDeviceFragment__signal_messages_are_synchronized">இணைக்கப்பட்ட பிறகு, சிக்னல் மெசேஜ்கள் உங்கள் மொபைல் ஃபோனில் சிக்னலுடன் ஒத்திசைக்கப்படும். உங்களின் பழைய மெசேஜ் பற்றிய வரலாறு தோன்றாது.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string name="LinkDeviceFragment__on_other_device_visit_signal">உங்கள் சாதனத்தில், சிக்னலை பதிவிறக்கிட %1$s-ஐப் பார்வையிடவும்</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">நீங்கள் இணைக்க விரும்பும் டிவைஸில், சிக்னலை நிறுவ %1$s-ஐப் பார்வையிடவும்</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string> -->
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">எனது இணைக்கப்பட்ட சாதனங்கள்</string>
@@ -919,6 +970,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">இணைக்கப்பட்ட சாதனங்கள் இல்லை</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">இணைக்கப்பட்ட சாதனத்தைத் தடைநீக்குதல்</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">இணைப்பதற்கு முன், இது நீங்கள் தான் என்பதை உறுதிப்படுத்தவும்</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">தொடர்க என்பதை அழுத்தி, உங்கள் மொபைலின் பூட்டை உள்ளிட்டு உறுதிப்படுத்தவும். உங்கள் சிக்னல் பின்-ஐ உள்ளிட வேண்டாம்.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">தொடர்க</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1348,7 +1405,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">குழு இணைப்பு</string>
     <string name="ShareableGroupLinkDialogFragment__share">பகிர்</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">இணைப்பை மீட்டமைக்கவும்</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">புதிய உறுப்பினர்களை அங்கீகரிக்கவும்</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">குழு இணைப்பு வழியாக குழுவில் சேர விரும்பும் புதிய உறுப்பினர்களுக்கு நிர்வாகி ஒப்புதல் தேவை.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">குழு இணைப்பை மீட்டமைக்க விரும்புகிறீர்களா? தற்போதைய இணைப்பைப் பயன்படுத்தி மக்கள் இனி குழுவில் சேர முடியாது.</string>
 
@@ -2046,6 +2103,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">திரும்பிச் செல்லுங்கள்</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">அழைப்புத் தகவல்</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">உங்கள் புகைப்பட கருவி அணைக்கப்பட்டுள்ளது</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">உங்கள் வீடியோவை இயக்க இங்கே தட்டவும்</string>
     <string name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">%1$s ஐ அழைக்க, சிக்னலுக்கு உங்கள் கேமரா அனுமதி தேவை Molly Camera permission</string>
@@ -2195,6 +2262,8 @@
     <string name="WebRtcCallView__additional_actions">கூடுதல் நடவடிக்கைகள்</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">அழைப்பை முடி</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">குழு ரிங்கிங்கை நிலைமாற்று</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">UI பிழை ஏற்பட்டது. டெவலப்பர்களிடம் இந்தப் பிழையைப் புகாரளிக்கவும்.</string>
@@ -2575,6 +2644,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">பின்னர் மீண்டும் முயல்வோம்.</string>
     <string name="ApkUpdateNotifications_auto_update_success_title">Molly வெற்றிகரமாக புதுப்பிக்கப்பட்டது</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">நீங்கள் தானாகவே பதிப்பு %1$sக்குப் புதுப்பிக்கப்பட்டீர்கள்.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">செய்தி அனுப்ப?</string>
@@ -3232,6 +3302,8 @@
     <string name="EditAboutFragment_free_to_chat">சாட் செய்ய நேரம் இருக்கிறது</string>
     <string name="EditAboutFragment_taking_a_break">ஓய்வெடுத்து கொண்டிருக்கிறேன்</string>
     <string name="EditAboutFragment_working_on_something_new">ஒரு புதிய விஷயத்தில் ஈடுபட்டுள்ளேன்</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">குழுவைத் திருத்து</string>
@@ -3727,6 +3799,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. கீழே உள்ள \"அமைப்புகள்\" என்பதை அழுத்தவும்</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %1$s அனுமதி வழங்கு</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. \"அனுமதிகள்\" என்பதை அழுத்து</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3.\"புகைப்படங்கள் மற்றும் வீடியோக்கள்\" அனுமதியை %1$s-க்கு வழங்கு</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">அமைப்புகள்</string>
 
@@ -4253,6 +4329,8 @@
     <string name="preferences_app_protection__screen_lock">திரை பூட்டு</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">அண்ட்ராய்டு திரை பூட்டு அல்லது கைரேகையுடன் Signal அணுகலைப் பூட்டு</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">திரை பூட்டு செயலற்ற நேரம் முடிந்தது</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">இந்தச் டிவைஸில் திரைப் பூட்டைப் பயன்படுத்த, பின், வடிவம் அல்லது கடவுச்சொல்லை அமைக்கவும்.</string>
     <string name="preferences_app_protection__signal_pin">Signal பின்</string>
     <string name="preferences_app_protection__create_a_pin">பின்னை உருவாக்கவும்</string>
     <string name="preferences_app_protection__change_your_pin">உங்கள் பின்னை மாற்றவும்</string>
@@ -4273,8 +4351,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">நீங்கள் பல முயற்சிகள் செய்துள்ளீர்கள். சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.</string>
     <string name="RegistrationActivity_error_connecting_to_service">சேவைக்கு இணைப்பதில் பிழை</string>
     <string name="preferences_chats__backups">காப்புப் பிரதிகள்</string>
-    <string name="prompt_passphrase_activity__signal_is_locked">Molly பூட்டப்பட்டுள்ளது</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">திறக்க தட்டவும்</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string name="prompt_passphrase_activity__unlock_signal">சிக்னலைத் திற</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string name="prompt_passphrase_activity__use_your_android_device">சிக்னலைத திறக்க உங்கள் ஆண்ட்ராய்டு டிவைஸ் பூட்டு அமைப்புகளைப் பயன்படுத்தவும்.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string name="prompt_passphrase_activity__screen_lock_is_on">திரைப் பூட்டு இயக்கத்தில் உள்ளது மற்றும் உங்கள் டிவைஸ் பூட்டு அமைப்புகளுடன் சிக்னல் பாதுகாப்பாக உள்ளது. நீங்கள் வழக்கமாக உங்கள் ஃபோனைத் திறப்பது போலவே சிக்னலையும் அன்லாக் செய்யவும், இது முகம் கண்டறிதல், கைரேகை மூலம் திறத்தல், பின், கடவுச்சொல் அல்லது வடிவத்தைக் கொண்டு இருக்கலாம்.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">ஆதரவைத் தொடர்பு கொள்க</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">மீண்டும் முயற்சிக்கவும்</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">ஆஃப்</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">திரைப் பூட்டைப் பயன்படுத்தவும்</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string name="ScreenLockSettingsFragment__your_android_device">நீங்கள் வெளியேறும்போது அல்லது செயலிகளை மாற்றும்போது சிக்னலைத் திறக்க உங்கள் ஆண்ட்ராய்டு டிவைஸ் பூட்டு அமைப்புகள் தேவைப்படும். பூட்டப்பட்டிருக்கும்போது, அறிவிப்பு முன்னோட்டங்கள் மெசேஜ் உள்ளடக்கத்தைக் காட்டாது.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">திரைப் பூட்டைத் துவங்கு</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">உடனடியாக</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">1 நிமிடத்திற்குப் பின்</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">5 நிமிடங்களுக்குப் பின்</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">30 நிமிடங்களுக்குப் பின்</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">விருப்ப நேரம்</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string name="ScreenLockSettingsFragment__use_signal_screen_lock">சிக்னல் திரைப் பூட்டைப் பயன்படுத்துக</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string name="ScreenLockSettingsFragment__turn_off_signal_lock">சிக்னல் திரைப் பூட்டை ஆஃப் செய்</string>
+
     <string name="Recipient_unknown">தெரியாத</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">அழிக்கப்பட்ட கணக்கு</string>
@@ -4901,7 +5012,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">விசைப்பலகை</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">பதிவு விசை அனுப்பும்</string>
+    <string name="ChatsSettingsFragment__send_with_enter">உள்ளிடுக மூலம் அனுப்புக</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">செய்திகள்</string>
@@ -4925,8 +5036,8 @@
     <string name="PrivacySettingsFragment__blocked">தடைசெய்யப்பட்டார்</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="one">%1$d தொடர்பு</item>
-        <item quantity="other">%1$d தொடர்புகள்</item>
+        <item quantity="one">%1$dதொடர்பு அல்லது குழு</item>
+        <item quantity="other">%1$dதொடர்புகள் அல்லது குழுக்கள்</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">செய்தி அனுப்புதல்</string>
     <string name="PrivacySettingsFragment__disappearing_messages">காணாமல் போகும் செய்திகள்</string>
@@ -5131,7 +5242,7 @@
     <string name="PermissionsSettingsFragment__only_admins">நிர்வாகிகள் மட்டுமே</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">புதிய உறுப்பினர்களை யார் சேர்க்க முடியும்?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">இந்த குழுவின் தகவலை யார் திருத்தலாம்?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">யாரால் முடியும் அனுப்பு செய்திகள்?</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">யாரெல்லாம் மெசேஜ்களை அனுப்பி, அழைப்புகளைத் துவங்கலாம்?</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">அறிவிப்புகளை ஒலியடக்கு</string>
@@ -6835,7 +6946,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">அழைப்பின் பெயரைத் திருத்தவும்</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">அனைத்து உறுப்பினர்களையும் அங்கீகரிக்கவும்</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">நிர்வாகி அனுமதி தேவை</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">Signal வழியாக இணைப்பைப் பகிரவும்</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -6891,7 +7002,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">அழைப்பின் பெயரைச் சேர்க்கவும்</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">அனைத்து உறுப்பினர்களையும் அங்கீகரிக்கவும்</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">நிர்வாகி அனுமதி தேவை</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">இணைப்பைப் பகிரவும்</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -7142,12 +7253,22 @@
     <string name="BackupAlertBottomSheet__download_later">பின்னர் பதிவிறக்கு</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">மீடியாவைப் பதிவிறக்க வேண்டாம்</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">மீடியா அழிக்கப்படும்</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">உங்கள் காப்புப்பிரதியில் சேமிக்கப்பட்ட மீடியா இன்று நிரந்தரமாக அழிக்கப்படும். அதைப் பதிவிறக்கம் செய்ய இதுவே கடைசி வாய்ப்பு.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">பதிவிறக்க</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">பதிவிறக்கம் செய்ய வேண்டாம்</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">உங்கள் ஊடகத்தைப் பதிவிறக்க %1$s இடத்தைக் காலியாக்கவும்.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">கிரெடிட் அல்லது டெபிட் கார்டு</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7184,6 +7305,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">இணைக்கப்பட்ட சாதனங்களுக்கு வரம்புகளைப் பயன்படுத்துக</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">செயல்படுத்தப்பட்டால், சாட் வரம்புகள் உங்கள் இணைக்கப்பட்ட சாதனங்களிலிருந்து மெசேஜ்களையும் அழிக்கும்.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">டிவைஸ் சேமிப்பகம்</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">டிவைஸ் சேமிப்பகத்தை உகந்ததாக்குக</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">பயன்படுத்தப்படாத மீடியா ஆஃப்லோட் செய்யப்படும், ஆனால் அவற்றை எப்போது வேண்டுமானாலும் உங்கள் காப்புப்பிரதியிலிருந்து பதிவிறக்கம் செய்யலாம்.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">இந்த அம்சத்தை இயக்க அப்கிரேட் செய்யவும்</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">சிக்னல் காப்புப்பிரதிகளின் கட்டண அடுக்குடன் மட்டுமே சேமிப்பக மேம்படுத்துதலைப் பயன்படுத்த முடியும். இந்த அம்சத்தைப் பயன்படுத்தத் தொடங்க, உங்கள் காப்புப்பிரதித் திட்டத்தை அப்கிரேட் செய்யவும்.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">இப்போதே அப்கிரேட் செய்க</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">இப்போது உங்களின் அனைத்து சாதனங்களிலும் அழித்தல் அம்சம் ஒத்திசைக்கப்பட்டுள்ளது</string>
@@ -7229,6 +7364,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">சந்தா ரத்துசெய்யப்பட்டது</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">பதிவிறக்கம் முடிக்கப்பட்டது</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">ஒரு இரவிற்குள் காப்புப்பிரதி உருவாக்கப்படும்.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">காப்புப்பிரதி வகை</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7270,12 +7407,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">உங்கள் சாதனத்தின் பின், கடவுச்சொல் அல்லது வடிவத்தை உள்ளிடவும்.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">சிக்னலுக்கு %1$s/மாதம் செலுத்துக</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">நீங்கள் பெறுவது:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">உங்கள் செய்திகளையும் மீடியாவையும் காப்புப் பிரதி எடுத்து, சிக்னலின் பாதுகாப்பான, எண்டு-டு-எண்டு குறியாக்கம் செய்யப்பட்ட சேமிப்பகச் சேவையைப் பயன்படுத்தவும். புதிய தொலைபேசியைப் பெறும்போது அல்லது சிக்னலை மீண்டும் நிறுவும் போது எந்த செய்தியையும் தவறவிடாதீர்கள்.</string>
@@ -7290,27 +7421,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">மேலும் அறிக</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">உங்கள் பின்னை உள்ளிடவும்</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">காப்புப்பிரதிகளைச் செயல்படுத்த சிக்னல் பின்னை உள்ளிடுக</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">அடுத்து</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">கீபோர்டை மாற்றுக</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">உங்கள் காப்புப்பிரதியைப் பின்கள் பாதுகாக்கின்றன</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">நீங்கள் சிக்னலை மீண்டும் நிறுவும் போது உங்கள் சிக்னல் பின் ஆனது காப்புப்பிரதியை மீட்டெடுக்க உதவுகிறது. குறைந்தபட்சம் %1$d இலக்கங்களைக் கொண்ட பின்னைப் பயன்படுத்தப் பரிந்துரைக்கிறோம்.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">உங்கள் பின்னை மறந்துவிட்டால், உங்கள் காப்புப்பிரதியை மீட்டெடுக்க முடியாது. அமைப்புகளில் எந்த நேரத்திலும் உங்கள் பின்னை மாற்றலாம்.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">தற்போதைய சிக்னல் பின்னைப் பயன்படுத்துக</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">புதிய பின்னை உருவாக்கவும்</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7325,6 +7464,30 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">பேக்கப் வகையை மாற்று</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">சந்தாவை ரத்துசெய்யவும்</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">இலவசம்</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s/மாதம்</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">உரை + உங்களின் அனைத்து மீடியா</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="one">உரை + மீடியாவின் %1$d நாள்</item>
+        <item quantity="other">உரை + மீடியாவின் %1$d நாட்கள்</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">முழு உரை மெசேஜ் காப்புப்பிரதி</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">முழு மீடியா காப்புப்பிரதி</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">சேமிப்பகத்தின் %1$s (%2$s புகைப்படங்கள்)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">சிக்னலுக்கு ஆதரவு வழங்கியதற்கு நன்றி!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="one">மீடியாவின் கடைசி %1$d நாள்</item>
+        <item quantity="other">மீடியாவின் கடைசி %1$d நாட்கள்</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7337,5 +7500,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">பின்னர் உறுதிசெய்து பதிவிறக்கு</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">சந்தாவைத் தொடர்க</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">நினைவூட்டல் ஐகான்</string>
     <!-- EOF -->
 </resources>

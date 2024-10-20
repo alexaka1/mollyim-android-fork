@@ -25,6 +25,7 @@ import org.signal.core.util.orNull
 import org.signal.core.util.readToList
 import org.signal.core.util.readToSet
 import org.signal.core.util.readToSingleBoolean
+import org.signal.core.util.readToSingleInt
 import org.signal.core.util.readToSingleLong
 import org.signal.core.util.readToSingleObject
 import org.signal.core.util.requireBlob
@@ -95,6 +96,7 @@ import org.thoughtcrime.securesms.util.ProfileUtil
 import org.thoughtcrime.securesms.util.RemoteConfig
 import org.thoughtcrime.securesms.util.Util
 import org.thoughtcrime.securesms.wallpaper.ChatWallpaper
+import org.thoughtcrime.securesms.wallpaper.ChatWallpaperFactory
 import org.thoughtcrime.securesms.wallpaper.WallpaperStorage
 import org.whispersystems.signalservice.api.profiles.SignalServiceProfile
 import org.whispersystems.signalservice.api.push.ServiceId
@@ -164,6 +166,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     const val CALL_VIBRATE = "call_vibrate"
     const val MUTE_UNTIL = "mute_until"
     const val MESSAGE_EXPIRATION_TIME = "message_expiration_time"
+    const val MESSAGE_EXPIRATION_TIME_VERSION = "message_expiration_time_version"
     const val SEALED_SENDER_MODE = "sealed_sender_mode"
     const val STORAGE_SERVICE_ID = "storage_service_id"
     const val STORAGE_SERVICE_PROTO = "storage_service_proto"
@@ -261,7 +264,8 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
         $NICKNAME_GIVEN_NAME TEXT DEFAULT NULL,
         $NICKNAME_FAMILY_NAME TEXT DEFAULT NULL,
         $NICKNAME_JOINED_NAME TEXT DEFAULT NULL,
-        $NOTE TEXT DEFAULT NULL
+        $NOTE TEXT DEFAULT NULL,
+        $MESSAGE_EXPIRATION_TIME_VERSION INTEGER DEFAULT 1 NOT NULL
       )
       """
 
@@ -305,6 +309,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       CALL_VIBRATE,
       MUTE_UNTIL,
       MESSAGE_EXPIRATION_TIME,
+      MESSAGE_EXPIRATION_TIME_VERSION,
       SEALED_SENDER_MODE,
       STORAGE_SERVICE_ID,
       MENTION_SETTING,
@@ -408,6 +413,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     fun maskCapabilitiesToLong(capabilities: SignalServiceProfile.Capabilities): Long {
       var value: Long = 0
       value = Bitmask.update(value, Capabilities.DELETE_SYNC, Capabilities.BIT_LENGTH, Recipient.Capability.fromBoolean(capabilities.isDeleteSync).serialize().toLong())
+      value = Bitmask.update(value, Capabilities.VERSIONED_EXPIRATION_TIMER, Capabilities.BIT_LENGTH, Recipient.Capability.fromBoolean(capabilities.isVersionedExpirationTimer).serialize().toLong())
       return value
     }
   }
@@ -567,13 +573,14 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     ).recipientId
   }
 
-  fun getOrInsertFromCallLinkRoomId(callLinkRoomId: CallLinkRoomId): RecipientId {
+  fun getOrInsertFromCallLinkRoomId(callLinkRoomId: CallLinkRoomId, storageId: ByteArray? = null): RecipientId {
     return getOrInsertByColumn(
       CALL_LINK_ROOM_ID,
       callLinkRoomId.serialize(),
       contentValuesOf(
         TYPE to RecipientType.CALL_LINK.id,
         CALL_LINK_ROOM_ID to callLinkRoomId.serialize(),
+        STORAGE_SERVICE_ID to Base64.encodeWithPadding(storageId ?: StorageSyncHelper.generateKey()),
         PROFILE_SHARING to 1
       )
     ).recipientId
@@ -1192,6 +1199,12 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
               SELECT ${DistributionListTables.ListTable.ID}
               FROM ${DistributionListTables.ListTable.TABLE_NAME}
             )
+            OR
+            $CALL_LINK_ROOM_ID NOT NULL AND $CALL_LINK_ROOM_ID IN (
+              SELECT ${CallLinkTable.ROOM_ID}
+              FROM ${CallLinkTable.TABLE_NAME}
+              WHERE (${CallLinkTable.ADMIN_KEY} NOT NULL OR ${CallLinkTable.DELETION_TIMESTAMP} > 0) AND ${CallLinkTable.ROOT_KEY} NOT NULL
+            )
         )
         """,
         RecipientType.INDIVIDUAL.id,
@@ -1210,6 +1223,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
             RecipientType.INDIVIDUAL -> out[id] = StorageId.forContact(key)
             RecipientType.GV1 -> out[id] = StorageId.forGroupV1(key)
             RecipientType.DISTRIBUTION_LIST -> out[id] = StorageId.forStoryDistributionList(key)
+            RecipientType.CALL_LINK -> out[id] = StorageId.forCallLink(key)
             else -> throw AssertionError()
           }
         }
@@ -1471,10 +1485,47 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     StorageSyncHelper.scheduleSyncForDataChange()
   }
 
-  fun setExpireMessages(id: RecipientId, expiration: Int) {
+  fun setExpireMessagesAndIncrementVersion(id: RecipientId, expiration: Int): Int {
+    val version = writableDatabase.rawQuery(
+      """
+      UPDATE $TABLE_NAME
+      SET $MESSAGE_EXPIRATION_TIME = $expiration,
+          $MESSAGE_EXPIRATION_TIME_VERSION = MIN($MESSAGE_EXPIRATION_TIME_VERSION + 1, ${Int.MAX_VALUE})
+      WHERE $ID = ${id.serialize()}
+      RETURNING $MESSAGE_EXPIRATION_TIME_VERSION
+      """,
+      null
+    ).readToSingleInt(defaultValue = 1)
+
+    AppDependencies.databaseObserver.notifyRecipientChanged(id)
+
+    return version
+  }
+
+  /**
+   * Sets the expiration timer without incrementing the version. Will eventually be removed once everyone has the ability to understand expireTimerVersions.
+   */
+  fun setExpireMessagesWithoutIncrementingVersion(id: RecipientId, expiration: Int) {
     val values = ContentValues(1).apply {
       put(MESSAGE_EXPIRATION_TIME, expiration)
     }
+    if (update(id, values)) {
+      AppDependencies.databaseObserver.notifyRecipientChanged(id)
+    }
+  }
+
+  /**
+   * Groups do not have an expireTimerVersion, and therefore we do not need to provide them.
+   */
+  fun setExpireMessagesForGroup(id: RecipientId, expiration: Int) {
+    setExpireMessages(id, expiration, 1)
+  }
+
+  fun setExpireMessages(id: RecipientId, expiration: Int, expirationVersion: Int) {
+    val values = contentValuesOf(
+      MESSAGE_EXPIRATION_TIME to expiration,
+      MESSAGE_EXPIRATION_TIME_VERSION to expirationVersion
+    )
     if (update(id, values)) {
       AppDependencies.databaseObserver.notifyRecipientChanged(id)
     }
@@ -1916,7 +1967,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
         for (pair in idWithWallpaper) {
           AppDependencies.databaseObserver.notifyRecipientChanged(pair.first)
           if (pair.second != null) {
-            WallpaperStorage.onWallpaperDeselected(context, Uri.parse(pair.second))
+            WallpaperStorage.onWallpaperDeselected(Uri.parse(pair.second))
           }
         }
       } else {
@@ -1928,11 +1979,11 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     }
   }
 
-  fun setWallpaper(id: RecipientId, chatWallpaper: ChatWallpaper?) {
-    setWallpaper(id, chatWallpaper?.serialize())
+  fun setWallpaper(id: RecipientId, chatWallpaper: ChatWallpaper?, notifyDeselected: Boolean) {
+    setWallpaper(id, chatWallpaper?.serialize(), notifyDeselected)
   }
 
-  private fun setWallpaper(id: RecipientId, wallpaper: Wallpaper?) {
+  private fun setWallpaper(id: RecipientId, wallpaper: Wallpaper?, notifyDeselected: Boolean) {
     val existingWallpaperUri = getWallpaperUri(id)
     val values = ContentValues().apply {
       put(WALLPAPER, wallpaper?.encode())
@@ -1947,8 +1998,8 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       AppDependencies.databaseObserver.notifyRecipientChanged(id)
     }
 
-    if (existingWallpaperUri != null) {
-      WallpaperStorage.onWallpaperDeselected(context, existingWallpaperUri)
+    if (notifyDeselected && existingWallpaperUri != null) {
+      WallpaperStorage.onWallpaperDeselected(existingWallpaperUri)
     }
   }
 
@@ -1958,7 +2009,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       .dimLevelInDarkTheme(if (enabled) ChatWallpaper.FIXED_DIM_LEVEL_FOR_DARK_THEME else 0f)
       .build()
 
-    setWallpaper(id, updated)
+    setWallpaper(id, updated, false)
   }
 
   private fun getWallpaper(id: RecipientId): Wallpaper? {
@@ -2001,6 +2052,23 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     }
 
     return 0
+  }
+
+  /**
+   * Migrates all recipients using [legacyUri] for their wallpaper to [newUri].
+   * Needed for an app migration.
+   */
+  fun migrateWallpaperUri(legacyUri: Uri, newUri: Uri): Int {
+    val newWallpaper = ChatWallpaperFactory.create(newUri)
+
+    return writableDatabase
+      .update(TABLE_NAME)
+      .values(
+        WALLPAPER to newWallpaper.serialize().encode(),
+        WALLPAPER_URI to newUri.toString()
+      )
+      .where("$WALLPAPER_URI = ?", legacyUri)
+      .run()
   }
 
   fun getPhoneNumberDiscoverability(id: RecipientId): PhoneNumberDiscoverableState? {
@@ -3770,8 +3838,8 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       put(STORAGE_SERVICE_ID, Base64.encodeWithPadding(StorageSyncHelper.generateKey()))
     }
 
-    val query = "$ID = ? AND ($TYPE IN (?, ?, ?) OR $REGISTERED = ? OR $ID = ?)"
-    val args = SqlUtil.buildArgs(recipientId, RecipientType.GV1.id, RecipientType.GV2.id, RecipientType.DISTRIBUTION_LIST.id, RegisteredState.REGISTERED.id, selfId.toLong())
+    val query = "$ID = ? AND ($TYPE IN (?, ?, ?, ?) OR $REGISTERED = ? OR $ID = ?)"
+    val args = SqlUtil.buildArgs(recipientId, RecipientType.GV1.id, RecipientType.GV2.id, RecipientType.DISTRIBUTION_LIST.id, RecipientType.CALL_LINK.id, RegisteredState.REGISTERED.id, selfId.toLong())
 
     writableDatabase.update(TABLE_NAME, values, query, args).also { updateCount ->
       Log.d(TAG, "[rotateStorageId] updateCount: $updateCount")
@@ -3930,6 +3998,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       AVATAR_COLOR to primaryRecord.avatarColor.serialize(),
       CUSTOM_CHAT_COLORS_ID to Optional.ofNullable(primaryRecord.chatColors).or(Optional.ofNullable(secondaryRecord.chatColors)).map { colors: ChatColors? -> colors!!.id.longValue }.orElse(null),
       MESSAGE_EXPIRATION_TIME to if (primaryRecord.expireMessages > 0) primaryRecord.expireMessages else secondaryRecord.expireMessages,
+      MESSAGE_EXPIRATION_TIME_VERSION to max(primaryRecord.expireTimerVersion, secondaryRecord.expireTimerVersion),
       REGISTERED to RegisteredState.REGISTERED.id,
       SYSTEM_GIVEN_NAME to secondaryRecord.systemProfileName.givenName,
       SYSTEM_FAMILY_NAME to secondaryRecord.systemProfileName.familyName,
@@ -4533,6 +4602,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
 //    const val PNP = 7
 //    const val PAYMENT_ACTIVATION = 8
     const val DELETE_SYNC = 9
+    const val VERSIONED_EXPIRATION_TIMER = 10
 
     // IMPORTANT: We cannot sore more than 32 capabilities in the bitmask.
   }

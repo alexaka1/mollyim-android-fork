@@ -17,7 +17,7 @@ import org.thoughtcrime.securesms.util.ServiceUtil
 class BiometricDeviceAuthentication(
   private val biometricManager: BiometricManager,
   private val biometricPrompt: BiometricPrompt,
-  private val biometricPromptInfo: PromptInfo
+  private var biometricPromptInfo: PromptInfo
 ) {
   companion object {
     const val AUTHENTICATED = 1
@@ -35,8 +35,9 @@ class BiometricDeviceAuthentication(
     private val DISALLOWED_BIOMETRIC_VERSIONS = setOf(28, 29)
   }
 
-  fun canAuthenticate(): Boolean {
-    return biometricManager.canAuthenticate(ALLOWED_AUTHENTICATORS) == BiometricManager.BIOMETRIC_SUCCESS
+  fun canAuthenticate(context: Context): Boolean {
+    val isKeyGuardSecure = ServiceUtil.getKeyguardManager(context).isKeyguardSecure
+    return isKeyGuardSecure && biometricManager.canAuthenticate(ALLOWED_AUTHENTICATORS) == BiometricManager.BIOMETRIC_SUCCESS
   }
 
   fun authenticate(context: Context, force: Boolean, showConfirmDeviceCredentialIntent: () -> Unit): Boolean {
@@ -68,6 +69,10 @@ class BiometricDeviceAuthentication(
 
   fun cancelAuthentication() {
     biometricPrompt.cancelAuthentication()
+  }
+
+  fun updatePromptInfo(promptInfo: PromptInfo) {
+    biometricPromptInfo = promptInfo
   }
 }
 

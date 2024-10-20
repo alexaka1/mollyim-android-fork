@@ -1,7 +1,7 @@
-FROM docker.io/eclipse-temurin:17.0.7_7-sdk-jammy@sha256:ab4bbe391a42adc8e590d0c54b3ca7903cbc3b62a3e3b23ac8dce94ebfef6b9e AS builder
+FROM docker.io/eclipse-temurin:17.0.12_7-jdk-jammy@sha256:d41eff8f20494968aaa1f5bbea4547303076b915d38f7d642441bd16538b45e3 AS builder
 
-ARG ANDROID_SDK_DIST=commandlinetools-linux-10406996_latest.zip
-ARG ANDROID_SDK_SHA256=8919e8752979db73d8321e9babe2caedcc393750817c1a5f56c128ec442fb540
+ARG ANDROID_SDK_DIST=commandlinetools-linux-11076708_latest.zip
+ARG ANDROID_SDK_SHA256=2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258
 
 ENV ANDROID_HOME=/opt/android-sdk-linux
 
@@ -22,11 +22,13 @@ RUN yes | sdkmanager --licenses
 
 RUN sdkmanager "platform-tools"
 
-ARG ANDROID_API_LEVEL=34
-ARG ANDROID_BUILD_TOOLS_VERSION=34.0.0
+ARG NDK_VERSION=27.0.12077973
+ARG COMPILE_SDK_VERSION=34
+ARG BUILD_TOOLS_VERSION=34.0.0
 
-RUN sdkmanager "platforms;android-${ANDROID_API_LEVEL}"
-RUN sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+RUN sdkmanager "ndk;${NDK_VERSION}"
+RUN sdkmanager "platforms;android-${COMPILE_SDK_VERSION}"
+RUN sdkmanager "build-tools;${BUILD_TOOLS_VERSION}"
 
 COPY gradlew /molly/
 COPY gradle /molly/gradle/

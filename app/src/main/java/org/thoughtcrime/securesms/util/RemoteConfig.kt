@@ -516,15 +516,6 @@ object RemoteConfig {
     defaultValue = null
   )
 
-  /** Whether to use the custom streaming muxer or built in android muxer.  */
-  @JvmStatic
-  @get:JvmName("useStreamingVideoMuxer")
-  val useStreamingVideoMuxer: Boolean by remoteBoolean(
-    key = "android.customVideoMuxer.1",
-    defaultValue = false,
-    hotSwappable = true
-  )
-
   /** The time in between routine CDS refreshes, in seconds.  */
   @JvmStatic
   @get:JvmName("cdsRefreshIntervalSeconds")
@@ -707,6 +698,27 @@ object RemoteConfig {
   /** A comma-separated list of models that should *not* use software AEC for calling.  */
   val softwareAecBlocklistModels: String by remoteString(
     key = "android.calling.softwareAecBlockList",
+    defaultValue = "",
+    hotSwappable = true
+  )
+
+  /** Whether the Oboe ADM should be used or not.  */
+  val oboeDeployment: Boolean by remoteBoolean(
+    key = "android.calling.oboeDeployment",
+    defaultValue = false,
+    hotSwappable = false
+  )
+
+  /** A comma-separated list of models that should use the Java ADM instead of the Oboe ADM.  */
+  val useJavaAdmModels: String by remoteString(
+    key = "android.calling.useJavaAdmList",
+    defaultValue = "",
+    hotSwappable = true
+  )
+
+  /** A comma-separated list of models that should use software AEC for calling with the Oboe ADM.  */
+  val useSoftwareAecForOboeModels: String by remoteString(
+    key = "android.calling.useSoftwareAecForOboe",
     defaultValue = "",
     hotSwappable = true
   )
@@ -937,7 +949,7 @@ object RemoteConfig {
   @JvmStatic
   @get:JvmName("useActiveCallManager")
   val useActiveCallManager: Boolean by remoteBoolean(
-    key = "android.calling.useActiveCallManager.5",
+    key = "android.calling.useActiveCallManager.6",
     defaultValue = false,
     hotSwappable = false
   )
@@ -977,11 +989,12 @@ object RemoteConfig {
   )
 
   /** Make CDSI lookups via libsignal-net instead of native websocket.  */
-  val useLibsignalNetForCdsiLookup: Boolean by remoteBoolean(
-    key = "android.cds.libsignal.4",
-    defaultValue = false,
-    hotSwappable = true
-  )
+  // val useLibsignalNetForCdsiLookup: Boolean by remoteBoolean(
+  //   key = "android.cds.libsignal.4",
+  //   defaultValue = false,
+  //   hotSwappable = true
+  // )
+  val useLibsignalNetForCdsiLookup: Boolean = false
 
   /** The lifespan of a linked device (i.e. the time it can be inactive for before it expires), in milliseconds.  */
   @JvmStatic
@@ -999,43 +1012,36 @@ object RemoteConfig {
    */
   @JvmStatic
   @get:JvmName("messageBackups")
-  val messageBackups: Boolean by remoteValue(
-    key = "android.messageBackups",
-    hotSwappable = false,
-    active = false  // MOLLY: Test before setting to true
-  ) { value ->
-    value.asBoolean(false)
-  }
-
-  /** Whether or not to use the custom CameraX controller class  */
-  @JvmStatic
-  @get:JvmName("customCameraXController")
-  val customCameraXController: Boolean by remoteBoolean(
-    key = "android.cameraXCustomController",
-    defaultValue = false,
-    hotSwappable = true
-  )
+  // val messageBackups: Boolean by remoteValue(
+  //   key = "android.messageBackups",
+  //   hotSwappable = false,
+  //   active = false
+  // ) { value ->
+  //   BuildConfig.MESSAGE_BACKUP_RESTORE_ENABLED || value.asBoolean(false)
+  // }
+  val messageBackups: Boolean = false
 
   /** Whether unauthenticated chat web socket is backed by libsignal-net  */
   @JvmStatic
   @get:JvmName("libSignalWebSocketEnabled")
-  val libSignalWebSocketEnabled: Boolean by remoteBoolean(
-    key = "android.libsignalWebSocketEnabled",
-    defaultValue = false,
-    hotSwappable = false,
-    active = false  // MOLLY: Test before setting to true
-  )
+  // val libSignalWebSocketEnabled: Boolean by remoteBoolean(
+  //   key = "android.libsignalWebSocketEnabled",
+  //   defaultValue = false,
+  //   hotSwappable = false
+  // )
+  val libSignalWebSocketEnabled: Boolean = false
 
   /** Whether or not to launch the restore activity after registration is complete, rather than before.  */
   @JvmStatic
   @get:JvmName("restoreAfterRegistration")
-  val restoreAfterRegistration: Boolean by remoteValue(
-    key = "android.registration.restorePostRegistration",
-    hotSwappable = false,
-    active = false  // MOLLY: Test before setting to true
-  ) { value ->
-    value.asBoolean(false)
-  }
+  // val restoreAfterRegistration: Boolean by remoteValue(
+  //   key = "android.registration.restorePostRegistration",
+  //   hotSwappable = false,
+  //   active = false
+  // ) { value ->
+  //   BuildConfig.MESSAGE_BACKUP_RESTORE_ENABLED || value.asBoolean(false)
+  // }
+  val restoreAfterRegistration: Boolean = false
 
   /**
    * Percentage [0, 100] of web socket requests that will be "shadowed" by sending
@@ -1043,14 +1049,14 @@ object RemoteConfig {
    */
   @JvmStatic
   @get:JvmName("libSignalWebSocketShadowingPercentage")
-  val libSignalWebSocketShadowingPercentage: Int by remoteValue(
-    key = "android.libsignalWebSocketShadowingPercentage",
-    hotSwappable = false,
-    active = false
-  ) { value ->
-    val remote = value.asInteger(0)
-    remote.coerceIn(0, 100)
-  }
+  // val libSignalWebSocketShadowingPercentage: Int by remoteValue(
+  //   key = "android.libsignalWebSocketShadowingPercentage",
+  //   hotSwappable = false
+  // ) { value ->
+  //   val remote = value.asInteger(0)
+  //   remote.coerceIn(0, 100)
+  // }
+  val libSignalWebSocketShadowingPercentage: Int = 0
 
   @JvmStatic
   val backgroundMessageProcessInterval: Long by remoteValue(
@@ -1087,6 +1093,22 @@ object RemoteConfig {
     key = "android.connectivityWarningConfig",
     defaultValue = "",
     hotSwappable = true
+  )
+
+  @JvmStatic
+  @get:JvmName("newCallUi")
+  val newCallUi: Boolean by remoteBoolean(
+    key = "android.newCallUi",
+    defaultValue = false,
+    hotSwappable = false
+  )
+
+  @JvmStatic
+  @get:JvmName("useHevcEncoder")
+  val useHevcEncoder: Boolean by remoteBoolean(
+    key = "android.useHevcEncoder",
+    defaultValue = false,
+    hotSwappable = false
   )
 
   // endregion

@@ -16,6 +16,7 @@
  */
 package org.thoughtcrime.securesms;
 
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +28,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.annotation.WorkerThread;
 import androidx.core.content.ContextCompat;
-import androidx.multidex.MultiDexApplication;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.security.ProviderInstaller;
@@ -92,7 +92,7 @@ import org.thoughtcrime.securesms.notifications.MessageNotifier;
 import org.thoughtcrime.securesms.providers.BlobProvider;
 import org.thoughtcrime.securesms.ratelimit.RateLimitUtil;
 import org.thoughtcrime.securesms.recipients.Recipient;
-import org.thoughtcrime.securesms.registration.RegistrationUtil;
+import org.thoughtcrime.securesms.registration.util.RegistrationUtil;
 import org.thoughtcrime.securesms.ringrtc.RingRtcLogger;
 import org.thoughtcrime.securesms.service.AnalyzeDatabaseAlarmListener;
 import org.thoughtcrime.securesms.service.DirectoryRefreshListener;
@@ -140,7 +140,7 @@ import rxdogtag2.RxDogTag;
  *
  * @author Moxie Marlinspike
  */
-public class ApplicationContext extends MultiDexApplication implements AppForegroundObserver.Listener {
+public class ApplicationContext extends Application implements AppForegroundObserver.Listener {
 
   private static final String TAG = Log.tag(ApplicationContext.class);
 
@@ -189,6 +189,7 @@ public class ApplicationContext extends MultiDexApplication implements AppForegr
                                                   DatabaseSecretProvider.getOrCreateDatabaseSecret(this),
                                                   AttachmentSecretProvider.getInstance(this).getOrCreateAttachmentSecret());
                             })
+                            .addBlocking("signal-store", () -> SignalStore.init(this))
                             .addBlocking("logging", () -> {
                               initializeLogging(false);
                               Log.i(TAG, "onCreateUnlock()");
@@ -202,7 +203,7 @@ public class ApplicationContext extends MultiDexApplication implements AppForegr
                             .addBlocking("first-launch", this::initializeFirstEverAppLaunch)
                             .addBlocking("gcm-check", this::initializeFcmCheck)
                             .addBlocking("app-migrations", this::initializeApplicationMigrations)
-                            .addBlocking("lifecycle-observer", () -> AppDependencies.getAppForegroundObserver().addListener(this))
+                            .addBlocking("lifecycle-observer", () -> AppForegroundObserver.addListener(this))
                             .addBlocking("message-retriever", this::initializeMessageRetrieval)
                             .addBlocking("blob-provider", this::initializeBlobProvider)
                             .addBlocking("remote-config", RemoteConfig::init)
@@ -223,6 +224,7 @@ public class ApplicationContext extends MultiDexApplication implements AppForegr
                             .addNonBlocking(this::beginJobLoop)
                             .addNonBlocking(EmojiSource::refresh)
                             .addNonBlocking(() -> AppDependencies.getGiphyMp4Cache().onAppStart(this))
+                            .addNonBlocking(AppDependencies::getBillingApi)
                             .addNonBlocking(this::ensureProfileUploaded)
                             .addNonBlocking(() -> AppDependencies.getExpireStoriesManager().scheduleIfNecessary())
                             .addPostRender(() -> AppDependencies.getDeletedCallEventManager().scheduleIfNecessary())
@@ -456,7 +458,11 @@ public class ApplicationContext extends MultiDexApplication implements AppForegr
 
   @VisibleForTesting
   void initializeAppDependencies() {
-    AppDependencies.init(this, new ApplicationDependencyProvider(this));
+    if (!AppDependencies.isInitialized()) {
+      Log.i(TAG, "Initializing AppDependencies.");
+      AppDependencies.init(this, new ApplicationDependencyProvider(this));
+    }
+    AppForegroundObserver.begin();
   }
 
   private void initializeFirstEverAppLaunch() {

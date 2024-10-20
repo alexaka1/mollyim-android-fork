@@ -85,6 +85,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">Leisti prieigą</string>
     <string name="AttachmentKeyboard_payment">Mokėjimas</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">Tvarkyti</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">Pasirinkti daugiau nuotraukų</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">Pereiti į nustatymus</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string name="AttachmentKeyboard_signal_has_limited_access">„Molly“ prieiga prie nuotraukų ir vaizdo įrašų yra ribojama</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">Nerasta nuotraukų, pasirinkite nuotraukas ir vaizdo įrašus, kurie bus rodomi čia, arba pakeiskite leidimus</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">Nerasta jokių nuotraukų ar vaizdo įrašų. „Signal“ turi prieigą tik prie jūsų pasirinktų nuotraukų ir vaizdo įrašų.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">Nerasta programėlė medijos pasirinkimui.</string>
@@ -105,7 +119,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">Jei norite, kad būtų rodomos nuotraukos ir vaizdo įrašai:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string name="AttachmentManager_signal_needs_storage_access">„Molly“ reikia prieigos prie saugyklos, kad galėtų rodyti jūsų nuotraukas ir vaizdo įrašus.</string>
+    <string name="AttachmentManager_signal_needs_storage_access">„Molly“ reikia prieigos, kad galėtų rodyti jūsų nuotraukas ir vaizdo įrašus.</string>
 
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s neįjungė Mokėjimų </string>
@@ -334,6 +348,8 @@
     <string name="CommunicationActions_invalid_link">Neteisinga nuoroda</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">Neteisinga skambučio nuoroda. Įsitikink, kad nuoroda pilna ir teisinga, tuomet bandyk prisijungti.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -470,7 +486,7 @@
     <!-- Dialog title asking users for microphone permission -->
     <string name="ConversationActivity_allow_access_microphone">Leisti prieigą prie mikrofono</string>
     <!-- Dialog description that will explain the steps needed to give microphone permissions -->
-    <string name="ConversationActivity_signal_to_send_audio_messages">Norėdami siųsti garso žinutes:</string>
+    <string name="ConversationActivity_signal_to_send_audio_messages">Norėdami siųsti balso žinutes:</string>
     <!-- Alert dialog description asking for microphone permission in order to send voice messages -->
     <string name="ConversationActivity_to_send_voice_messages_allow_signal_access_to_your_microphone">Norėdami siųsti balso žinutes, leiskite „Molly“ prieigą prie mikrofono.</string>
     <!-- Toast text explaining Signal\'s need for microphone access -->
@@ -838,6 +854,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">Daryti atsarginę kopiją dabar</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">Įrašų atkurti neįmanoma</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">Jūsų įrenginyje trūksta vietos. Atlaisvinkite saugyklos vietos, kad galėtumėte atkurti savo įrašus.\n\nJei pasirinksite „Praleisti atkūrimą“, įrašai iš atsarginių kopijų bus ištrinti, kai įrenginys užbaigs naują atsarginę kopiją.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">Jūsų įrenginyje trūksta vietos. Atlaisvinkite iki %1$s vietos, kad galėtumėte atkurti savo įrašus.\n\nJei pasirinksite „Praleisti atkūrimą“, įrašai iš atsarginių kopijų bus ištrinti, kai įrenginys užbaigs naują atsarginę kopiją.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">Gerai</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">Praleisti atkūrimą</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">Atsarginės kopijos klaidos piktograma</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">Atlaisvinkite saugyklos vietos, kad galėtumėte atkurti savo įrašus.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">Atlaisvinkite iki %1$s vietos, kad galėtumėte atkurti savo įrašus.</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">Įrašai atkuriami</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%1$s iš %2$s (%3$d %%)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">Įrašų atkūrimas pristabdytas</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">Laukiama „Wi-Fi“…</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">Laukiama interneto ryšio…</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">Baterija senka. Įkraukite įrenginį.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">Atlaisvinkite iki %1$s, kad galėtumėte atkurti savo įrašus.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">Praleisti atkūrimą</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">Pokalbių atsarginės kopijos</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">Atsarginės kopijos yra šifruojamos naudojant slaptafrazę ir yra laikomos jūsų įrenginyje.</string>
@@ -939,9 +990,9 @@
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">Žinutės visuose susietuose įrenginiuose yra privačios</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
-    <string name="LinkDeviceFragment__signal_messages_are_synchronized">„Molly“ žinutės sinchronizuojamos su „Molly“ jūsų mobiliajame telefone, kai jis susietas. Ankstesnių žinučių istorija nebus rodoma.</string>
+    <string name="LinkDeviceFragment__signal_messages_are_synchronized">„Signal“ žinutės sinchronizuojamos su „Signal“ jūsų mobiliajame telefone, kai jis susietas. Ankstesnių žinučių istorija nebus rodoma.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string name="LinkDeviceFragment__on_other_device_visit_signal">Kitame įrenginyje apsilankykite %1$s, kad įdiegtumėte „Molly“</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">Įrenginyje, kurį norite susieti, apsilankykite %1$s ir įdiekite „Signal“</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string> -->
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">Mano susieti įrenginiai</string>
@@ -959,6 +1010,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">Nėra susietų įrenginių</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">Atrakinkite, kad susietumėte įrenginį</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">Prieš susiedami patvirtinkite, kad tai jūs</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">Bakstelėkite „Tęsti“ ir įveskite savo telefono užraktą, kad patvirtintumėte. Neįveskite savo „Signal“ PIN kodo.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">Tęsti</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1428,7 +1485,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">Grupės nuoroda</string>
     <string name="ShareableGroupLinkDialogFragment__share">Bendrinti</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">Atstatyti nuorodą</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">Patvirtinti naujus narius</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">Reikalauti, kad administratorius patvirtintų naujus, per grupės nuorodą prisijungiančius, narius.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">Ar tikrai norite atstatyti grupės nuorodą? Žmonės daugiau nebegalės prisijungti prie grupės naudodami dabartinę nuorodą.</string>
 
@@ -2174,6 +2231,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">Grįžti</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">Skambučio informacija</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">Jūsų kamera išjungta</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">Bakstelėkite čia norėdami įjungti savo vaizdą</string>
     <string name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">Norint skambinti %1$s, Molly reikia prieigos prie jūsų kameros</string>
@@ -2345,6 +2412,8 @@
     <string name="WebRtcCallView__additional_actions">Papildomi veiksmai</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">Baigti skambutį</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">Perjungti grupės skambėjimą</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">Įvyko vartotojo sąsajos klaida. Prašome pranešti apie šią klaidą kūrėjams.</string>
@@ -2745,6 +2814,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">Vėliau pabandysime dar kartą.</string>
     <string name="ApkUpdateNotifications_auto_update_success_title">„Molly“ sėkmingai atnaujinta</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">Automatiškai atnaujinta į versiją %1$s.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">Siųsti žinutę?</string>
@@ -3430,6 +3500,8 @@
     <string name="EditAboutFragment_free_to_chat">Galiu kalbėti</string>
     <string name="EditAboutFragment_taking_a_break">Man pertrauka</string>
     <string name="EditAboutFragment_working_on_something_new">Dirbu ties kažkuo nauju</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">Taisyti grupę</string>
@@ -3931,6 +4003,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. Bakstelėk „Nustatymus“ apačioje</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %1$s Suteikite leidimą</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. Bakstelėkite „Leidimai“</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3. %1$s Suteikite leidimą prie nuotraukų ir vaizdo įrašų</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">Nustatymai</string>
 
@@ -4475,6 +4551,8 @@
     <string name="preferences_app_protection__screen_lock">Ekrano užraktas</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">Užrakinti prieigą prie Signal, naudojant „Android“ ekrano užraktą ar piršto atspaudą</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">Ekrano užraktas suveiks po</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">Norėdami naudoti ekrano užraktą, šiame įrenginyje nustatykite PIN kodą, šabloną arba slaptažodį.</string>
     <string name="preferences_app_protection__signal_pin">Signal PIN kodas</string>
     <string name="preferences_app_protection__create_a_pin">Sukurti PIN kodą</string>
     <string name="preferences_app_protection__change_your_pin">Keisti PIN kodą</string>
@@ -4495,8 +4573,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">Atlikote per daug bandymų. Vėliau bandykite dar kartą.</string>
     <string name="RegistrationActivity_error_connecting_to_service">Klaida, jungiantis prie paslaugos</string>
     <string name="preferences_chats__backups">Atsarginės kopijos</string>
-    <string name="prompt_passphrase_activity__signal_is_locked">Molly yra užrakinta</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">BAKSTELĖKITE, NORĖDAMI ATRAKINTI</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string name="prompt_passphrase_activity__unlock_signal">Atrakinti „Molly“</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string name="prompt_passphrase_activity__use_your_android_device">Norėdami atrakinti „Molly“ naudokite „Android“ įrenginio užrakto nustatymus.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string name="prompt_passphrase_activity__screen_lock_is_on">Ekrano užraktas įjungtas ir „Molly“ yra apsaugota naudojant jūsų įrenginio užrakto nustatymus. Atrakinkite „Molly“ taip, kaip atrakinate telefoną, pvz., pagal veidą, piršto atspaudu, PIN kodu, slaptažodžiu ar šablonu.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">Susisiekti su aptarnavimo komanda</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">Bandykite dar kartą</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">Išjungta</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">Naudoti ekrano užraktą?</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string name="ScreenLockSettingsFragment__your_android_device">Jūsų „Android“ įrenginio užrakto nustatymai bus reikalingi norint atrakinti „Molly“, kai išeisite iš programos arba ją perjungsite. Užrakinus, pranešimų peržiūrose pranešimų turinys nebus rodomas.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">Įjungti ekrano užraktą</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">Iškart</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">Po 1 minutės</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">Po 5 minučių</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">Po 30 minučių</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">Tinkintas laikas</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string name="ScreenLockSettingsFragment__use_signal_screen_lock">Naudoti „Molly“ ekrano užraktą?</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string name="ScreenLockSettingsFragment__turn_off_signal_lock">Išjungti „Molly“ ekrano užraktą?</string>
+
     <string name="Recipient_unknown">Nežinoma</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">Ištrinta paskyra</string>
@@ -5139,7 +5250,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">Klaviatūra</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">„Enter“ (Įvedimo) klavišas išsiunčia</string>
+    <string name="ChatsSettingsFragment__send_with_enter">Siųsti spustelėjus „Įvesti“</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">Žinutės</string>
@@ -5163,10 +5274,10 @@
     <string name="PrivacySettingsFragment__blocked">Užblokuotas</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="one">%1$d adresatas</item>
-        <item quantity="few">%1$d adresatai</item>
-        <item quantity="many">%1$d adresato</item>
-        <item quantity="other">%1$d adresatų</item>
+        <item quantity="one">%1$d adresatas ar grupė</item>
+        <item quantity="few">%1$d adresatai ar grupės</item>
+        <item quantity="many">%1$d adresato ar grupės</item>
+        <item quantity="other">%1$d adresatų ar grupių</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">Susirašinėjimas</string>
     <string name="PrivacySettingsFragment__disappearing_messages">Išnykstančios žinutės</string>
@@ -5375,7 +5486,7 @@
     <string name="PermissionsSettingsFragment__only_admins">Tik administratoriai</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">Kas gali pridėti naujus narius?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">Kas gali taisyti šios grupės informaciją?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">Kas gali siųsti žinutes?</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">Kas gali siųsti žinutes ir pradėti skambučius?</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">Nutildyti pranešimus</string>
@@ -7141,7 +7252,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">Redaguoti skambučio pavadinimą</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">Patvirtinti visus narius</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">Reikalauti administratoriaus patvirtinimo</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">Bendrinti nuorodą per „Signal“</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -7197,7 +7308,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">Pridėti skambučio pavadinimą</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">Patvirtinti visus narius</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">Reikalauti administratoriaus patvirtinimo</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">Bendrinti nuorodą</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -7458,12 +7569,22 @@
     <string name="BackupAlertBottomSheet__download_later">Atsisiųsti vėliau</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">Neatsisiųsti įrašų</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">Įrašai bus ištrinti</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">Jūsų atsarginėje kopijoje saugomi įrašai šiandien bus ištrinti visam laikui. Tai paskutinė jūsų galimybė juos atsisiųsti.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">Atsisiųsti</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">Neatsisiųsti</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">Atlaisvinkite iki %1$s vietos, kad galėtumėte atsisiųsti savo įrašą.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">Kredito arba debeto kortelė</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7500,6 +7621,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">Taikyti apribojimus susietiems įrenginiams</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">Kai įjungta, pokalbio ilgio ribojimo funkcija ištrins žinutes iš susietų įrenginių.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">Saugykla įrenginyje</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimizuoti saugyklą įrenginyje</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">Nepanaudoti įrašai bus išimti, tačiau juos bet kada galėsite atsisiųsti iš atsarginės kopijos.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">Atnaujinkite, kad įgalintumėte šią funkciją</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">Saugyklos optimizavimą galima naudoti tik įsigijus mokamą „Signal“ atsarginių kopijų planą. Norėdami pradėti naudotis šia funkcija, atnaujinkite atsarginių kopijų planą.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">Naujinti dabar</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">Ištrynimas dabar sinchronizuojamas visuose jūsų įrenginiuose</string>
@@ -7545,6 +7680,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">Prenumerata nutraukta</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">Atsisiuntimas baigtas</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">Atsarginė kopija bus sukurta per naktį.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">Atsarginio kopijavimo tipas</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7586,12 +7723,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">Įveskite įrenginio PIN kodą, slaptažodį arba šabloną.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">Mokėkite „Signal“ %1$s per mėnesį</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">Gausite:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">Kurkite atsargines žinučių ir įrašų kopijas naudodami „Signal“ saugią, užšifruotą saugyklos paslaugą. Nepraraskite nė vienos žinutes įsigiję naują telefoną arba iš naujo įdiegę „Signal“.</string>
@@ -7606,27 +7737,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">Sužinoti daugiau</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">Įveskite savo PIN kodą</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">Norėdami įjungti atsargines kopijas, įveskite „Signal“ PIN kodą</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">Kitas</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">Perjungti klaviatūrą</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">PIN kodai apsaugo jūsų atsarginę kopiją</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">„Signal“ PIN kodas leidžia atkurti atsarginę kopiją iš naujo įdiegus „Signal“. Rekomenduojame pasirinkti bent %1$d skaitmenų PIN kodą.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">Pamiršę PIN kodą atsarginės kopijos atkurti negalėsite. PIN kodą galite bet kada pakeisti nustatymuose.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">Naudoti esamą „Signal“ PIN kodą</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">Sukurti naują PIN kodą</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7641,6 +7780,34 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">Keisti atsarginės kopijos tipą</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">Nutraukti prenumeratą</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">Nemokamas</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s/mėnesį</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">Žinutės + visi jūsų įrašai</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="one">Žinutės + %1$d diena įrašų</item>
+        <item quantity="few">Žinutės + %1$d dienos įrašų</item>
+        <item quantity="many">Žinutės + %1$d dienos įrašų</item>
+        <item quantity="other">Žinutės + %1$d dienų įrašų</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">Visų žinučių atsarginė kopija</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">Visų įrašų atsarginė kopija</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">%1$s saugyklos vietos (%2$s nuotraukų)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">Ačiū, kad palaikote „Signal“!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="one">Paskutinė %1$d diena įrašų</item>
+        <item quantity="few">Paskutinės %1$d dienos įrašų</item>
+        <item quantity="many">Paskutinės %1$d dienos įrašų</item>
+        <item quantity="other">Paskutinės %1$d dienų įrašų</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7653,5 +7820,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">Patvirtinti ir atsisiųsti vėliau</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">Išsaugoti prenumeratą</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">Priminimo piktograma</string>
     <!-- EOF -->
 </resources>

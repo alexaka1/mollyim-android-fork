@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import org.greenrobot.eventbus.EventBus;
@@ -166,8 +167,6 @@ public abstract class PassphraseRequiredActivity extends PassphraseActivity impl
       return STATE_WELCOME_PUSH_SCREEN;
     } else if (SignalStore.storageService().needsAccountRestore()) {
       return STATE_ENTER_SIGNAL_PIN;
-    } else if (userHasSkippedOrForgottenPin()) {
-      return STATE_CREATE_SIGNAL_PIN;
     } else if (userCanTransferOrRestore()) {
       return STATE_TRANSFER_OR_RESTORE;
     } else if (userMustSetProfileName()) {
@@ -186,7 +185,7 @@ public abstract class PassphraseRequiredActivity extends PassphraseActivity impl
   }
 
   private boolean userCanTransferOrRestore() {
-    return !SignalStore.registration().isRegistrationComplete() && RemoteConfig.restoreAfterRegistration() && !SignalStore.registration().hasSkippedTransferOrRestore();
+    return !SignalStore.registration().isRegistrationComplete() && RemoteConfig.restoreAfterRegistration() && !SignalStore.registration().hasSkippedTransferOrRestore() && !SignalStore.registration().hasCompletedRestore();
   }
 
   private boolean userMustCreateSignalPin() {
@@ -235,7 +234,7 @@ public abstract class PassphraseRequiredActivity extends PassphraseActivity impl
 
   private Intent getTransferOrRestoreIntent() {
     Intent intent = RestoreActivity.getIntentForTransferOrRestore(this);
-    return getRoutedIntent(intent, getIntent());
+    return getRoutedIntent(intent, MainActivity.clearTop(this));
   }
 
   private Intent getCreateProfileNameIntent() {
@@ -261,13 +260,13 @@ public abstract class PassphraseRequiredActivity extends PassphraseActivity impl
   }
 
   private Intent getRoutedIntent(Intent destination, @Nullable Intent nextIntent) {
-    if (nextIntent != null)   destination.putExtra("next_intent", nextIntent);
+    if (nextIntent != null)   destination.putExtra(NEXT_INTENT_EXTRA, nextIntent);
     return destination;
   }
 
   private Intent getRoutedIntent(Class<?> destination, @Nullable Intent nextIntent) {
     final Intent intent = new Intent(this, destination);
-    if (nextIntent != null)   intent.putExtra("next_intent", nextIntent);
+    if (nextIntent != null)   intent.putExtra(NEXT_INTENT_EXTRA, nextIntent);
     return intent;
   }
 
@@ -286,7 +285,7 @@ public abstract class PassphraseRequiredActivity extends PassphraseActivity impl
     };
 
     IntentFilter filter = new IntentFilter(KeyCachingService.CLEAR_KEY_EVENT);
-    registerReceiver(clearKeyReceiver, filter, KeyCachingService.KEY_PERMISSION, null);
+    ContextCompat.registerReceiver(this, clearKeyReceiver, filter, KeyCachingService.KEY_PERMISSION, null, ContextCompat.RECEIVER_NOT_EXPORTED);
   }
 
   private void removeClearKeyReceiver(Context context) {

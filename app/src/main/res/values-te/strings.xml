@@ -85,6 +85,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">ప్రాప్యతను అనుమతించు</string>
     <string name="AttachmentKeyboard_payment">చెల్లింపులు</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">నిర్వహించండి</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">మరిన్ని ఫోటోలను ఎంచుకోండి</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">అమరికలుకు వెళ్లండి</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string name="AttachmentKeyboard_signal_has_limited_access">ఫోటోలు లేదా వీడియోలకు Molly కు పరిమిత యాక్సెస్ ఉంది</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">ఫోటోలు ఏవీ కనుగొనబడలేదు, ఇక్కడ కనిపించడానికి ఫోటోలు మరియు వీడియోలను ఎంచుకోండి లేదా అనుమతులను మార్చండి</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">ఫోటోలు లేదా వీడియోలు ఏవీ కనుగొనబడలేదు. మీరు ఎంచుకున్న ఫోటోలు మరియు వీడియోలకు మాత్రమే Signal యాక్సెస్‌ను కలిగి ఉంటుంది.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">మీడియా ఎంచుకోవడానికి అనువర్తనం దొరకదు.</string>
@@ -105,7 +119,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">ఫోటోలు, వీడియోలను చూపడానికి:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string name="AttachmentManager_signal_needs_storage_access">మీ ఫోటోలు, వీడియోలను చూపడానికి Molly కు నిల్వ యాక్సెస్ అవసరం.</string>
+    <string name="AttachmentManager_signal_needs_storage_access">మీ ఫోటోలు, వీడియోలను చూపడానికి Molly కు యాక్సెస్ అవసరం.</string>
 
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s చెల్లింపులను యాక్టివేట్ చేయలేదు </string>
@@ -328,6 +342,8 @@
     <string name="CommunicationActions_invalid_link">చెల్లని లింక్</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">ఇది చెల్లుబాటు అయ్యే కాల్ లింక్ కాదు. చేరడానికి ప్రయత్నించే ముందు మొత్తం లింక్ సంపూర్ణంగా మరియు సరిగ్గా ఉందని నిర్ధారించుకోండి.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -460,7 +476,7 @@
     <!-- Dialog title asking users for microphone permission -->
     <string name="ConversationActivity_allow_access_microphone">మీ మైక్రోఫోన్‌కు యాక్సెస్‌ను అనుమతించండి</string>
     <!-- Dialog description that will explain the steps needed to give microphone permissions -->
-    <string name="ConversationActivity_signal_to_send_audio_messages">ఆడియో సందేశాలను పంపడానికి:</string>
+    <string name="ConversationActivity_signal_to_send_audio_messages">స్వర సందేశాలు పంపించడానికి:</string>
     <!-- Alert dialog description asking for microphone permission in order to send voice messages -->
     <string name="ConversationActivity_to_send_voice_messages_allow_signal_access_to_your_microphone">స్వర సందేశాలను పంపడానికి, మీ మైక్రోఫోన్‌కు Molly యాక్సెస్‌ను అనుమతించండి.</string>
     <!-- Toast text explaining Signal\'s need for microphone access -->
@@ -798,6 +814,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">భద్రపరచు</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">మీడియాను పునరుద్ధరించడం సాధ్యం కాదు</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">మీ పరికరంలో తగినంత ఖాళీ స్థలం లేదు. మీ మీడియాను పునరుద్ధరించడానికి నిల్వ స్థలాన్ని ఖాళీ చేయండి.\n\nఒకవేళ మీరు \"స్కిప్ రీస్టోర్\" ఎంచుకుంటే మీ పరికరం మళ్ళీ కొత్త బ్యాకప్ పూర్తి చేసినప్పుడు మీ బ్యాకప్‌లో ఉన్న మీడియా తొలగించబడుతుంది.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">మీ పరికరంలో తగినంత ఖాళీ స్థలం లేదు. మీ మీడియాను పునరుద్ధరించడానికి స్థలంలో %1$s ని ఖాళీ చేయండి.\n\nఒకవేళ మీరు \"స్కిప్ రీస్టోర్\" ఎంచుకుంటే మీ పరికరం మళ్ళీ కొత్త బ్యాకప్ పూర్తి చేసినప్పుడు మీ బ్యాకప్‌లో ఉన్న మీడియా తొలగించబడుతుంది.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">సరే</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">పునరుద్ధరించడాన్ని దాటవేయండి</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">బ్యాకప్ లోపం ఐకాన్</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">మీ మీడియాను పునరుద్ధరించడానికి నిల్వ స్థలాన్ని ఖాళీ చేయండి.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">మీ మీడియాను పునరుద్ధరించడానికి స్థలంలో %1$s ని ఖాళీ చేయండి.\n\n</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">మీడియాను పునరుద్ధరిస్తోంది</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%2$s లో %1$s (%3$d%%)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">మీడియా పునరుద్ధరణ పాజ్ చేయబడింది</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">WiFi కోసం వేచి ఉంది…</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">ఇంటర్నెట్ కనెక్షన్ కోసం వేచి ఉంది…</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">తక్కువ బ్యాటరీ. మీ పరికరం ఛార్జ్ చేయండి.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">మీ మీడియాను పునరుద్ధరించడానికి %1$s ను ఖాళీ చేయండి.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">పునరుద్ధరించడాన్ని దాటవేయండి</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">చాట్ బ్యాకప్‌లు</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">ప్రత్యామ్నాయములు పాస్‌ఫ్రేజ్‌తో గుప్తీకరించబడతాయి మరియు మీ పరికరంలో నిల్వ చేయబడతాయి.</string>
@@ -899,9 +950,9 @@
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">లింక్ చేసిన పరికరాలలో పంపే సందేశాలు అన్ని ప్రైవేట్‌గా ఉంటాయి</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
-    <string name="LinkDeviceFragment__signal_messages_are_synchronized">మీ మొబైల్ ఫోన్ లింక్ అయిన తర్వాత Molly సందేశాలు Molly తో సింక్రనైజ్ చేయబడతాయి. మీ మునుపటి సందేశాల చరిత్ర కనిపించదు.</string>
+    <string name="LinkDeviceFragment__signal_messages_are_synchronized">మీ మొబైల్ ఫోన్ లింక్ అయిన తర్వాత Signal సందేశాలు Signal తో సింక్రనైజ్ చేయబడతాయి. మీ మునుపటి సందేశాల చరిత్ర కనిపించదు.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string name="LinkDeviceFragment__on_other_device_visit_signal">మీ ఇతర పరికరంలో, Molly ను ఇన్‌స్టాల్ చేయడానికి %1$s సందర్శించండి</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">మీరు లింక్ చేయాలనుకున్న పరికరంలో, Signal ను ఇన్‌స్టాల్ చేయడానికి %1$s సందర్శించండి</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string> -->
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">నా లింక్ చేసిన పరికరాలు</string>
@@ -919,6 +970,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">లింక్ చేసిన పరికరాలు ఏవీ లేవు</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">పరికరాన్ని లింక్ చేయడానికి అన్‌లాక్ చేయండి</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">లింక్ చేయడానికి ముందు, ఇది మీరేనని నిర్ధారించండి</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">నిర్ధారించడానికి కొనసాగించును తట్టి, మీ ఫోన్ లాక్ ఎంటర్ చేయండి. మీ Signal PIN ఎంటర్ చేయకండి.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">కొనసాగండి</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1348,7 +1405,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">సమూహ లింక్</string>
     <string name="ShareableGroupLinkDialogFragment__share">పంచుకోండి</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">లింక్‌ను రీసెట్ చేయండి</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">కొత్త సభ్యులను ఆమోదించండి</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">సమూహ లింక్ ద్వారా చేరిన కొత్త సభ్యులను ఆమోదించడానికి నిర్వాహకుడిని అవసరం.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">మీరు సమూహ లింక్‌ను రీసెట్ చేయాలనుకుంటున్నారా? ప్రస్తుత లింక్‌ను ఉపయోగించి ప్రజలు ఇకపై సమూహంలో చేరలేరు.</string>
 
@@ -2046,6 +2103,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">వెనక్కి వెళ్ళు</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">కాల్ సమాచారం</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">మీ కెమెరా ఆఫ్‌లో ఉంది</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">మీ వీడియోను ప్రారంభించడానికి ఇక్కడ నొక్కండి</string>
     <string name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">%1$s కి కాల్ చేయడానికి, Molly కు మీ కెమెరాకు ప్రాప్యత అవసరం</string>
@@ -2195,6 +2262,8 @@
     <string name="WebRtcCallView__additional_actions">అదనపు చర్యలు</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">కాల్ ముగించండి</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">గ్రూప్ రింగింగ్ టోగల్ చేస్తుంది</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">ఒక UI లోపం సంభవించింది. దయచేసి ఈ లోపాన్ని డెవలపర్‌లకు నివేదించండి.</string>
@@ -2575,6 +2644,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">మేము తర్వాత మళ్ళీ ప్రయత్నిస్తాము.</string>
     <string name="ApkUpdateNotifications_auto_update_success_title">Molly విజయవంతంగా అప్‌డేట్ చేయబడింది</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">మీరు ఆటోమేటిక్‌గా %1$s వెర్షన్‌కు అప్‌డేట్ చేయబడ్డారు.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">సందేశం పంపాల?</string>
@@ -3232,6 +3302,8 @@
     <string name="EditAboutFragment_free_to_chat">చాట్ చేయడానికి ఉచితం</string>
     <string name="EditAboutFragment_taking_a_break">విశ్రాంతి తీసుకొంటున్నా</string>
     <string name="EditAboutFragment_working_on_something_new">క్రొత్తదానిపై పని చేస్తోంది</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">సమూహాన్ని మార్చు</string>
@@ -3727,6 +3799,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. దిగువన “సెట్టింగ్‌లు” తట్టండి</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %1$s అనుమతిని ఇవ్వండి</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. “అనుమతులు” తట్టండి</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3. %1$s “ఫోటోలు మరియు వీడియోలు” అనుమతిని ఇవ్వండి</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">సెట్టింగ్‌లు</string>
 
@@ -4253,6 +4329,8 @@
     <string name="preferences_app_protection__screen_lock">స్క్రీన్ తాళం</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">Android స్క్రీన్ లాక్ లేదా వేలిముద్రతో Signal యాక్సెస్ను లాక్ చేయండి</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">స్క్రీన్ లాక్ నిష్క్రియ సమయం</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">స్క్రీన్ లాక్‌ను ఉపయోగించడానికి ఈ పరికరంలో PIN, నమూనా లేదా పాస్‌వర్డ్‌ను సెట్ చేయండి.</string>
     <string name="preferences_app_protection__signal_pin">Signal పిన్</string>
     <string name="preferences_app_protection__create_a_pin">పిన్ సృష్టించండి</string>
     <string name="preferences_app_protection__change_your_pin">మీ పిన్ మార్చండి</string>
@@ -4273,8 +4351,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">మీరు చాలా ప్రయత్నాలు చేసారు. దయచేసి తర్వాత మళ్లీ ప్రయత్నించండి.</string>
     <string name="RegistrationActivity_error_connecting_to_service">సేవకు కనెక్ట్ చేయడంలో లోపం</string>
     <string name="preferences_chats__backups">ప్రత్యామ్నాయములు</string>
-    <string name="prompt_passphrase_activity__signal_is_locked">Molly లాక్ చేయబడింది</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">అన్లాక్ చేయడానికి ట్యాప్ చేయండి</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string name="prompt_passphrase_activity__unlock_signal">Molly ను అన్‌లాక్ చేయండి</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string name="prompt_passphrase_activity__use_your_android_device">Molly ను అన్‌లాక్ చెయ్యడానికి మీ ఆండ్రాయిడ్ పరికరం లాక్ సెట్టింగ్‌లను ఉపయోగించండి.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string name="prompt_passphrase_activity__screen_lock_is_on">స్క్రీన్ లాక్ ఆన్ అయ్యి ఉంది మరియు Molly మీ పరికరం లాక్ సెట్టింగ్‌లతో సురక్షితంగా రక్షించబడుతోంది. మీరు సాధారణంగా మీ ఫోన్‌ని అన్‌లాక్ చేసే విధంగానే Molly ను అన్‌లాక్ చేయండి, ఇది ఫేస్ అన్‌లాక్, ఫింగర్‌ప్రింట్ అన్‌లాక్, PIN, పాస్‌వర్డ్ లేదా నమూనాతో కావచ్చు.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">మద్దతును సంప్రదించండి</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">మళ్ళీ ప్రయత్నించండి</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">ఆఫ్</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">స్క్రీన్ లాక్ ఉపయోగించండి</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string name="ScreenLockSettingsFragment__your_android_device">మీరు యాప్‌లను విడిచిపెట్టినప్పుడు లేదా యాప్‌ల మధ్య మారినప్పుడు Molly ను అన్‌లాక్ చేయడానికి మీ ఆండ్రాయిడ్ పరికరం లాక్ సెట్టింగ్‌లు అవసరం. లాక్ చేయబడినప్పుడు, నోటిఫికేషన్ ప్రివ్యూలు సందేశ కంటెంట్‌ను చూపవు.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">స్క్రీన్ లాక్‌ను ప్రారంభించండి</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">వెంటనే</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">1 నిమిషం తర్వాత</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">5 నిమిషాల తర్వాత</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">30 నిమిషాల తర్వాత</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">అనుకూల సమయం</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string name="ScreenLockSettingsFragment__use_signal_screen_lock">Molly స్క్రీన్ లాక్ ఉపయోగించండి</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string name="ScreenLockSettingsFragment__turn_off_signal_lock">Molly స్క్రీన్ లాక్ ఆఫ్ చేయండి</string>
+
     <string name="Recipient_unknown">తెలియని</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">తొలగించబడిన ఖాతా</string>
@@ -4901,7 +5012,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">కీబోర్డ్</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">ఎంటర్ కీ పంపుతుంది</string>
+    <string name="ChatsSettingsFragment__send_with_enter">ఎంటర్‌తో పంపించండి</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">సందేశాలు</string>
@@ -4925,8 +5036,8 @@
     <string name="PrivacySettingsFragment__blocked">బ్లాక్ చేయబడింది</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="one">%1$d పరిచయం</item>
-        <item quantity="other">%1$d పరిచయాలు</item>
+        <item quantity="one">%1$d పరిచయం లేదా గ్రూప్</item>
+        <item quantity="other">%1$d పరిచయాలు లేదా గ్రూప్‌లు</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">సందేశం</string>
     <string name="PrivacySettingsFragment__disappearing_messages">అదృశ్యమవుతున్న సందేశాలు</string>
@@ -5131,7 +5242,7 @@
     <string name="PermissionsSettingsFragment__only_admins">పరిపాలకులు మాత్రమే</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">కొత్త సభ్యులను ఎవరు చేర్చగలరు?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">ఈ గుంపు వివరణను ఎవరు సవరించగలరు?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">ఎవరు సందేశాలను పంపగలరు?</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">ఎవరు సందేశాలు పంపగలరు మరియు కాల్‌లను ప్రారంభించగలరు?</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">నోటిఫికేషన్‌లను మ్యూట్ చేయండి</string>
@@ -6835,7 +6946,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">కాల్ పేరును సవరించండి</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">సభ్యులందరినీ ఆమోదించండి</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">అడ్మిన్ ఆమోదం అవసరం</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">Signal ద్వారా లింక్‌ను పంచుకోండి</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -6891,7 +7002,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">కాల్ పేరును జోడించండి</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">సభ్యులందరినీ ఆమోదించండి</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">అడ్మిన్ ఆమోదం అవసరం</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">లింక్‌ను పంచుకోండి</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -7142,12 +7253,22 @@
     <string name="BackupAlertBottomSheet__download_later">తర్వాత డౌన్‌లోడ్ చేసుకోండి</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">మీడియాను డౌన్‌లోడ్ చేయవద్దు</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">మీడియా తొలగించబడుతుంది</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">మీ బ్యాకప్‌లో నిల్వ చేయబడిన మీడియా ఈరోజు శాశ్వతంగా తొలగించబడుతుంది. దీన్ని డౌన్‌లోడ్ చేసుకోవడానికి ఇదే మీకు చివరి అవకాశం.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">దిగుమతి</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">డౌన్‌లోడ్ చేయకండి</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">మీ మీడియాను డౌన్‌లోడ్ చేయడానికి మొత్తం స్థలంలో %1$s స్థలాన్ని ఖాళీ చేయండి.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">క్రెడిట్ లేదా డెబిట్ కార్డు</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7184,6 +7305,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">లింక్ చేసిన పరికరాలకు పరిమితులను వర్తింపజేయండి</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">ఎనేబుల్ చేసినప్పుడు, చాట్ పరిమితులు మీ లింక్ చేసిన పరికరాల నుండి సందేశాలను కూడా తొలగిస్తాయి.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">పరికరంలో నిల్వ</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">పరికరంలో నిల్వను అనుకూలపరచండి</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">ఉపయోగించని మీడియా ఆఫ్‌లోడ్ చేయబడుతుంది, అయితే మీ బ్యాకప్ నుండి ఎప్పుడైనా దానిని డౌన్‌లోడ్ చేసుకోవచ్చు.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">ఈ విలక్షణత ప్రారంభించడానికి అప్‌గ్రేడ్ చేయండి</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">నిల్వ అనుకూలత Signal బ్యాకప్‌ల చెల్లింపు శ్రేణితో మాత్రమే ఉపయోగించడానికి సాధ్యం అవుతుంది. ఈ విలక్షణత ఉపయోగించడం ప్రారంభించడానికి మీ బ్యాకప్ ప్లాన్ అప్‌గ్రేడ్ చేయండి.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">ఇప్పుడే అప్‌గ్రేడ్ చేయండి</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">తొలగించడం ఇప్పుడు మీ అన్ని పరికరాలలో సింక్ చేయబడింది</string>
@@ -7229,6 +7364,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">సబ్స్క్రిప్షన్ రద్దు చేయబడింది</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">డౌన్‌లోడ్ పూర్తయింది</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">బ్యాకప్ రాత్రికి రాత్రి సృష్టించబడుతుంది.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">బ్యాకప్ రకం</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7270,12 +7407,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">దయచేసి మీ పరికరం PIN, పాస్‌వర్డ్ లేదా ప్యాటర్న్ ఎంటర్ చేయండి.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">Signal కు నెలకు %1$s చెల్లించండి</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">మీరు ఇవి పొందుతారు:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">మీ సందేశాలు అలాగే మీడియాను Signal యొక్క సురక్షితమైన ఎండ్-టు-ఎండ్ గుప్తీకరణ ఉన్న నిల్వ సేవను ఉపయోగించి బ్యాకప్ చేయండి. మీరు కొత్త ఫోన్ కొనుక్కునప్పుడు లేదా Signal రీ-ఇన్‌స్టాల్ చేసినప్పుడు ఎప్పుడూ ఒక్క సందేశాన్ని కూడా కోల్పోవద్దు.</string>
@@ -7290,27 +7421,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">మరింత తెలుసుకోండి</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">మీ పిన్ను నమోదు చేయండి</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">బ్యాకప్‌లను ప్రారంభించడానికి మీ Signal PIN ఎంటర్ చేయండి</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">తరువాత</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">కీబోర్డ్ మారండి</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">PINలు మీ బ్యాకప్‌ను రక్షిస్తాయి</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">మీరు Signal ను రీ-ఇన్‌స్టాల్ చేసినప్పుడు మీ Signal PIN మీ బ్యాకప్‌ను రీస్టోర్ చేయడానికి మిమ్మల్ని అనుమతిస్తుంది. కనీసం %1$d అంకెలు ఉన్న PIN ఉపయోగించమని మేము సిఫార్సు చేస్తున్నాము.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">ఒకవేళ మీరు మీ PIN మర్చిపోతే, మీరు మీ బ్యాకప్ రీస్టోర్ చెయ్యలేరు. మీరు మీ PIN ఎప్పుడైనా సెట్టింగ్లలో మార్చవచ్చు.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">ప్రస్తుత Signal PIN ఉపయోగించండి</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">క్రొత్త పిన్ సృష్టించండి</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7325,6 +7464,30 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">బ్యాకప్ రకం మార్చండి</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">సబ్‌స్క్రిప్షన్‌ను రద్దు చేయండి</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">ఉచితం</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s/నెల</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">టెక్స్ట్ + మీ మీడియా మొత్తం</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="one">టెక్స్ట్ + మీడియా యొక్క %1$d రోజు</item>
+        <item quantity="other">టెక్స్ట్ + మీడియా యొక %1$d రోజులు</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">టెక్స్ట్ సందేశం పూర్తి బ్యాకప్</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">మీడియా పూర్తి బ్యాకప్</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">నిల్వలో %1$s (%2$s ఫోటోలు)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">Signal కు మద్దతు ఇచ్చినందుకు ధన్యవాదాలు!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="one">మీడియా యొక్క చివరి %1$d రోజు</item>
+        <item quantity="other">మీడియా యొక్క చివరి %1$d రోజులు</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7337,5 +7500,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">నిర్ధారించి, తర్వాత డౌన్‌లోడ్ చేయండి</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">సబ్స్క్రిప్షన్ ఉంచండి</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">రిమైండర్ ఐకాన్</string>
     <!-- EOF -->
 </resources>

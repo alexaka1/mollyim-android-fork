@@ -5,9 +5,11 @@
 
 package org.thoughtcrime.securesms.components.settings.app.internal.backup
 
+import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -21,15 +23,22 @@ import org.thoughtcrime.securesms.attachments.AttachmentId
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment
 import org.thoughtcrime.securesms.backup.v2.BackupMetadata
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
+import org.thoughtcrime.securesms.backup.v2.local.ArchiveFileSystem
+import org.thoughtcrime.securesms.backup.v2.local.ArchiveResult
+import org.thoughtcrime.securesms.backup.v2.local.LocalArchiver
+import org.thoughtcrime.securesms.backup.v2.local.LocalArchiver.FailureCause
+import org.thoughtcrime.securesms.backup.v2.local.SnapshotFileSystem
 import org.thoughtcrime.securesms.database.MessageType
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.dependencies.AppDependencies
-import org.thoughtcrime.securesms.jobs.ArchiveAttachmentJob
-import org.thoughtcrime.securesms.jobs.AttachmentDownloadJob
 import org.thoughtcrime.securesms.jobs.AttachmentUploadJob
 import org.thoughtcrime.securesms.jobs.BackupMessagesJob
 import org.thoughtcrime.securesms.jobs.BackupRestoreJob
 import org.thoughtcrime.securesms.jobs.BackupRestoreMediaJob
+import org.thoughtcrime.securesms.jobs.CopyAttachmentToArchiveJob
+import org.thoughtcrime.securesms.jobs.RestoreAttachmentJob
+import org.thoughtcrime.securesms.jobs.RestoreAttachmentThumbnailJob
+import org.thoughtcrime.securesms.jobs.RestoreLocalAttachmentJob
 import org.thoughtcrime.securesms.jobs.SyncArchivedMediaJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.mms.IncomingMessage
@@ -47,7 +56,17 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
 
   val disposables = CompositeDisposable()
 
-  private val _state: MutableState<ScreenState> = mutableStateOf(ScreenState(backupState = BackupState.NONE, uploadState = BackupUploadState.NONE, plaintext = false))
+  private val _state: MutableState<ScreenState> = mutableStateOf(
+    ScreenState(
+      backupState = BackupState.NONE,
+      uploadState = BackupUploadState.NONE,
+      plaintext = false,
+      canReadWriteBackupDirectory = SignalStore.settings.signalBackupDirectory?.let {
+        val file = DocumentFile.fromTreeUri(AppDependencies.application, it)
+        file != null && file.canWrite() && file.canRead()
+      } ?: false
+    )
+  )
   val state: State<ScreenState> = _state
 
   private val _mediaState: MutableState<MediaState> = mutableStateOf(MediaState())
@@ -111,6 +130,30 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
       }
   }
 
+  fun import(uri: Uri) {
+    _state.value = _state.value.copy(backupState = BackupState.IMPORT_IN_PROGRESS)
+
+    val self = Recipient.self()
+    val selfData = BackupRepository.SelfData(self.aci.get(), self.pni.get(), self.e164.get(), ProfileKey(self.profileKey))
+
+    disposables += Single.fromCallable {
+      val archiveFileSystem = ArchiveFileSystem.fromUri(AppDependencies.application, uri)!!
+      val snapshotInfo = archiveFileSystem.listSnapshots().firstOrNull() ?: return@fromCallable ArchiveResult.failure(FailureCause.MAIN_STREAM)
+      val snapshotFileSystem = SnapshotFileSystem(AppDependencies.application, snapshotInfo.file)
+
+      LocalArchiver.import(snapshotFileSystem, selfData)
+
+      val mediaNameToFileInfo = archiveFileSystem.filesFileSystem.allFiles()
+      RestoreLocalAttachmentJob.enqueueRestoreLocalAttachmentsJobs(mediaNameToFileInfo)
+    }
+      .subscribeOn(Schedulers.io())
+      .observeOn(AndroidSchedulers.mainThread())
+      .subscribeBy {
+        backupData = null
+        _state.value = _state.value.copy(backupState = BackupState.NONE)
+      }
+  }
+
   fun validate(length: Long, inputStreamFactory: () -> InputStream) {
     val self = Recipient.self()
     val selfData = BackupRepository.SelfData(self.aci.get(), self.pni.get(), self.e164.get(), ProfileKey(self.profileKey))
@@ -132,7 +175,7 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
     _state.value = _state.value.copy(uploadState = BackupUploadState.UPLOAD_IN_PROGRESS)
 
     disposables += Single
-      .fromCallable { BackupRepository.uploadBackupFile(backupData!!.inputStream(), backupData!!.size.toLong()) }
+      .fromCallable { BackupRepository.uploadBackupFile(backupData!!.inputStream(), backupData!!.size.toLong()) is NetworkResult.Success }
       .subscribeOn(Schedulers.io())
       .subscribe { success ->
         _state.value = _state.value.copy(uploadState = if (success) BackupUploadState.UPLOAD_DONE else BackupUploadState.UPLOAD_FAILED)
@@ -144,7 +187,7 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
 
     disposables += Single
       .fromCallable {
-        BackupRepository.restoreBackupTier()
+        BackupRepository.restoreBackupTier(SignalStore.account.requireAci())
         BackupRepository.getRemoteBackupState()
       }
       .subscribeOn(Schedulers.io())
@@ -201,7 +244,7 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
           .filter { attachments.contains(it.dbAttachment.attachmentId) }
           .map { it.dbAttachment }
 
-        BackupRepository.archiveMedia(toArchive)
+        BackupRepository.copyAttachmentToArchive(toArchive)
       }
       .subscribeOn(Schedulers.io())
       .observeOn(Schedulers.single())
@@ -218,13 +261,14 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
                 reUploadAndArchiveMedia(result.result.mediaIdToAttachmentId(it.mediaId))
               }
           }
+
           else -> _mediaState.set { copy(error = MediaStateError(errorText = "$result")) }
         }
       }
   }
 
   fun archiveAttachmentMedia(attachment: BackupAttachment) {
-    disposables += Single.fromCallable { BackupRepository.archiveMedia(attachment.dbAttachment) }
+    disposables += Single.fromCallable { BackupRepository.copyAttachmentToArchive(attachment.dbAttachment) }
       .subscribeOn(Schedulers.io())
       .observeOn(Schedulers.single())
       .doOnSubscribe { _mediaState.set { update(inProgress = inProgressMediaIds + attachment.dbAttachment.attachmentId) } }
@@ -251,7 +295,7 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
         AppDependencies
           .jobManager
           .startChain(AttachmentUploadJob(attachmentId))
-          .then(ArchiveAttachmentJob(attachmentId))
+          .then(CopyAttachmentToArchiveJob(attachmentId))
           .enqueueAndBlockUntilCompletion(15.seconds.inWholeMilliseconds)
       }
       .subscribeOn(Schedulers.io())
@@ -303,7 +347,7 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
       }
   }
 
-  fun restoreArchivedMedia(attachment: BackupAttachment) {
+  fun restoreArchivedMedia(attachment: BackupAttachment, asThumbnail: Boolean) {
     disposables += Completable
       .fromCallable {
         val recipientId = SignalStore.releaseChannel.releaseChannelRecipientId!!
@@ -322,20 +366,29 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
         val insertMessage = SignalDatabase.messages.insertMessageInbox(message, threadId).get()
 
         SignalDatabase.attachments.debugCopyAttachmentForArchiveRestore(
-          insertMessage.messageId,
-          attachment.dbAttachment
+          mmsId = insertMessage.messageId,
+          attachment = attachment.dbAttachment,
+          forThumbnail = asThumbnail
         )
 
         val archivedAttachment = SignalDatabase.attachments.getAttachmentsForMessage(insertMessage.messageId).first()
 
-        AppDependencies.jobManager.add(
-          AttachmentDownloadJob(
-            messageId = insertMessage.messageId,
-            attachmentId = archivedAttachment.attachmentId,
-            manual = false,
-            forceArchiveDownload = true
+        if (asThumbnail) {
+          AppDependencies.jobManager.add(
+            RestoreAttachmentThumbnailJob(
+              messageId = insertMessage.messageId,
+              attachmentId = archivedAttachment.attachmentId,
+              highPriority = false
+            )
           )
-        )
+        } else {
+          AppDependencies.jobManager.add(
+            RestoreAttachmentJob.forInitialRestore(
+              messageId = insertMessage.messageId,
+              attachmentId = archivedAttachment.attachmentId
+            )
+          )
+        }
       }
       .subscribeOn(Schedulers.io())
       .observeOn(Schedulers.single())
@@ -354,7 +407,8 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
     val backupState: BackupState = BackupState.NONE,
     val uploadState: BackupUploadState = BackupUploadState.NONE,
     val remoteBackupState: RemoteBackupState = RemoteBackupState.Unknown,
-    val plaintext: Boolean
+    val plaintext: Boolean,
+    val canReadWriteBackupDirectory: Boolean = false
   )
 
   enum class BackupState(val inProgress: Boolean = false) {

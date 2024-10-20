@@ -85,6 +85,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">התר גישה</string>
     <string name="AttachmentKeyboard_payment">תשלום</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">ניהול</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">בחירת תמונות נוספות</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">לך אל הגדרות</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string name="AttachmentKeyboard_signal_has_limited_access">ל–Molly יש גישה מוגבלת לתמונות או לסרטונים</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">לא נמצאו תמונות, יש לבחור תמונות וסרטונים שיופיעו כאן או לשנות את ההרשאות</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">לא נמצאו תמונות או סרטונים. ל–Signal יש גישה רק לתמונות וסרטונים שנבחרו על ידך.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">לא ניתן למצוא יישום לבחירת מדיה.</string>
@@ -105,7 +119,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">כדי להציג תמונות וסרטונים:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string name="AttachmentManager_signal_needs_storage_access">Molly צריכה גישה לאחסון כדי להציג את התמונות והסרטונים שלך.</string>
+    <string name="AttachmentManager_signal_needs_storage_access">Molly צריכה גישה כדי להציג את התמונות והסרטונים שלך.</string>
 
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s לא הפעיל/ה תשלומים </string>
@@ -334,6 +348,8 @@
     <string name="CommunicationActions_invalid_link">קישור בלתי תקף</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">זה לא לינק שיחה תקף. יש לוודא שהלינק שלם ונכון לפני שמנסים להצטרף.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -838,6 +854,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">לגבות כעת</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">לא ניתן לשחזר מדיה</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">אין מספיק מקום פנוי במכשיר שלך. יש לפנות שטח אחסון כדי לשחזר את המדיה שלך.\n\nבחירה ב״דילוג על שחזור״ תגרום למחיקת המדיה בגיבוי שלך בפעם הבאה שהמכשיר שלך ישלים גיבוי חדש.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">אין מספיק מקום פנוי במכשיר שלך. יש לפנות %1$s של שטח כדי לשחזר את המדיה שלך.\n\nבחירה ב״דילוג על שחזור״ תגרום למחיקת המדיה בגיבוי שלך בפעם הבאה שהמכשיר שלך ישלים גיבוי חדש.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">אישור</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">דילוג על שחזור</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">סמל שגיאת גיבוי</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">יש לפנות שטח אחסון כדי לשחזר את המדיה שלך.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">יש לפנות %1$s של שטח כדי לשחזר את המדיה שלך.</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">מדיה בשחזור</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%1$s מתוך %2$s (%3$d)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">שחזור המדיה הושהה</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">ממתינים ל–WiFi…</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">ממתינים לחיבור אינטרנט…</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">סוללה חלשה. יש לטעון את המכשיר.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">יש לפנות שטח של %1$s כדי לשחזר את המדיה שלך.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">דילוג על שחזור</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">גיבויי צ׳אטים</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">גיבויים מוצפנים עם משפט־סיסמה ומאוחסנים במכשיר שלך.</string>
@@ -939,9 +990,9 @@
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">כל התכתבות במכשירים המקושרים היא פרטית</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
-    <string name="LinkDeviceFragment__signal_messages_are_synchronized">הודעות Molly יסונכרנו עם Molly בטלפון הנייד שלך לאחר שהוא יקושר. היסטוריית ההודעות הקודמת שלך לא תופיע.</string>
+    <string name="LinkDeviceFragment__signal_messages_are_synchronized">הודעות Signal יסונכרנו עם Signal בטלפון הנייד שלך לאחר שהוא יקושר. היסטוריית ההודעות הקודמת שלך לא תופיע.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string name="LinkDeviceFragment__on_other_device_visit_signal">במכשיר האחר שלך, יש לבקר ב–%1$s כדי להתקין את Molly</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">במכשיר שברצונך לקשר, יש לבקר ב–%1$s כדי להתקין את Signal</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string> -->
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">המכשירים המקושרים שלי</string>
@@ -959,6 +1010,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">אין מכשירים מקושרים</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">יש לפתוח את הנעילה כדי לקשר מכשיר</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">לפני הקישור, צריך לאשר שמדובר בך</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">יש ללחוץ על ׳המשך׳ ולהזין את ביטול נעילת הטלפון שלך כדי לאשר. לא להזין את קוד ה‑PIN של Signal.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">המשך</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1428,7 +1485,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">קישור קבוצה</string>
     <string name="ShareableGroupLinkDialogFragment__share">שתף</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">אפס קישור</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">אשר חברי קבוצה חדשים</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">דרוש מנהלן כדי לאשר הצטרפות של חברי קבוצה חדשים באמצעות קישור הקבוצה.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">האם אתה בטוח שאתה רוצה לאפס את קישור הקבוצה? אנשים לא יוכלו עוד להצטרף אל הקבוצה ע״י שימוש בקישור הנוכחי.</string>
 
@@ -2174,6 +2231,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">חזור</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">מידע על שיחה</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">המצלמה שלך כבויה</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">הקש כאן כדי להפעיל את צילום הוידאו שלך</string>
     <string name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">כדי להתקשר אל %1$s, היישום Molly צריך גישה אל המצלמה שלך</string>
@@ -2345,6 +2412,8 @@
     <string name="WebRtcCallView__additional_actions">פעולות נוספות</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">סיים שיחה</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">שינוי מצב צלצול</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">אירעה שגיאת ממשק משתמש. כדאי לדווח על השגיאה למפתחים.</string>
@@ -2745,6 +2814,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">ננסה שוב מאוחר יותר.</string>
     <string name="ApkUpdateNotifications_auto_update_success_title">Molly עודכנה בהצלחה</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">עודכנת אוטומטית לגרסה %1$s.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">לשלוח הודעה?</string>
@@ -3430,6 +3500,8 @@
     <string name="EditAboutFragment_free_to_chat">פנוי/ה לצ\'אט</string>
     <string name="EditAboutFragment_taking_a_break">לוקח הפסקה</string>
     <string name="EditAboutFragment_working_on_something_new">עובד על משהו חדש</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">ערוך קבוצה</string>
@@ -3931,6 +4003,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. לוחצים על ״הגדרות״ למטה</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %1$s מפעילים את ההרשאה</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. לוחצים על ״הרשאות״</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3. %1$s מפעילים את ההרשאה ״תמונות וסרטונים״</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">הגדרות</string>
 
@@ -4475,6 +4551,8 @@
     <string name="preferences_app_protection__screen_lock">נעילת מסך</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">נעל גישה אל Signal באמצעות נעילת מסך או טביעת אצבע</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">פסק זמן אי־פעילות של נעילת מסך</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">כדי להשתמש בנעילת מסך יש להגדיר PIN, קו ביטול נעילה, או סיסמה במכשיר זה.</string>
     <string name="preferences_app_protection__signal_pin">PIN של Signal</string>
     <string name="preferences_app_protection__create_a_pin">צור PIN</string>
     <string name="preferences_app_protection__change_your_pin">שנה את ה־PIN שלך</string>
@@ -4495,8 +4573,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">עשית יותר מדי ניסיונות. אנא נסה שוב מאוחר יותר.</string>
     <string name="RegistrationActivity_error_connecting_to_service">שגיאה בהתחברות אל שירות</string>
     <string name="preferences_chats__backups">גיבויים</string>
-    <string name="prompt_passphrase_activity__signal_is_locked">Molly נעול</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">הקש כדי לשחרר נעילה</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string name="prompt_passphrase_activity__unlock_signal">ביטול נעילת Molly</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string name="prompt_passphrase_activity__use_your_android_device">יש להשתמש בהגדרות נעילת מכשיר ה–Android שלך כדי לבטל את הנעילה של Molly.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string name="prompt_passphrase_activity__screen_lock_is_on">נעילת המסך מופעלת ו–Molly מאובטחת כהלכה עם הגדרות נעילת המכשיר שלך. אפשר לבטל את הנעילה של Molly באותו אופן שבו מבטלים את נעילת המסך הרגילה — על ידי זיהוי פנים, טביעת אצבע, PIN, סיסמה או קו ביטול נעילה.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">יצירת קשר עם התמיכה</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">ניסיון חוזר</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">כבויה</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">שימוש בנעילת מסך</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string name="ScreenLockSettingsFragment__your_android_device">הגדרות הנעילה של מכשיר Android שלך יידרשו כדי לבטל את הנעילה של Molly בעת יציאה או מעבר בין אפליקציות. במצב נעול, התראות תצוגה מקדימה לא יציגו את תוכן ההודעה.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">הפעלת נעילת מסך</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">מיד</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">אחרי דקה 1</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">אחרי 5 דקות</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">אחרי 30 דקות</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">זמן מותאם אישית</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string name="ScreenLockSettingsFragment__use_signal_screen_lock">שימוש בנעילת מסך של Molly</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string name="ScreenLockSettingsFragment__turn_off_signal_lock">כיבוי נעילת המסך של Molly</string>
+
     <string name="Recipient_unknown">בלתי ידוע</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">חשבון שנמחק</string>
@@ -5139,7 +5250,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">מקלדת</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">מקש Enter שולח</string>
+    <string name="ChatsSettingsFragment__send_with_enter">שליחה עם enter</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">הודעות</string>
@@ -5163,10 +5274,10 @@
     <string name="PrivacySettingsFragment__blocked">חסום/ה</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="one">איש קשר %1$d</item>
-        <item quantity="two">%1$d אנשי קשר</item>
-        <item quantity="many">%1$d אנשי קשר</item>
-        <item quantity="other">%1$d אנשי קשר</item>
+        <item quantity="one">איש קשר או קבוצה %1$d</item>
+        <item quantity="two">%1$d אנשי קשר או קבוצות</item>
+        <item quantity="many">%1$d אנשי קשר או קבוצות</item>
+        <item quantity="other">%1$d אנשי קשר או קבוצות</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">תכתובת</string>
     <string name="PrivacySettingsFragment__disappearing_messages">הודעות נעלמות</string>
@@ -5375,7 +5486,7 @@
     <string name="PermissionsSettingsFragment__only_admins">רק מנהלנים</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">מי יכול להוסיף חברי קבוצה חדשים?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">מי יכול לערוך את המידע של קבוצה הזאת?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">מי יכול לשלוח הודעות?</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">מי יכול לשלוח הודעות ולהתחיל שיחות?</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">השתקת התראות</string>
@@ -7141,7 +7252,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">עריכת שם שיחה</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">אישור כל החברים</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">דרישת אישור מנהל/ת</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">שיתוף לינק דרך Signal</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -7197,7 +7308,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">הוספת שם שיחה</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">אישור כל החברים</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">דרישת אישור מנהל/ת</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">שיתוף קישור</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -7458,12 +7569,22 @@
     <string name="BackupAlertBottomSheet__download_later">הורדה אחר כך</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">לא להוריד מדיה</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">המדיה תימחק</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">המדיה שמאוחסנת בגיבוי שלך תימחק לצמיתות היום. זו ההזדמנות האחרונה שלך להוריד אותה.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">הורד</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">לא להוריד</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">יש לפנות שטח של %1$s כדי להוריד את המדיה שלך.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">כרטיס אשראי או דביט</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7500,6 +7621,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">החלת מגבלות על מכשירים מקושרים</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">כשאפשרות זו מופעלת, מגבלות הצ׳אט ימחקו הודעות גם מהמכשירים המקושרים שלך.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">אחסון במכשיר</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">אופטימיזציה של אחסון במכשיר</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">מדיה שאינה בשימוש תוסר, אך ניתן להוריד אותה מהגיבוי שלך בכל עת.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">יש לשדרג כדי לאפשר את הפיצ׳ר הזה</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">ניתן להשתמש באופטימיזציה של אחסון רק עם אפשרות הגיבוי בתשלום של Signal. אפשר לשדרג את תכנית הגיבוי שלך כדי להתחיל להשתמש בפיצ׳ר.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">שדרוג כעת</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">המחיקה מסונכרנת כעת בכל המכשירים שלך</string>
@@ -7545,6 +7680,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">מינוי בוטל</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">ההורדה הושלמה</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">הגיבוי ייווצר במהלך הלילה.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">סוג גיבוי</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7586,12 +7723,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">יש להכניס את קוד ה–PIN, הסיסמה, או התבנית של המכשיר שלך.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">תשלום של %1$s לחודש ל–Signal</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">מקבלים:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">אפשר לגבות את ההודעות והמדיה ששלך באמצעות שירות האחסון המוצפן מקצה לקצה של Signal. ככה, לא מאבדים אף הודעה כשמחליפים טלפון או מתקינים מחדש את Signal.</string>
@@ -7606,27 +7737,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">למידע נוסף</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">הכנס את ה־PIN שלך</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">יש להזין את קוד ה–PIN של Signal כדי לאפשר גיבויים</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">הבא</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">החלפת מקלדת</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">קודי PIN מגינים על הגיבוי שלך</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">ה–PIN שלך ב–Signal מאפשר לך לשחזר את הגיבוי שלך בעת התקנה מחדש של האפליקציה. אנחנו ממליצים להשתמש בקוד PIN שמכיל לפחות %1$d ספרות.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">אם שכחת את ה–PIN, לא תהיה לך אפשרות לשחזר את הגיבוי שלך. אפשר לשנות את קוד ה–PIN שלך בכל עת בהגדרות.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">שימוש ב–PIN נוכחי של Signal</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">צור PIN חדש</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7641,6 +7780,34 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">שינוי סוג גיבוי</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">ביטול מנוי</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">חינם</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s לחודש</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">טקסט + כל המדיה שלך</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="one">טקסט + יום %1$d של מדיה</item>
+        <item quantity="two">טקסט + יומיים של מדיה</item>
+        <item quantity="many">טקסט + %1$d ימים של מדיה</item>
+        <item quantity="other">טקסט + %1$d ימים של מדיה</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">גיבוי מלא של הודעות טקסט</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">גיבוי מלא של מדיה</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">%1$s של אחסון (%2$s תמונות)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">תודה על התמיכה ב–Signal!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="one">יום אחרון %1$d של מדיה</item>
+        <item quantity="two">יומיים אחרונים של מדיה</item>
+        <item quantity="many">%1$d ימים אחרונים של מדיה</item>
+        <item quantity="other">%1$d ימים אחרונים של מדיה</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7653,5 +7820,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">אישור והורדה אחר כך</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">שמירה על מנוי</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">סמל תזכורת</string>
     <!-- EOF -->
 </resources>

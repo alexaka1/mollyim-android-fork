@@ -85,6 +85,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">Dozvoli pristup</string>
     <string name="AttachmentKeyboard_payment">Plaćanje</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">Upravljaj</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">Odaberite više fotografija</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">Go to Settings</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string name="AttachmentKeyboard_signal_has_limited_access">Molly ima ograničen pristup fotografijama ili videozapisima</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">Fotografije nisu pronađene, odaberite fotografije i videozapise koji će se pojaviti ovdje ili promijenite dozvole</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">Nisu pronađene fotografije ili videozapisi. Signal ima pristup samo fotografijama i videozapisima koje ste odabrali.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">Nije pronađena aplikacija za biranje priloga.</string>
@@ -105,7 +119,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">Za prikaz fotografija i video zapisa:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string name="AttachmentManager_signal_needs_storage_access">Molly treba pristup pohrani za prikazivanje vaših fotografija i videozapisa.</string>
+    <string name="AttachmentManager_signal_needs_storage_access">Molly treba pristup za prikazivanje vaših fotografija i videozapisa.</string>
 
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s nije aktivirao/la Plaćanja </string>
@@ -334,6 +348,8 @@
     <string name="CommunicationActions_invalid_link">Nevažeći link</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">Ovo nije važeća poveznica za poziv. Prije nego se pokušate pridružiti provjerite je li cijela poveznica netaknuta i ispravna.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -470,7 +486,7 @@
     <!-- Dialog title asking users for microphone permission -->
     <string name="ConversationActivity_allow_access_microphone">Dozvolite pristup vašem mikrofonu</string>
     <!-- Dialog description that will explain the steps needed to give microphone permissions -->
-    <string name="ConversationActivity_signal_to_send_audio_messages">Za slanje audio poruka:</string>
+    <string name="ConversationActivity_signal_to_send_audio_messages">Za slanje glasovnih poruka:</string>
     <!-- Alert dialog description asking for microphone permission in order to send voice messages -->
     <string name="ConversationActivity_to_send_voice_messages_allow_signal_access_to_your_microphone">Za slanje glasovnih poruka, dozvolite da Molly pristupi vašem mikrofonu.</string>
     <!-- Toast text explaining Signal\'s need for microphone access -->
@@ -838,6 +854,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">Kreiraj kopiju sada</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">Nije moguće obnoviti medijske sadržaje</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">Vaš uređaj nema dovoljno slobodnog prostora. Oslobodite prostor za pohranu da obnovite svoje medijske sadržaje.\n\nAko odaberete \"Preskoči obnovu\", medijski sadržaji u vašoj sigurnosnoj kopiji će se izbrisati sljedeći put kada vaš uređaj izvrši kreiranje nove sigurnosne kopije.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">Vaš uređaj nema dovoljno slobodnog prostora. Oslobodite %1$s prostora za vraćanje medijskih sadržaja.\n\nAko odaberete \"Preskoči obnovu\", medijski sadržaji u vašoj sigurnosnoj kopiji će se izbrisati sljedeći put kada vaš uređaj izvrši kreiranje nove sigurnosne kopije.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">OK</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">Preskoči obnovu</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">Ikona greške sigurnosne kopije</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">Oslobodite prostor za pohranu da obnovite svoje medijske sadržaje.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">Oslobodite %1$s prostora za obnovu medijskih sadržaja.</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">Obnova medijskih sadržaja</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%3$d%1$s od %2$s (%%)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">Obnova medijskih sadržaja je pauzirana</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">Čeka se WiFi…</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">Čeka se internetska veza…</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">Slaba baterija. Napunite uređaj.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">Oslobodite %1$s za obnovu medijskih sadržaja.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">Preskoči obnovu</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">Rezervne kopije chata</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">Rezervne kopije šifrirane su pomoću lozinke i pohranjene na Vašem uređaju.</string>
@@ -939,9 +990,9 @@
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">Sve poruke na povezanim uređajima su privatne</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
-    <string name="LinkDeviceFragment__signal_messages_are_synchronized">Molly poruke se sinhronizuju sa Mollyom na vašem mobilnom telefonu nakon što se poveže. Vaša prethodna historija poruka se neće pojaviti.</string>
+    <string name="LinkDeviceFragment__signal_messages_are_synchronized">Signal poruke se sinhronizuju sa Signalom na vašem mobilnom telefonu nakon što se poveže. Vaša prethodna historija poruka se neće pojaviti.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string name="LinkDeviceFragment__on_other_device_visit_signal">Na svom drugom uređaju posjetite %1$s da instalirate Molly</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">Na uređaju koji želite povezati, posjetite %1$s da instalirate Signal</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string> -->
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">Moji povezani uređaji</string>
@@ -959,6 +1010,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">Nema povezanih uređaja</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">Otključajte da povežete uređaj</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">Prije povezivanja, potvrdite svoj identitet</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">Dodirnite Nastavi i unesite šifru za otključavanje telefona da potvrdite. Nemojte unositi svoj PIN za Signal.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">Nastavi</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1428,7 +1485,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">Link za grupu</string>
     <string name="ShareableGroupLinkDialogFragment__share">Dijeli</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">Kreiraj novi link</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">Prihvati nove članove</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">Zahtijevaj da novim članovima administrator odobri pristupanje grupi putem linka.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">Jeste li sigurni da želite iznova kreirati link za grupu? Novi članovi više neće moći pristupiti grupi putem trenutnog linka.</string>
 
@@ -2174,6 +2231,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">Nazad</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">Informacije o pozivu</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">Vaša kamera je isključena</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">Pritisnite ovdje da uključite video</string>
     <string name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">Da biste nazvali %1$s, Mollyu je potreban pristup Vašoj kameri</string>
@@ -2345,6 +2412,8 @@
     <string name="WebRtcCallView__additional_actions">Dodatne radnje</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">Završi razgovor</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">Uključi zvono grupe</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">Došlo je do greške korisničkog sučelja. Prijavite ovu grešku programerima.</string>
@@ -2745,6 +2814,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">Pokušat ćemo ponovo kasnije.</string>
     <string name="ApkUpdateNotifications_auto_update_success_title">Molly je uspješno ažuriran</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">Automatski ste ažurirani na verziju %1$s.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">Poslati poruku?</string>
@@ -3430,6 +3500,8 @@
     <string name="EditAboutFragment_free_to_chat">Dostupni za chat</string>
     <string name="EditAboutFragment_taking_a_break">Na pauzi</string>
     <string name="EditAboutFragment_working_on_something_new">Radim na nečemu novom</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">Uredi grupu</string>
@@ -3931,6 +4003,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. Dodirnite “Postavke” u nastavku</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %1$s Dopustite dozvolu</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. Dodirnite “Dozvole”</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3. %1$s Dozvolite \"Fotografije i videozapise\".</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">Postavke</string>
 
@@ -4475,6 +4551,8 @@
     <string name="preferences_app_protection__screen_lock">Zaključavanje ekrana</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">Zaključaj pristup Signalu pomoću Androidovog zaključavanja ekrana ili otiska prsta</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">Zaključavanje ekrana nakon neaktivnosti</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">Za korištenje zaključavanja ekrana postavite PIN, uzorak ili lozinku na ovom uređaju.</string>
     <string name="preferences_app_protection__signal_pin">Signal PIN</string>
     <string name="preferences_app_protection__create_a_pin">Kreiraj PIN</string>
     <string name="preferences_app_protection__change_your_pin">Promijenite svoj PIN</string>
@@ -4495,8 +4573,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">Pokušali ste previše puta. Molimo pokušajte ponovo kasnije.</string>
     <string name="RegistrationActivity_error_connecting_to_service">Greška pri povezivanju sa uslugom</string>
     <string name="preferences_chats__backups">Rezervne kopije</string>
-    <string name="prompt_passphrase_activity__signal_is_locked">Molly je zaključan</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">PRITISNITE DA OTKLJUČATE</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string name="prompt_passphrase_activity__unlock_signal">Otključajte Molly</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string name="prompt_passphrase_activity__use_your_android_device">Koristite Android postavke zaključavanja uređaja da otključate Molly.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string name="prompt_passphrase_activity__screen_lock_is_on">Zaključavanje ekrana je uključeno i Molly je sigurno zaštićen postavkama zaključavanja vašeg uređaja. Otključajte Molly na isti način kao što biste inače otključali svoj telefon, to može biti pomoću otključavanja licem, otključavanja otiskom prsta, PIN-a, lozinke ili uzorka.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">Kontaktirajte podršku</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">Pokušajte ponovo</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">Isključeno</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">Koristite zaključavanje ekrana</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string name="ScreenLockSettingsFragment__your_android_device">Postavke zaključavanja vašeg Android uređaja će biti potrebne za otključavanje Mollya kada napustite ili promijenite aplikaciju. Kada je uređaj zaključan, pregledi obavještenja neće prikazati sadržaj poruke.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">Pokreni zaključavanje ekrana</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">Odmah</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">Nakon 1 minutu</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">Nakon 5 minuta</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">Nakon 30 minuta</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">Prilagodi vrijeme</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string name="ScreenLockSettingsFragment__use_signal_screen_lock">Koristite zaključavanje ekrana Molly</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string name="ScreenLockSettingsFragment__turn_off_signal_lock">Isključite zaključavanje ekrana Molly</string>
+
     <string name="Recipient_unknown">Nepoznato</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">Izbrisan račun</string>
@@ -5139,7 +5250,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">Tastatura</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">Tipka Enter šalje</string>
+    <string name="ChatsSettingsFragment__send_with_enter">Pošaljite sa Enter</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">Poruke</string>
@@ -5163,10 +5274,10 @@
     <string name="PrivacySettingsFragment__blocked">Blokirano</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="one">%1$d kontakt</item>
-        <item quantity="few">%1$d kontakta</item>
-        <item quantity="many">%1$d kontakata</item>
-        <item quantity="other">%1$d kontakata</item>
+        <item quantity="one">%1$d kontakt ili grupa</item>
+        <item quantity="few">%1$d kontakta ili grupe</item>
+        <item quantity="many">%1$d kontakata ili grupa</item>
+        <item quantity="other">%1$d kontakata ili grupa</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">Poruke</string>
     <string name="PrivacySettingsFragment__disappearing_messages">Nestajuće poruke</string>
@@ -5375,7 +5486,7 @@
     <string name="PermissionsSettingsFragment__only_admins">Samo administratori</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">Ko može uvrstiti nove članove?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">Ko može mijenjati informacije o ovoj grupi?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">Ko može slati poruke?</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">Ko može slati poruke i upućivati pozive?</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">Isključi zvuk obavještenja</string>
@@ -7141,7 +7252,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">Uređivanje naziva poziva</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">Odobri sve članove</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">Zatraži odobrenje administratora</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">Podijelite poveznicu putem Signala</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -7197,7 +7308,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">Dodajte ime poziva</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">Odobri sve članove</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">Zatraži odobrenje administratora</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">Podijeli poveznicu</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -7458,12 +7569,22 @@
     <string name="BackupAlertBottomSheet__download_later">Preuzmi kasnije</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">Ne preuzimaj medij</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">Medijski sadržaji će se izbrisati</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">Medijski sadržaji pohranjeni u vašoj sigurnosnoj kopiji će se trajno izbrisati danas. Ovo vam je posljednja prilika da ih preuzmete.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">Preuzmi</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">Ne preuzimaj</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">Oslobodite %1$s prostora da preuzmete medije.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">Kreditna ili debitna kartica</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7500,6 +7621,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">Primijenite ograničenja na povezane uređaje</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">Kada je omogućeno, ograničenja chata će također izbrisati poruke sa vaših povezanih uređaja.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">Pohrana na uređaju</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimizirajte pohranu na uređaju</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">Neiskorišteni medijski sadržaji će biti uklonjeni, ali se mogu preuzeti iz vaše sigurnosne kopije u bilo koje vrijeme.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">Nadogradite da omogućite ovu značajku</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">Optimizacija pohrane može se koristiti samo s plaćenim nivoom sigurnosnih kopija Signala. Nadogradite svoj plan rezervne kopije da počnete koristiti ovu značajku.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">Nadogradite sada</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">Brisanje je sada sinhronizirano na svim vašim uređajima</string>
@@ -7545,6 +7680,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">Pretplata je otkazana</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">Preuzimanje je završeno</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">Sigurnosna kopija će biti kreirana tokom noći.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">Vrsta rezervne kopije</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7586,12 +7723,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">Unesite PIN za svoj uređaj, lozinku ili uzorak.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">Platite %1$smjesečno za Signal</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">Dobit ćete:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">Kreirajte sigurnosnu kopiju poruka i medija i koristite sigurnu, sveobuhvatno šifriranu uslugu pohrane Signala. Nikada nemojte izgubiti poruku kada dobijete novi telefon ili ponovo instalirate Signal.</string>
@@ -7606,27 +7737,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">Saznaj više</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">Unesite svoj PIN</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">Unesite svoj PIN Signala da omogućite sigurnosne kopije</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">Dalje</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">Promijeni tastaturu</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">PIN-ovi štite vašu sigurnosnu kopiju</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">Vaš Signal PIN vam omogućava da vratite rezervnu kopiju kada ponovo instalirate Signal. Preporučujemo korištenje PIN-a koji ima najmanje %1$d cifara.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">Ako zaboravite PIN, nećete moći vratiti sigurnosnu kopiju. PIN možete promijeniti u bilo kojem trenutku u postavkama.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">Koristite trenutni PIN Signala</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">Kreiraj novi PIN</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7641,6 +7780,34 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">Promijenite vrstu sigurnosne kopije</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">Otkaži pretplatu</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">Besplatno</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s/mjesečno</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">Tekst + svi vaši medijski sadržaji</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="one">Tekst + %1$d dan medijskih sadržaja</item>
+        <item quantity="few">Tekst + %1$d dana medijskih sadržaja</item>
+        <item quantity="many">Tekst + %1$d dana medijskih sadržaja</item>
+        <item quantity="other">Tekst + %1$d dana medijskih sadržaja</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">Sigurnosna kopija cijele tekstualne poruke</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">Potpuna sigurnosna kopija medijskih sadržaja</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">%1$s pohrane (fotografije: %2$s)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">Hvala što podržavate Signal!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="one">Posljednji %1$d dan medijskih sadržaja</item>
+        <item quantity="few">Posljednja %1$d dana medijskih sadržaja</item>
+        <item quantity="many">Posljednjih %1$d dana medijskih sadržaja</item>
+        <item quantity="other">Posljednjih %1$d dana medijskih sadržaja</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7653,5 +7820,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">Potvrdite i preuzmite kasnije</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">Zadrži pretplatu</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">Ikona podsjetnika</string>
     <!-- EOF -->
 </resources>

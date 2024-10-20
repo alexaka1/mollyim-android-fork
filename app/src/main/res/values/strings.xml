@@ -89,6 +89,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">Allow Access</string>
     <string name="AttachmentKeyboard_payment">Payment</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">Manage</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">Select more photos</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">Go to Settings</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string mollyify="true" name="AttachmentKeyboard_signal_has_limited_access">Molly has limited access to photos or videos</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">No photos found, select photos and videos to appear here or change permissions</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">No photos or videos found. Signal only has access to photos and videos you selected.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">Can\'t find an app to select media.</string>
@@ -108,7 +122,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">To show photos and videos:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string mollyify="true" name="AttachmentManager_signal_needs_storage_access">Molly needs storage access to show your photos and videos.</string>
+    <string mollyify="true" name="AttachmentManager_signal_needs_storage_access">Molly needs access to show your photos and videos.</string>
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s hasn\'t activated Payments </string>
     <!-- Alert dialog description to send the recipient a request to activate payments -->
@@ -330,6 +344,8 @@
     <string name="CommunicationActions_invalid_link">Invalid link</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">This is not a valid call link. Make sure the entire link is intact and correct before attempting to join.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -462,7 +478,7 @@
     <!-- Dialog title asking users for microphone permission -->
     <string name="ConversationActivity_allow_access_microphone">Allow access to your microphone</string>
     <!-- Dialog description that will explain the steps needed to give microphone permissions -->
-    <string name="ConversationActivity_signal_to_send_audio_messages">To send audio messages:</string>
+    <string name="ConversationActivity_signal_to_send_audio_messages">To send voice messages:</string>
     <!-- Alert dialog description asking for microphone permission in order to send voice messages -->
     <string mollyify="true" name="ConversationActivity_to_send_voice_messages_allow_signal_access_to_your_microphone">To send voice messages, allow Molly access to your microphone.</string>
     <!-- Toast text explaining Signal\'s need for microphone access -->
@@ -800,6 +816,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">Back up now</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">Can\'t restore media</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">Your device does not have enough free space. Free up storage space to restore your media.\n\nIf you choose “Skip restore” the media in your backup will be deleted the next time your device completes a new backup.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">Your device does not have enough free space. Free up %1$s of space to restore your media.\n\nIf you choose “Skip restore” the media in your backup will be deleted the next time your device completes a new backup.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">OK</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">Skip restore</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">Backup error icon</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">Free up storage space to restore your media.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">Free up %1$s of space to restore your media.</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">Restoring media</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%1$s of %2$s (%3$d%%)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">Restoring media paused</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">Waiting for WiFi…</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">Waiting for Internet connection…</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">Low battery. Charge your device.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">Free up %1$s to restore your media.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">Skip restore</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">Chat backups</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">Backups are encrypted with a passphrase and stored on your device.</string>
@@ -901,9 +952,9 @@
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">All messaging on linked devices is private</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
-    <string mollyify="true" name="LinkDeviceFragment__signal_messages_are_synchronized">Molly messages are synchronized with Molly on your mobile phone after it is linked. Your previous message history will not appear.</string>
+    <string name="LinkDeviceFragment__signal_messages_are_synchronized">Molly messages are synchronized with Molly on your mobile phone after it is linked. Your previous message history will not appear.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string mollyify="true" name="LinkDeviceFragment__on_other_device_visit_signal">On your other device, visit %s to install Molly</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">On the device you want to link, visit %s to install Molly</string>
     <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string>
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">My linked devices</string>
@@ -921,6 +972,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">No linked devices</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">Unlock to link a device</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">Before linking, confirm it\'s you</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">Tap continue and enter your phone\'s lock to confirm. Do not enter your Signal PIN.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">Continue</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1349,7 +1406,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">Group link</string>
     <string name="ShareableGroupLinkDialogFragment__share">Share</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">Reset link</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">Approve new members</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">Require an admin to approve new members joining via the group link.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">Are you sure you want to reset the group link? People will no longer be able to join the group using the current link.</string>
 
@@ -1592,12 +1649,12 @@
     <string name="MessageRecord_you_couldnt_be_added_to_the_new_group_and_have_been_invited_to_join">You couldn\'t be added to the New Group and have been invited to join.</string>
     <string name="MessageRecord_chat_session_refreshed">Chat session refreshed</string>
     <plurals name="MessageRecord_members_couldnt_be_added_to_the_new_group_and_have_been_invited">
-        <item quantity="one">A member couldn\'t be added to the New Group and has been invited to join.</item>
+        <item quantity="one">%1$s member couldn\'t be added to the New Group and has been invited to join.</item>
         <item quantity="other">%1$s members couldn\'t be added to the New Group and have been invited to join.</item>
     </plurals>
 
     <plurals name="MessageRecord_members_couldnt_be_added_to_the_new_group_and_have_been_removed">
-        <item quantity="one">A member couldn\'t be added to the New Group and has been removed.</item>
+        <item quantity="one">%1$s member couldn\'t be added to the New Group and has been removed.</item>
         <item quantity="other">%1$s members couldn\'t be added to the New Group and have been removed.</item>
     </plurals>
 
@@ -2048,6 +2105,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">Go back</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">Call information</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">Your camera is off</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">Tap here to turn on your video</string>
     <string mollyify="true" name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">To call %1$s, Molly needs access to your camera</string>
@@ -2197,6 +2264,8 @@
     <string name="WebRtcCallView__additional_actions">Additional actions</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">End call</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">Toggle group ringing</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">A UI error occurred. Please report this error to the developers.</string>
@@ -2579,6 +2648,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">We will try again later.</string>
     <string mollyify="true" name="ApkUpdateNotifications_auto_update_success_title">Molly successfully updated</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">You were automatically updated to version %1$s.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">Send message?</string>
@@ -3236,6 +3306,8 @@
     <string name="EditAboutFragment_free_to_chat">Free to chat</string>
     <string name="EditAboutFragment_taking_a_break">Taking a break</string>
     <string name="EditAboutFragment_working_on_something_new">Working on something new</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">Edit group</string>
@@ -3729,6 +3801,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. Tap “Settings” below</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %s Allow the permission</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. Tap “Permissions”</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3. %1$s Allow the “Photos and videos” permission</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">Settings</string>
 
@@ -4255,6 +4331,8 @@
     <string name="preferences_app_protection__screen_lock">Screen lock</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">Lock Signal access with Android screen lock or fingerprint</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">Screen lock inactivity timeout</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">To use screen lock set a PIN, pattern, or password on this device.</string>
     <string name="preferences_app_protection__signal_pin">Signal PIN</string>
     <string name="preferences_app_protection__create_a_pin">Create a PIN</string>
     <string name="preferences_app_protection__change_your_pin">Change your PIN</string>
@@ -4275,8 +4353,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">You\'ve made too many attempts. Please try again later.</string>
     <string name="RegistrationActivity_error_connecting_to_service">Error connecting to service</string>
     <string name="preferences_chats__backups">Backups</string>
-    <string mollyify="true" name="prompt_passphrase_activity__signal_is_locked">Molly is locked</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">TAP TO UNLOCK</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string mollyify="true" name="prompt_passphrase_activity__unlock_signal">Unlock Molly</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string mollyify="true" name="prompt_passphrase_activity__use_your_android_device">Use your Android device lock settings to unlock Molly.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string mollyify="true" name="prompt_passphrase_activity__screen_lock_is_on">Screen lock is on and Molly is safely secured with your device lock settings. Unlock Molly the same way as you would normally unlock your phone, this could be with Face Unlock, Fingerprint Unlock, a PIN, password or pattern.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">Contact support</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">Try again</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">Off</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">Use screen lock</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string mollyify="true" name="ScreenLockSettingsFragment__your_android_device">Your Android device lock settings will be required to unlock Molly when you leave or switch apps. When locked, notification previews will not show message content.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">Start screen lock</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">Immediately</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">After 1 minute</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">After 5 minutes</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">After 30 minutes</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">Custom time</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string mollyify="true" name="ScreenLockSettingsFragment__use_signal_screen_lock">Use Molly screen lock</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string mollyify="true" name="ScreenLockSettingsFragment__turn_off_signal_lock">Turn off Molly screen lock</string>
+
     <string name="Recipient_unknown">Unknown</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">Deleted account</string>
@@ -4903,7 +5014,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">Keyboard</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">Enter key sends</string>
+    <string name="ChatsSettingsFragment__send_with_enter">Send with enter</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">Messages</string>
@@ -4927,8 +5038,8 @@
     <string name="PrivacySettingsFragment__blocked">Blocked</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="one">%1$d contact</item>
-        <item quantity="other">%1$d contacts</item>
+        <item quantity="one">%1$d contact or group</item>
+        <item quantity="other">%1$d contacts or groups</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">Messaging</string>
     <string name="PrivacySettingsFragment__disappearing_messages">Disappearing messages</string>
@@ -5133,7 +5244,7 @@
     <string name="PermissionsSettingsFragment__only_admins">Only admins</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">Who can add new members?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">Who can edit this group\'s info?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">Who can send messages?</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">Who can send messages and start calls?</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">Mute notifications</string>
@@ -6837,7 +6948,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">Edit call name</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">Approve all members</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">Require admin approval</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">Share link via Signal</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -6893,7 +7004,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">Add call name</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">Approve all members</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">Require admin approval</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">Share link</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -7144,12 +7255,22 @@
     <string name="BackupAlertBottomSheet__download_later">Download later</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">Don\'t download media</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">Media will be deleted</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">The media stored in your backup will be permanently deleted today. This is your last chance to download it.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">Download</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">Don\'t download</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">Free up %1$s of space to download your media.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">Credit or debit card</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7186,6 +7307,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">Apply limits to linked devices</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">When enabled, chat limits will also delete messages from your linked devices.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">On-device storage</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimize on-device storage</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">Unused media will be offloaded, but can be downloaded from your backup anytime.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">Upgrade to enable this feature</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">Storage optimization can only be used with the paid tier of Signal Backups. Upgrade your backup plan to start using this feature.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">Upgrade now</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">Deleting is now synced across all of your devices</string>
@@ -7231,6 +7366,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">Subscription cancelled</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">Download complete</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">Backup will be created overnight.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">Backup type</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7272,12 +7409,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">Please enter your device pin, password or pattern.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">Pay %1$s/month to Signal</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">You\'ll get:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">Back up your messages and media and using Signal\'s secure, end-to-end encrypted storage service. Never lose a message when you get a new phone or reinstall Signal.</string>
@@ -7292,27 +7423,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">Learn more</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">Enter your PIN</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">Enter your Signal PIN to enable backups</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">Next</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">Switch keyboard</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">PINs protect your backup</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">Your Signal PIN lets you restore your backup when you re-install Signal. We recommend using a PIN that\'s at least %1$d digits.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">If you forget your PIN, you will not be able to restore your backup. You can change your PIN at any time in settings.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">Use current Signal PIN</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">Create new PIN</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7327,6 +7466,30 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">Change backup type</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">Cancel subscription</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">Free</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s/month</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">Text + all your media</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="one">Text + %1$d day of media</item>
+        <item quantity="other">Text + %1$d days of media</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">Full text message backup</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">Full media backup</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">%1$s of storage (%2$s photos)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">Thanks for supporting Signal!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="one">Last %1$d day of media</item>
+        <item quantity="other">Last %1$d days of media</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7339,5 +7502,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">Confirm and download later</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">Keep subscription</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">Reminder icon</string>
     <!-- EOF -->
 </resources>

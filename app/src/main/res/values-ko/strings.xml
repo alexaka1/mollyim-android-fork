@@ -85,6 +85,20 @@
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">권한 허용</string>
     <string name="AttachmentKeyboard_payment">결제</string>
+    <!-- Text in a button that allows users to manage which media Signal has access to -->
+    <string name="AttachmentKeyboard_manage">관리</string>
+    <!-- Option in menu to select more photos that Signal will have access to -->
+    <string name="AttachmentKeyboard_select_more_photos">더 많은 사진 선택</string>
+    <!-- Option in menu to go to settings -->
+    <string name="AttachmentKeyboard_go_to_settings">설정으로 이동</string>
+    <!-- Text explaining that Signal has limited access to photos -->
+    <string name="AttachmentKeyboard_signal_has_limited_access">Molly의 사진 또는 동영상에 대한 액세스 권한이 제한됩니다.</string>
+    <!-- Text shown when user has given no photos for Signal to access and an explanation on how to change those permissions -->
+    <string name="AttachmentKeyboard_no_photos_found">사진을 찾을 수 없습니다. 여기에 표시할 사진과 동영상을 선택하거나 권한을 변경하세요.</string>
+
+    <!-- MediaGalleryFragment -->
+    <!-- Text describing that no photos or videos are currently found in the gallery and that Signal can only access media that the user allows -->
+    <string name="MediaGalleryFragment__no_photos_found">사진 또는 동영상을 찾을 수 없습니다. Signal에는 사용자가 선택한 사진과 동영상에 대해서만 액세스 권한이 부여됩니다.</string>
 
     <!-- AttachmentManager -->
     <string name="AttachmentManager_cant_open_media_selection">미디어를 선택할 수 있는 앱이 없습니다.</string>
@@ -105,7 +119,7 @@
     <!-- Dialog description that will explain the steps needed to give gallery storage permission -->
     <string name="AttachmentManager_signal_to_show_photos">사진과 동영상 표시 방법:</string>
     <!-- Toast text explaining Signal\'s need for storage access -->
-    <string name="AttachmentManager_signal_needs_storage_access">사진과 동영상을 표시하려면 Molly에 권한이 필요합니다.</string>
+    <string name="AttachmentManager_signal_needs_storage_access">사진과 동영상을 표시하려면 Molly에 액세스 권한이 필요합니다.</string>
 
     <!-- Alert dialog title to show the recipient has not activated payments -->
     <string name="AttachmentManager__not_activated_payments">%1$s 님이 결제를 아직 활성화하지 않았습니다. </string>
@@ -325,6 +339,8 @@
     <string name="CommunicationActions_invalid_link">잘못된 링크</string>
     <!-- Message on dialog when call link url cannot be parsed -->
     <string name="CommunicationActions_this_is_not_a_valid_call_link">통화 링크가 올바르지 않습니다. 통화에 참여하기 전에 링크가 정확한지 확인하세요.</string>
+    <!-- Displayed in a snackbar when the user is already in a call -->
+    <string name="CommunicationActions__you_are_already_in_a_call">You are already in a call</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -455,7 +471,7 @@
     <!-- Dialog title asking users for microphone permission -->
     <string name="ConversationActivity_allow_access_microphone">마이크를 사용할 수 있도록 허용</string>
     <!-- Dialog description that will explain the steps needed to give microphone permissions -->
-    <string name="ConversationActivity_signal_to_send_audio_messages">음성 메시지를 보내려면 다음을 수행하세요.</string>
+    <string name="ConversationActivity_signal_to_send_audio_messages">음성 메시지를 보내는 방법:</string>
     <!-- Alert dialog description asking for microphone permission in order to send voice messages -->
     <string name="ConversationActivity_to_send_voice_messages_allow_signal_access_to_your_microphone">음성 메시지를 보내려면 Molly에서 마이크를 사용할 수 있도록 허용하세요.</string>
     <!-- Toast text explaining Signal\'s need for microphone access -->
@@ -778,6 +794,41 @@
     <!-- Action button to dismiss sheet and back up now -->
     <string name="CreateBackupBottomSheet__back_up_now">지금 백업</string>
 
+    <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
+    <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">미디어를 복원할 수 없음</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed while the app is calculating the amount of disk space required. -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space_placeholder">기기에 여유 공간이 부족합니다. 미디어를 복원하려면 여유 공간을 확보하세요.\n\n\'복원 건너뛰기\'를 선택하면 다음번 기기에서 새로운 백업을 완료할 시 백업의 미디어가 삭제됩니다.</string>
+    <!-- Help text for a bottom sheet dialog shown when the restoration of the media backup fails, displayed once the app knows how much disk space is required. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaFailedBottomSheet__Your_device_does_not_have_enough_free_space">기기에 여유 공간이 부족합니다. 미디어를 복원하려면 %1$s의 여유 공간을 확보하세요.\n\n\'복원 건너뛰기\'를 선택하면 다음번 기기에서 새로운 백업을 완료할 시 백업의 미디어가 삭제됩니다.</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog without aborting the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Okay">확인</string>
+    <!-- Negative button on a bottom sheet dialog shown when the restoration of the media backup fails. This aborts the restoration process. -->
+    <string name="RestoreMediaFailedBottomSheet__Skip_restore">복원 건너뛰기</string>
+    <!-- Accessibility content description for the "Backup Error" icon -->
+    <string name="RestoreMediaFailedBottomSheet__Backup_error_icon_content_description">백업 오류 아이콘</string>
+
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. -->
+    <string name="RestoreMediaErrorBanner__Free_up_storage_space">미디어를 복원하려면 여유 공간을 확보하세요.</string>
+    <!-- Banner text that is displayed at the top of the app when trying to restore more media than the device\'s memory has space for. The placeholder is a filesize, such as "1.23 GB." -->
+    <string name="RestoreMediaErrorBanner__Free_up_of_space">미디어를 복원하려면 %1$s의 여유 공간을 확보하세요.</string>
+
+    <!-- Remote media restoration in-process status title. -->
+    <string name="RestoreMediaReminder__Restoring_media">미디어 복원 중</string>
+    <!-- Remote media restoration in-process description. The first to placeholders are filesizes, such as "865 MB" and "2.3 GB". The final placeholder is a whole number representing the percentage progress. -->
+    <string name="RestoreMediaReminder__Progress_filesize">%1$s/%2$s(%3$d%%)</string>
+    <!-- Remote media restoration paused status title. -->
+    <string name="RestoreMediaReminder__Restoring_media_paused">미디어 복원 일시 중지됨</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_Wifi">WiFi를 연결하는 중…</string>
+    <!-- Remote media restoration paused status description for when the restore is paused because internet is unavailable. -->
+    <string name="RestoreMediaReminder__Waiting_for_internet_connection">인터넷을 연결하는 중…</string>
+    <!-- Remote media restoration paused status description for when the device\'s battery is low -->
+    <string name="RestoreMediaReminder__low_battery">배터리가 부족합니다. 기기를 충전하세요.</string>
+    <!-- Remote media restoration call to action when the device is out of space. The placeholder string is a file size, such as "1.23 GB". -->
+    <string name="RestoreMediaReminder__Free_up_space">미디어를 복원하려면 %1$s의 여유 공간을 확보하세요.</string>
+    <!-- Button label to abort media restoration -->
+    <string name="RestoreMediaReminder__Skip_restore">복원 건너뛰기</string>
+
     <!-- BackupsPreferenceFragment -->
     <string name="BackupsPreferenceFragment__chat_backups">대화 백업</string>
     <string name="BackupsPreferenceFragment__backups_are_encrypted_with_a_passphrase">백업된 파일들은 암호화되어서 기기에 저장됩니다.</string>
@@ -879,9 +930,9 @@
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">연결된 기기의 모든 메시지는 비공개입니다.</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
-    <string name="LinkDeviceFragment__signal_messages_are_synchronized">휴대폰의 Molly과 연결하면 Molly 메시지가 동기화됩니다. 이전 메시지 내역은 표시되지 않습니다.</string>
+    <string name="LinkDeviceFragment__signal_messages_are_synchronized">휴대폰의 Signal과 연결하면 Signal 메시지가 동기화됩니다. 이전 메시지 내역은 표시되지 않습니다.</string>
     <!-- Bottom sheet description explaining that for non-desktop/iPad devices, they should go to %s to download Signal where %s is Signal\'s website -->
-    <string name="LinkDeviceFragment__on_other_device_visit_signal">다른 기기에서 %1$s을(를) 방문하여 Molly을 설치하세요.</string>
+    <string name="LinkDeviceFragment__on_other_device_visit_signal">연결하려는 기기에서 %1$s을(를) 방문하여 Signal을 설치하세요.</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__signal_download_url" translatable="false">signal.org/download</string> -->
     <!-- Header title listing out current linked devices -->
     <string name="LinkDeviceFragment__my_linked_devices">내 연결된 기기</string>
@@ -899,6 +950,12 @@
     <string name="LinkDeviceFragment__no_linked_devices">연결된 기기 없음</string>
     <!-- Title on biometrics prompt explaining what biometrics are being used for -->
     <string name="LinkDeviceFragment__unlock_to_link">잠금 해제하여 기기 연결</string>
+    <!-- Title on bottom sheet explaining our usage of biometrics to link a device -->
+    <string name="LinkDeviceFragment__before_linking">연결 전 본인 확인</string>
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">계속을 탭하고 휴대폰 잠금을 풀어 확인하세요. Signal PIN을 입력하지 마세요.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">계속</string>
 
     <!-- AddLinkDeviceFragment -->
     <!-- Description text shown on the QR code scanner when linking a device -->
@@ -1308,7 +1365,7 @@
     <string name="ShareableGroupLinkDialogFragment__group_link">그룹 링크</string>
     <string name="ShareableGroupLinkDialogFragment__share">공유</string>
     <string name="ShareableGroupLinkDialogFragment__reset_link">링크 초기화</string>
-    <string name="ShareableGroupLinkDialogFragment__approve_new_members">새 멤버 승인</string>
+    <string name="ShareableGroupLinkDialogFragment__require_admin_approval">Require admin approval</string>
     <string name="ShareableGroupLinkDialogFragment__require_an_admin_to_approve_new_members_joining_via_the_group_link">그룹 링크로 참가하려는 새 멤버를 승인하려면 관리자 권한이 필요합니다.</string>
     <string name="ShareableGroupLinkDialogFragment__are_you_sure_you_want_to_reset_the_group_link">그룹 링크를 초기화하시겠습니까? 이 링크로 사람들이 그룹에 참가할 수 없게 됩니다.</string>
 
@@ -1982,6 +2039,16 @@
     <!-- Title text for the Valentine\'s Day donation megaphone. The placeholder will always be a heart emoji. Needs to be a placeholder for Android reasons. -->
     <!-- Body text for the Valentine\'s Day donation megaphone. -->
 
+    <!-- CallScreenTopBar -->
+    <!-- Content description for navigation icon -->
+    <string name="CallScreenTopBar__go_back">뒤로 가기</string>
+    <!-- Content description for info icon -->
+    <string name="CallScreenTopBar__call_information">통화 정보</string>
+
+    <!-- CallScreenPreJoinOverlay -->
+    <!-- Displayed when users camera is disabled -->
+    <string name="CallScreenPreJoinOverlay__your_camera_is_off">카메라가 꺼졌습니다.</string>
+
     <!-- WebRtcCallActivity -->
     <string name="WebRtcCallActivity__tap_here_to_turn_on_your_video">비디오를 사용하려면 탭하세요</string>
     <string name="WebRtcCallActivity__to_call_s_signal_needs_access_to_your_camera">%1$s 님에게 전화하려면 Molly에서 카메라 권한이 필요합니다.</string>
@@ -2120,6 +2187,8 @@
     <string name="WebRtcCallView__additional_actions">작업 더 보기</string>
     <!-- Content description for end-call button -->
     <string name="WebRtcCallView__end_call">전화 종료</string>
+    <!-- Content description for toggling group ring state -->
+    <string name="WebRtcCallView__toggle_group_ringing">그룹 벨소리 토글</string>
 
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">UI 오류가 발생했습니다. 이 오류를 개발자에게 보고해 주세요.</string>
@@ -2490,6 +2559,7 @@
     <string name="ApkUpdateNotifications_failed_general_body">나중에 다시 시도하겠습니다.</string>
     <string name="ApkUpdateNotifications_auto_update_success_title">Molly을 업데이트했습니다.</string>
     <string name="ApkUpdateNotifications_auto_update_success_body">%1$s 버전으로 자동 업데이트되었습니다.</string>
+    <string name="ApkUpdateNotifications_manual_update_success_body">You updated to version %1$s.</string>
 
     <!-- UntrustedSendDialog -->
     <string name="UntrustedSendDialog_send_message">메시지를 보내시겠습니까?</string>
@@ -3133,6 +3203,8 @@
     <string name="EditAboutFragment_free_to_chat">대화 가능</string>
     <string name="EditAboutFragment_taking_a_break">쉬는 중</string>
     <string name="EditAboutFragment_working_on_something_new">새로운 것에 도전하는 중</string>
+    <!-- Error text shown when the About text contains an invalid character -->
+    <string name="EditAboutFragment_one_or_more_characters">One or more characters is invalid.</string>
 
     <!-- EditProfileFragment -->
     <string name="EditProfileFragment__edit_group">그룹 편집</string>
@@ -3625,6 +3697,10 @@
     <string name="PermissionDeniedBottomSheet__1_tap_settings_below">1. 아래에서 \'설정\'을 탭합니다.</string>
     <!-- Sheet describing step 2 on how to give permissions by checking the permissions button in settings where %s will be replaced with an image of a checked button -->
     <string name="PermissionDeniedBottomSheet__2_allow_permission">2. %1$s 사용 권한 허용</string>
+    <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
+    <string name="PermissionDeniedBottomSheet__2_tap_permissions">2. \'권한\'을 탭합니다.</string>
+    <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">3. %1$s \'사진 및 동영상\' 권한을 허용합니다.</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">설정</string>
 
@@ -4142,6 +4218,8 @@
     <string name="preferences_app_protection__screen_lock">화면 잠금</string>
     <string name="preferences_app_protection__lock_signal_access_with_android_screen_lock_or_fingerprint">안드로이드 화면 잠금 또는 지문으로 Signal 잠금</string>
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">다음 시간만큼 사용하지 않을 때 화면 잠금</string>
+    <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
+    <string name="preferences_app_protection__to_use_screen_lock">화면 잠금을 사용하려면 이 기기에서 PIN, 패턴, 또는 암호를 설정하세요.</string>
     <string name="preferences_app_protection__signal_pin">Signal 번호</string>
     <string name="preferences_app_protection__create_a_pin">번호 생성</string>
     <string name="preferences_app_protection__change_your_pin">PIN 번호 바꾸기</string>
@@ -4162,8 +4240,41 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">많이 시도했습니다. 다시 시도해 주세요.</string>
     <string name="RegistrationActivity_error_connecting_to_service">서비스 연결 중 오류 발생</string>
     <string name="preferences_chats__backups">백업</string>
-    <string name="prompt_passphrase_activity__signal_is_locked">Molly이 잠김</string>
-    <string name="prompt_passphrase_activity__tap_to_unlock">탭하여 잠금 해제</string>
+    <!-- Title text shown when Signal is locked and needs to be unlocked -->
+    <string name="prompt_passphrase_activity__unlock_signal">Molly 잠금 해제</string>
+    <!-- Description text explaining how to unlock Signal -->
+    <string name="prompt_passphrase_activity__use_your_android_device">Molly을 잠금 해제하려면 Android 기기 잠금 설정을 사용하세요.</string>
+    <!-- Text shown in a dialog that further explains how to unlock Signal by using the same unlocking methods that are used to unlock their own device -->
+    <string name="prompt_passphrase_activity__screen_lock_is_on">화면 잠금이 켜져 있으며 Molly이 기기 잠금 설정으로 안전하게 보호되고 있습니다. Molly을 얼굴 잠금 해제, 지문 잠금 해제, PIN, 암호, 패턴 등 평소 휴대폰을 잠금 해제하는 것과 같은 방식으로 잠금 해제하세요.</string>
+    <!-- Button in a dialog that will contact Signal support if pressed -->
+    <string name="prompt_passphrase_activity__contact_support">지원팀에 문의</string>
+    <!-- Button text to try again after unlocking has previously failed -->
+    <string name="prompt_passphrase_activity__try_again">다시 시도</string>
+
+    <!-- ScreenLockSettingsFragment -->
+    <!-- Text shown when screen lock is not enabled -->
+    <string name="ScreenLockSettingsFragment__off">꺼짐</string>
+    <!-- Text shown with toggle that when switched on will enable screen lock -->
+    <string name="ScreenLockSettingsFragment__use_screen_lock">화면 잠금 사용</string>
+    <!-- Description of what screen locking will do and how notification content will not be shown when screen is locked -->
+    <string name="ScreenLockSettingsFragment__your_android_device">Molly에서 나가거나 앱을 전환할 경우 Molly을 잠금 해제하려면 Android 기기 잠금 설정이 필요합니다. 잠금 상태에서는 알림 미리 보기가 메시지 내용을 표시하지 않습니다.</string>
+    <!-- Title text explaining when users should start the screen lock -->
+    <string name="ScreenLockSettingsFragment__start_screen_lock">화면 잠금 시작</string>
+    <!-- Option text explaining that screen lock should start immediately -->
+    <string name="ScreenLockSettingsFragment__immediately">즉시</string>
+    <!-- Option text explaining that screen lock should start after 1 minute of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_1_min">1분 후</string>
+    <!-- Option text explaining that screen lock should start after 5 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_5_min">5분 후</string>
+    <!-- Option text explaining that screen lock should start after 30 minutes of inactivity -->
+    <string name="ScreenLockSettingsFragment__after_30_min">30분 후</string>
+    <!-- Option text explaining that screen lock should start at a custom time set by the user -->
+    <string name="ScreenLockSettingsFragment__custom_time">사용자 지정 시간</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn on screen lock -->
+    <string name="ScreenLockSettingsFragment__use_signal_screen_lock">Molly 화면 잠금 사용</string>
+    <!-- Title on biometrics prompt explaining that biometrics are needed to turn off screen lock -->
+    <string name="ScreenLockSettingsFragment__turn_off_signal_lock">Molly 화면 잠금 해제</string>
+
     <string name="Recipient_unknown">알 수 없음</string>
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">계정 삭제</string>
@@ -4782,7 +4893,7 @@
 
     <!-- ChatsSettingsFragment -->
     <string name="ChatsSettingsFragment__keyboard">키보드</string>
-    <string name="ChatsSettingsFragment__enter_key_sends">엔터 키로 메시지 보내기</string>
+    <string name="ChatsSettingsFragment__send_with_enter">Enter 키로 보내기</string>
 
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">메시지</string>
@@ -4806,7 +4917,7 @@
     <string name="PrivacySettingsFragment__blocked">차단함</string>
     <!-- Settings label that shows the number blocked contacts -->
     <plurals name="PrivacySettingsFragment__d_contacts">
-        <item quantity="other">연락처 %1$d개</item>
+        <item quantity="other">연락처 또는 그룹 %1$d개</item>
     </plurals>
     <string name="PrivacySettingsFragment__messaging">메시징</string>
     <string name="PrivacySettingsFragment__disappearing_messages">사라지는 메시지</string>
@@ -5009,7 +5120,7 @@
     <string name="PermissionsSettingsFragment__only_admins">관리자만</string>
     <string name="PermissionsSettingsFragment__who_can_add_new_members">누가 새로운 멤버들을 추가시킬 수 있습니까?</string>
     <string name="PermissionsSettingsFragment__who_can_edit_this_groups_info">누가 이 그룹의 정보를 수정할 수 있습니까?</string>
-    <string name="PermissionsSettingsFragment__who_can_send_messages">누가 메시지를 전송할 수 있습니까?</string>
+    <string name="PermissionsSettingsFragment__who_can_send_messages">메시지를 보내고 통화를 시작할 수 있는 사용자를 선택하세요.</string>
 
     <!-- SoundsAndNotificationsSettingsFragment -->
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">알림 끄기</string>
@@ -6682,7 +6793,7 @@
     <!-- Option to open a full screen dialog to edit a call name -->
     <string name="CreateCallLinkBottomSheetDialogFragment__edit_call_name">통화 이름 수정</string>
     <!-- Toggle to require approval for all members before joining -->
-    <string name="CreateCallLinkBottomSheetDialogFragment__approve_all_members">모든 멤버 승인</string>
+    <string name="CreateCallLinkBottomSheetDialogFragment__require_admin_approval">관리자 승인 필요</string>
     <!-- Row label to share the link via Signal -->
     <string name="CreateCallLinkBottomSheetDialogFragment__share_link_via_signal">Signal을 통해 링크 공유</string>
     <!-- Row label to copy the link to the clipboard -->
@@ -6738,7 +6849,7 @@
     <!-- Displayed in a text row, allowing the user to click and add a call name -->
     <string name="CallLinkDetailsFragment__add_call_name">통화 이름 추가</string>
     <!-- Displayed in a toggle row, allowing the user to click to enable or disable member approval -->
-    <string name="CallLinkDetailsFragment__approve_all_members">모든 멤버 승인</string>
+    <string name="CallLinkDetailsFragment__require_admin_approval">관리자 승인 필요</string>
     <!-- Displayed in a text row, allowing the user to share the call link -->
     <string name="CallLinkDetailsFragment__share_link">링크 공유</string>
     <!-- Displayed in a text row, allowing the user to delete the call link -->
@@ -6984,12 +7095,22 @@
     <string name="BackupAlertBottomSheet__download_later">나중에 다운로드</string>
     <!-- Secondary action button text to dismiss sheet, skipping media download -->
     <string name="BackupAlertBottomSheet__dont_download_media">미디어 다운로드 안 함</string>
+    <!-- Dialog title for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__media_will_be_deleted">미디어가 삭제됩니다.</string>
+    <!-- Dialog message for last chance to download backup -->
+    <string name="BackupAlertBottomSheet__the_media_stored_in_your_backup">백업에 저장된 미디어가 오늘 영구 삭제됩니다. 미디어를 다운로드할 수 있는 마지막 기회입니다.</string>
+    <!-- Dialog action to download now -->
+    <string name="BackupAlertBottomSheet__download">다운로드</string>
+    <!-- Dialog action to not download now -->
+    <string name="BackupAlertBottomSheet__dont_download">다운로드 안 함</string>
 
     <!-- BackupStatus -->
     <!-- Status title when user does not have enough free space to download their media. Placeholder is required disk space. -->
     <string name="BackupStatus__free_up_s_of_space_to_download_your_media">미디어를 다운로드하려면 %1$s의 여유 공간을 확보하세요.</string>
 
     <!-- BackupsTypeSettingsFragment -->
+    <!-- Displayed as the user\'s payment method as a label in a preference row -->
+    <string name="BackupsTypeSettingsFragment__google_play">Google Play</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
     <string name="BackupsTypeSettingsFragment__credit_or_debit_card">신용 또는 직불 카드</string>
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -7026,6 +7147,20 @@
     <string name="ManageStorageSettingsFragment_apply_limits_title">연결된 기기에 제한 적용</string>
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">대화 제한을 사용하도록 설정할 경우 연결된 기기에서도 메시지를 삭제합니다.</string>
+    <!-- Setting section title header for storage optimization -->
+    <string name="ManageStorageSettingsFragment__on_device_storage">기기 저장 공간</string>
+    <!-- Setting row title for storage optimization -->
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">기기 저장 공간 최적화</string>
+    <!-- Setting row explanation for storage optimization -->
+    <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">사용하지 않는 미디어를 오프로드하지만, 언제든지 백업에서 다운로드할 수 있습니다.</string>
+
+    <!-- UpgradeToEnableOptimizedStorageSheet -->
+    <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_to_enable_this_feature">업그레이드하여 이 기능 활성화</string>
+    <!-- Subtitle of bottom sheet detailing that the user must upgrade to enable storage optimization -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__storage_optimization_can_only_be_used">저장 공간 최적화는 유료 Signal 백업으로만 사용할 수 있습니다. 이 기능을 사용하기 시작하려면 백업 플랜을 업그레이드하세요.</string>
+    <!-- Primary action to launch upgrade flow -->
+    <string name="UpgradeToEnableOptimizedStorageSheet__upgrade_now">지금 업그레이드</string>
 
     <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
     <string name="DeleteSyncEducation_title">이제 모든 기기에서 삭제를 동기화합니다</string>
@@ -7071,6 +7206,8 @@
     <string name="RemoteBackupsSettingsFragment__subscription_cancelled">구독 취소 완료</string>
     <!-- Snackbar text displayed when backup is successfully downloaded -->
     <string name="RemoteBackupsSettingsFragment__download_complete">다운로드 완료</string>
+    <!-- Snackbar text displayed when backup will be created overnight -->
+    <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">밤사이 백업을 생성합니다.</string>
     <!-- Title text in row detailing selected backup type -->
     <string name="RemoteBackupsSettingsFragment__backup_type">백업 종류</string>
     <!-- Subtitle text in row detailing selected backup type displayed when backups are disabled -->
@@ -7112,12 +7249,6 @@
     <!-- The body of an alert dialog shown when we detect the user may be confused by the lock screen -->
     <string name="PassphrasePromptActivity_help_prompt_body">기기 PIN, 암호 또는 패턴을 입력하세요.</string>
 
-    <!-- MessageBackupsCheckoutSheet -->
-    <!-- Sheet title. Placeholder is formatted price. -->
-    <string name="MessageBackupsCheckoutSheet__pay_s_per_month">Signal에 매달 %1$s 지불</string>
-    <!-- Sheet subtitle -->
-    <string name="MessageBackupsCheckoutSheet__youll_get">혜택:</string>
-
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
     <string name="MessageBackupsEducationScreen__backup_your_messages_and_media">Signal의 안전한 엔드투엔드 암호화 저장소 서비스를 사용하여 메시지와 미디어를 백업하세요. 새 휴대폰을 구매하거나 Signal을 다시 설치하는 경우에도 메시지를 손실할 염려가 없습니다.</string>
@@ -7132,27 +7263,35 @@
     <!-- Action button label to learn more -->
     <string name="MessageBackupsEducationScreen__learn_more">자세히 알아보기</string>
 
-    <!-- MessageBackupsPinConfirmationScreen -->
-    <!-- Screen title -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_pin">PIN 입력</string>
-    <!-- Screen subtitle -->
-    <string name="MessageBackupsPinConfirmationScreen__enter_your_signal_pin_to_enable_backups">Signal PIN을 입력하여 백업을 활성화하세요.</string>
-    <!-- Action button to confirm pin entry and continue -->
-    <string name="MessageBackupsPinConfirmationScreen__next">다음</string>
-    <!-- Action button to switch keyboard type -->
-    <string name="MessageBackupsPinConfirmationScreen__switch_keyboard">키보드 전환</string>
-
-    <!-- MessageBackupsPinEducationScreen -->
+    <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsPinEducationScreen__pins_protect_your_backup">PIN을 사용한 백업 보호</string>
-    <!-- Notice about pin length. Placeholder is recommended pin length -->
-    <string name="MessageBackupsPinEducationScreen__your_signal_pin_lets_you">Signal 재설치 시 Signal PIN을 사용하여 백업을 복원할 수 있습니다. %1$d자리 이상의 PIN을 사용하는 것이 좋습니다.</string>
-    <!-- Notice about changing your pin. -->
-    <string name="MessageBackupsPinEducationScreen__if_you_forget_your_pin">PIN을 잊어버리면 백업을 복원할 수 없습니다. 설정에서 언제든지 PIN을 변경할 수 있습니다.</string>
-    <!-- Action button label to utilize current pin -->
-    <string name="MessageBackupsPinEducationScreen__use_current_signal_pin">현재 Signal PIN 사용</string>
-    <!-- Action button to create a new pin -->
-    <string name="MessageBackupsPinEducationScreen__create_new_pin">새로운 PIN 만들기</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Your backup key</string>
+    <!-- Screen body part 1 -->
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your backup key is a 64-digit code that lets you restore your backup when you re-install Signal.</string>
+    <!-- Screen body part 2 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">If you forget your key, you will not be able to restore your backup. Signal cannot help you recover your backup.</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyEducationScreen__next">Next</string>
+
+    <!-- MessageBackupsKeyRecordScreen -->
+    <!-- Screen headline -->
+    <string name="MessageBackupsKeyRecordScreen__record_your_backup_key">Record your backup key</string>
+    <!-- Screen subhead -->
+    <string name="MessageBackupsKeyRecordScreen__this_key_is_required_to_recover">This key is required to recover your account and data. Store this key somewhere safe. If you lose it, you won’t be able to recover your account.</string>
+    <!-- Copy to clipboard button label -->
+    <string name="MessageBackupsKeyRecordScreen__copy_to_clipboard">Copy to clipboard</string>
+    <!-- Action button label -->
+    <string name="MessageBackupsKeyRecordScreen__next">Next</string>
+    <!-- Bottom sheet title -->
+    <string name="MessageBackupsKeyRecordScreen__keep_your_key_safe">Keep your key safe</string>
+    <!-- Bottom sheet subtitle -->
+    <string name="MessageBackupsKeyRecordScreen__signal_will_not">Signal will not be able to help you restore your backup if you lose your key. Store it somewhere safe and secure, and do not share it with others.</string>
+    <!-- Checkbox label -->
+    <string name="MessageBackupsKeyRecordScreen__ive_recorded_my_key">I\'ve recorded my key</string>
+    <!-- Sheet action button label -->
+    <string name="MessageBackupsKeyRecordScreen__continue">Continue</string>
+    <!-- Sheet secondary action button label -->
+    <string name="MessageBackupsKeyRecordScreen__see_key_again">See key again</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -7167,6 +7306,28 @@
     <string name="MessageBackupsTypeSelectionScreen__change_backup_type">백업 유형 변경</string>
     <!-- Secondary action button label when selecting a backup tier with a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__cancel_subscription">구독 취소</string>
+    <!-- MessageBackupsType block amount for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__free">무료</string>
+    <!-- MessageBackupsType block amount for paid tier. Placeholder is formatted currency amount. -->
+    <string name="MessageBackupsTypeSelectionScreen__s_month">%1$s/월</string>
+    <!-- Title for free tier -->
+    <string name="MessageBackupsTypeSelectionScreen__text_plus_all_your_media">문자 + 모든 미디어</string>
+    <!-- Title for paid tier. Placeholder is days of media retention. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__text_plus_d_days_of_media">
+        <item quantity="other">문자 + %1$d일간의 미디어</item>
+    </plurals>
+    <!-- Description text for text history feature -->
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">전체 문자 메시지 백업</string>
+    <!-- Description text for paid tier media retention -->
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">전체 미디어 백업</string>
+    <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
+    <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">%1$s 스토리지(%2$s 사진)</string>
+    <!-- Description text for thanks -->
+    <string name="MessageBackupsTypeSelectionScreen__thanks_for_supporting_signal">Signal을 지원해 주셔서 감사합니다!</string>
+    <!-- Description text for free tier media retention. Placeholder is retention day count. -->
+    <plurals name="MessageBackupsTypeSelectionScreen__last_d_days_of_media">
+        <item quantity="other">지난 %1$d일간의 미디어</item>
+    </plurals>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -7179,5 +7340,8 @@
     <string name="ConfirmBackupCancellationDialog__confirm_and_download_later">확인 및 나중에 다운로드</string>
     <!-- Action button label to keep current subscription -->
     <string name="ConfirmBackupCancellationDialog__keep_subscription">구독 유지</string>
+
+    <!-- Accessible content description for the reminder view, describing the icon in the view. -->
+    <string name="ReminderView_icon_content_description">미리 알림 아이콘</string>
     <!-- EOF -->
 </resources>

@@ -84,6 +84,7 @@ class Recipient(
   private val messageRingtoneUri: Uri? = null,
   private val callRingtoneUri: Uri? = null,
   val expiresInSeconds: Int = 0,
+  val expireTimerVersion: Int = 1,
   private val registeredValue: RegisteredState = RegisteredState.UNKNOWN,
   val profileKey: ByteArray? = null,
   val expiringProfileKeyCredential: ExpiringProfileKeyCredential? = null,
@@ -314,8 +315,11 @@ class Recipient(
   /** The notification channel, if both set and supported by the system. Otherwise null. */
   val notificationChannel: String? = if (!NotificationChannels.supported()) null else notificationChannelValue
 
-  /** The user's payment capability. */
+  /** The user's capability to handle synchronizing deletes across linked devices. */
   val deleteSyncCapability: Capability = capabilities.deleteSync
+
+  /** The user's capability to handle tracking an expire timer version. */
+  val versionedExpirationTimerCapability: Capability = capabilities.versionedExpirationTimer
 
   /** The state around whether we can send sealed sender to this user. */
   val sealedSenderAccessMode: SealedSenderAccessMode = if (pni.isPresent && pni == serviceId) {
@@ -363,8 +367,11 @@ class Recipient(
   /** The badge to feature on a recipient's avatar, if any. */
   val featuredBadge: Badge? = badges.firstOrNull()
 
+  /** A string filtering out banned emojis from the about text */
+  val filteredAbout: String? by lazy { about?.filterNot { StringUtil.FILTERED_EMOJIS.contains(it) } }
+
   /** A string combining the about emoji + text for displaying various places. */
-  val combinedAboutAndEmoji: String? by lazy { listOf(aboutEmoji, about).filter { it.isNotNullOrBlank() }.joinToString(separator = " ").nullIfBlank() }
+  val combinedAboutAndEmoji: String? by lazy { listOf(aboutEmoji, filteredAbout).filter { it.isNotNullOrBlank() }.joinToString(separator = " ").nullIfBlank() }
 
   /** Whether or not we should blur the recipient's avatar when showing it in the chat list and other locations. */
   val shouldBlurAvatar: Boolean

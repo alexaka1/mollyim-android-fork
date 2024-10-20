@@ -18,9 +18,9 @@ apply {
   from("fix-profm.gradle")
 }
 
-val canonicalVersionCode = 1443
-val canonicalVersionName = "7.13.4"
-val currentHotfixVersion = 1
+val canonicalVersionCode = 1465
+val canonicalVersionName = "7.18.2"
+val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 val mollyRevision = 1
 
@@ -45,6 +45,7 @@ val signalBuildToolsVersion: String by rootProject.extra
 val signalCompileSdkVersion: String by rootProject.extra
 val signalTargetSdkVersion: Int by rootProject.extra
 val signalMinSdkVersion: Int by rootProject.extra
+val signalNdkVersion: String by rootProject.extra
 val signalJavaVersion: JavaVersion by rootProject.extra
 val signalKotlinJvmTarget: String by rootProject.extra
 
@@ -79,6 +80,7 @@ android {
 
   buildToolsVersion = signalBuildToolsVersion
   compileSdkVersion = signalCompileSdkVersion
+  ndkVersion = signalNdkVersion
 
   flavorDimensions += listOf("environment", "license", "distribution")
   useLibrary("org.apache.http.legacy")
@@ -88,6 +90,7 @@ android {
 
   kotlinOptions {
     jvmTarget = signalKotlinJvmTarget
+    freeCompilerArgs = listOf("-Xjvm-default=all")
   }
 
   signingConfigs {
@@ -127,13 +130,29 @@ android {
     targetCompatibility = signalJavaVersion
   }
 
-  packagingOptions {
-    resources {
-      excludes += setOf("LICENSE.txt", "LICENSE", "NOTICE", "asm-license.txt", "META-INF/LICENSE", "META-INF/LICENSE.md", "META-INF/NOTICE", "META-INF/LICENSE-notice.md", "META-INF/proguard/androidx-annotations.pro", "libsignal_jni.dylib", "signal_jni.dll", "libsignal_jni_testing.dylib", "signal_jni_testing.dll")
-    }
+  packaging {
     jniLibs {
+      excludes += setOf(
+        "**/*.dylib",
+        "**/*.dll"
+      )
       // MOLLY: Compress native libs by default as APK is not split on ABIs
       useLegacyPackaging = true
+    }
+    resources {
+      excludes += setOf(
+        "LICENSE.txt",
+        "LICENSE",
+        "NOTICE",
+        "asm-license.txt",
+        "META-INF/LICENSE",
+        "META-INF/LICENSE.md",
+        "META-INF/NOTICE",
+        "META-INF/LICENSE-notice.md",
+        "META-INF/proguard/androidx-annotations.pro",
+        "**/*.dylib",
+        "**/*.dll"
+      )
     }
   }
 
@@ -158,8 +177,6 @@ android {
     targetSdk = signalTargetSdkVersion
 
     applicationId = basePackageId
-
-    multiDexEnabled = true
 
     buildConfigField("String", "SIGNAL_PACKAGE_NAME", "\"org.thoughtcrime.securesms\"")
     buildConfigField("String", "SIGNAL_CANONICAL_VERSION_NAME", "\"$canonicalVersionName\"")
@@ -431,7 +448,6 @@ dependencies {
   implementation(libs.androidx.compose.runtime.livedata)
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.constraintlayout)
-  implementation(libs.androidx.multidex)
   implementation(libs.androidx.navigation.fragment.ktx)
   implementation(libs.androidx.navigation.ui.ktx)
   implementation(libs.androidx.navigation.compose)
@@ -441,6 +457,7 @@ dependencies {
   implementation(libs.androidx.lifecycle.viewmodel.savedstate)
   implementation(libs.androidx.lifecycle.common.java8)
   implementation(libs.androidx.lifecycle.reactivestreams.ktx)
+  implementation(libs.androidx.lifecycle.runtime.compose)
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.camera.core)
   implementation(libs.androidx.camera.camera2)
@@ -501,6 +518,7 @@ dependencies {
   implementation(libs.kotlin.stdlib.jdk8)
   implementation(libs.kotlin.reflect)
   "gmsImplementation"(libs.kotlinx.coroutines.play.services)
+  implementation(libs.kotlinx.coroutines.rx3)
   implementation(libs.jackson.module.kotlin)
   implementation(libs.rxjava3.rxandroid)
   implementation(libs.rxjava3.rxkotlin)
@@ -512,6 +530,8 @@ dependencies {
   implementation(libs.molly.glide.webp.decoder)
   implementation(libs.gosimple.nbvcxz)
   "fossImplementation"("org.osmdroid:osmdroid-android:6.1.16")
+
+  "gmsImplementation"(project(":billing"))
 
   "spinnerImplementation"(project(":spinner"))
 
@@ -527,7 +547,6 @@ dependencies {
   testImplementation(testLibs.robolectric.robolectric) {
     exclude(group = "com.google.protobuf", module = "protobuf-java")
   }
-  testImplementation(testLibs.robolectric.shadows.multidex)
   testImplementation(testLibs.bouncycastle.bcprov.jdk15on) {
     version {
       strictly("1.70")

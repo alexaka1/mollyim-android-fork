@@ -59,10 +59,11 @@ import org.thoughtcrime.securesms.backup.v2.ui.subscription.RemoteRestoreViewMod
 import org.thoughtcrime.securesms.conversation.v2.registerForLifecycle
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobs.ProfileUploadJob
+import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.profiles.AvatarHelper
 import org.thoughtcrime.securesms.profiles.edit.CreateProfileActivity
 import org.thoughtcrime.securesms.recipients.Recipient
-import org.thoughtcrime.securesms.registration.RegistrationUtil
+import org.thoughtcrime.securesms.registration.util.RegistrationUtil
 import org.thoughtcrime.securesms.restore.transferorrestore.TransferOrRestoreMoreOptionsDialog
 import org.thoughtcrime.securesms.util.DateUtils
 import org.thoughtcrime.securesms.util.Util
@@ -101,6 +102,7 @@ class RemoteRestoreActivity : BaseActivity() {
           )
           if (state.importState == RemoteRestoreViewModel.ImportState.RESTORED) {
             SideEffect {
+              SignalStore.registration.markRestoreCompleted()
               RegistrationUtil.maybeMarkRegistrationComplete()
               AppDependencies.jobManager.add(ProfileUploadJob())
               startActivity(MainActivity.clearTop(this))
