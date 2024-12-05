@@ -1,0 +1,99 @@
+name: Android CI
+
+on:
+  workflow_dispatch
+env:
+  TAG_REF: "${{ inputs.version || github.ref_name }}"
+  BUILD_ENV_FILE: ${{ vars.BUILD_ENV_FILE || 'beta-stable.env' }}
+  HAVE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE != '' }}
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: read # to fetch code (actions/checkout)
+
+    env:
+      GRADLE_OPTS: "-Dorg.gradle.project.kotlin.compiler.execution.strategy=in-process"
+      CI_MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: "${{ env.TAG_REF }}"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Set up builder image
+        run: docker compose build
+        working-directory: reproducible-builds
+
+      - name: Export CI environment variables
+        run: |
+          cp -v "ci/$BUILD_ENV_FILE" .env
+          for var in APP_TITLE APP_FILENAME PACKAGE_ID \
+                     BUILD_VARIANTS FORCE_INTERNAL_USER_FLAG \
+                     MAPS_API_KEY; do
+            if [ -n "${!var}" ]; then
+              echo "Setting CI_$var=${!var}"
+              echo "CI_$var=${!var}" >> $GITHUB_ENV
+            fi
+          done
+        working-directory: reproducible-builds
+        env:
+          APP_TITLE: ${{ vars.CI_APP_TITLE }}
+          APP_FILENAME: ${{ vars.CI_APP_FILENAME }}
+          PACKAGE_ID: ${{ vars.CI_PACKAGE_ID }}
+          BUILD_VARIANTS: ${{ vars.CI_BUILD_VARIANTS }}
+          FORCE_INTERNAL_USER_FLAG: ${{ vars.CI_FORCE_INTERNAL_USER_FLAG }}
+          MAPS_API_KEY: ${{ vars.CI_MAPS_API_KEY }}
+
+      - name: Extract signing keys
+        if: "env.HAVE_KEYSTORE == 'true'"
+        run: printenv KEYSTORE | base64 -d > certs/keystore.jks
+        working-directory: reproducible-builds
+        env:
+          KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+
+      - name: Build without signing
+        if: "env.HAVE_KEYSTORE == 'false'"
+        run: docker compose run -v "$HOME/.gradle/caches:/.gradle-ro-cache:ro" assemble
+        working-directory: reproducible-builds
+
+      - name: Build and sign
+        if: "env.HAVE_KEYSTORE == 'true'"
+        run: docker compose run -v "$HOME/.gradle/caches:/.gradle-ro-cache:ro" assemble
+        working-directory: reproducible-builds
+        env:
+          CI_KEYSTORE_PATH: certs/keystore.jks
+          CI_KEYSTORE_ALIAS: release
+          CI_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+
+      - name: Clean up keystore
+        if: "always()"
+        run: rm -f certs/keystore.jks
+        working-directory: reproducible-builds
+
+      - name: Log APK and AAB checksums
+        run: find outputs \( -name "*.aab" -o -name "*.apk" \) -exec sha256sum '{}' +
+        working-directory: reproducible-builds
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: reproducible-builds/outputs/apk/*/release/*.apk
+          if-no-files-found: error
+
+      - name: Upload Bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle
+          path: reproducible-builds/outputs/bundle/*Release/*.aab
+          if-no-files-found: error
