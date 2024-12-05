@@ -1,6 +1,7 @@
 package org.thoughtcrime.securesms.messages
 
 import android.app.Application
+import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -17,21 +18,19 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.groups.GroupsV2ProcessingLock
 import org.thoughtcrime.securesms.jobmanager.impl.BackoffUtil
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint
-import org.thoughtcrime.securesms.jobs.ForegroundServiceUtil
-import org.thoughtcrime.securesms.jobs.ForegroundServiceUtil.startWhenCapable
 import org.thoughtcrime.securesms.jobs.PushProcessMessageErrorJob
 import org.thoughtcrime.securesms.jobs.PushProcessMessageJob
-import org.thoughtcrime.securesms.jobs.UnableToStartException
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.messages.MessageDecryptor.FollowUpOperation
 import org.thoughtcrime.securesms.messages.protocol.BufferedProtocolStore
 import org.thoughtcrime.securesms.notifications.NotificationChannels
 import org.thoughtcrime.securesms.recipients.RecipientId
-import org.thoughtcrime.securesms.service.KeyCachingService
+import org.thoughtcrime.securesms.service.SafeForegroundService
 import org.thoughtcrime.securesms.util.AlarmSleepTimer
 import org.thoughtcrime.securesms.util.AppForegroundObserver
 import org.thoughtcrime.securesms.util.SignalLocalMetrics
 import org.thoughtcrime.securesms.util.asChain
+import org.whispersystems.signalservice.api.SignalWebSocket
 import org.whispersystems.signalservice.api.push.ServiceId
 import org.whispersystems.signalservice.api.util.SleepTimer
 import org.whispersystems.signalservice.api.util.UptimeSleepTimer
@@ -55,7 +54,7 @@ import kotlin.time.Duration.Companion.seconds
  *
  * This class is responsible for opening/closing the websocket based on the app's state and observing new inbound messages received on the websocket.
  */
-class IncomingMessageObserver(private val context: Application) {
+class IncomingMessageObserver(private val context: Application, private val signalWebSocket: SignalWebSocket) {
 
   companion object {
     private val TAG = Log.tag(IncomingMessageObserver::class.java)
@@ -97,8 +96,6 @@ class IncomingMessageObserver(private val context: Application) {
 
   private val messageContentProcessor = MessageContentProcessor(context)
 
-  private var foregroundServiceStartPending = AtomicBoolean(true)
-
   private var appVisible = false
   private var lastInteractionTime: Long = System.currentTimeMillis()
 
@@ -112,7 +109,13 @@ class IncomingMessageObserver(private val context: Application) {
   init {
     MessageRetrievalThread().start()
 
-    // MOLLY: Foreground service startup is handled inside the connection loop
+    val registered = SignalStore.account.isRegistered
+    val pushAvailable = SignalStore.account.pushAvailable
+    val forceWebsocket = SignalStore.internal.isWebsocketModeForced
+
+    if (registered && (!pushAvailable || forceWebsocket)) {
+      ForegroundService.startIfNotRunning(context)
+    }
 
     AppForegroundObserver.addListener(object : AppForegroundObserver.Listener {
       override fun onForeground() {
@@ -166,11 +169,6 @@ class IncomingMessageObserver(private val context: Application) {
   }
 
   private fun isConnectionNecessary(): Boolean {
-    if (KeyCachingService.isLocked()) {
-      Log.i(TAG, "Don't connect anymore. App is locked.")
-      return false
-    }
-
     val timeIdle: Long
     val keepAliveEntries: Set<Pair<String, Long>>
     val appVisibleSnapshot: Boolean
@@ -192,29 +190,10 @@ class IncomingMessageObserver(private val context: Application) {
     }
 
     val registered = SignalStore.account.isRegistered
-    val fcmEnabled = SignalStore.account.fcmEnabled
     val pushAvailable = SignalStore.account.pushAvailable
     val hasNetwork = NetworkConstraint.isMet(context)
     val hasProxy = AppDependencies.networkManager.isProxyEnabled
     val forceWebsocket = SignalStore.internal.isWebsocketModeForced
-
-    if (registered && (!pushAvailable || forceWebsocket)) {
-      // MOLLY: Try to start the foreground service only once
-      if (foregroundServiceStartPending.getAndSet(false)) {
-        try {
-          ForegroundServiceUtil.start(context, Intent(context, ForegroundService::class.java))
-        } catch (e: UnableToStartException) {
-          Log.w(TAG, "Unable to start foreground service for websocket. Deferring to background to try with blocking")
-          SignalExecutors.UNBOUNDED.execute {
-            try {
-              startWhenCapable(context, Intent(context, ForegroundService::class.java))
-            } catch (e: UnableToStartException) {
-              Log.w(TAG, "Unable to start foreground service for websocket!", e)
-            }
-          }
-        }
-      }
-    }
 
     val lastInteractionString = if (appVisibleSnapshot) "N/A" else timeIdle.toString() + " ms (" + (if (timeIdle < maxBackgroundTime) "within limit" else "over limit") + ")"
     val conclusion = registered &&
@@ -223,8 +202,7 @@ class IncomingMessageObserver(private val context: Application) {
 
     val needsConnectionString = if (conclusion) "Needs Connection" else "Does Not Need Connection"
 
-    Log.d(TAG, "[$needsConnectionString] Network: $hasNetwork, Foreground: $appVisibleSnapshot, Time Since Last Interaction: $lastInteractionString, FCM: $fcmEnabled, Stay open requests: $keepAliveEntries, Registered: $registered, Proxy: $hasProxy, Force websocket: $forceWebsocket" +
-      "PushAvailable: $pushAvailable")
+    Log.d(TAG, "[$needsConnectionString] Network: $hasNetwork, Foreground: $appVisibleSnapshot, Time Since Last Interaction: $lastInteractionString, PushAvailable: $pushAvailable, Stay open requests: $keepAliveEntries, Registered: $registered, Proxy: $hasProxy, Force websocket: $forceWebsocket")
     return conclusion
   }
 
@@ -245,6 +223,7 @@ class IncomingMessageObserver(private val context: Application) {
   fun terminateAsync() {
     Log.w(TAG, "Termination Enqueued! ${this.hashCode()}", Throwable())
     networkConnectionListener.unregister()
+    ForegroundService.stopIfRunning(context)
     SignalExecutors.BOUNDED.execute {
       Log.w(TAG, "Beginning termination. ${this.hashCode()}")
       terminated = true
@@ -253,7 +232,7 @@ class IncomingMessageObserver(private val context: Application) {
   }
 
   private fun disconnect() {
-    AppDependencies.signalWebSocket.disconnect()
+    signalWebSocket.disconnect()
   }
 
   @JvmOverloads
@@ -376,7 +355,7 @@ class IncomingMessageObserver(private val context: Application) {
       Log.i(TAG, "Initializing! (${this.hashCode()})")
       uncaughtExceptionHandler = this
 
-      sleepTimer = if (!SignalStore.account.fcmEnabled || SignalStore.internal.isWebsocketModeForced) AlarmSleepTimer(context) else UptimeSleepTimer()
+      sleepTimer = if (!SignalStore.account.pushAvailable || SignalStore.internal.isWebsocketModeForced) AlarmSleepTimer(context) else UptimeSleepTimer()
     }
 
     override fun run() {
@@ -393,8 +372,7 @@ class IncomingMessageObserver(private val context: Application) {
         waitForConnectionNecessary()
         Log.i(TAG, "Making websocket connection....")
 
-        val signalWebSocket = AppDependencies.signalWebSocket
-        val webSocketDisposable = AppDependencies.webSocketObserver.subscribe { state: WebSocketConnectionState ->
+        val webSocketDisposable = signalWebSocket.webSocketState.subscribe { state: WebSocketConnectionState ->
           Log.d(TAG, "WebSocket State: $state")
 
           // Any change to a non-connected state means that we are not drained
@@ -405,7 +383,7 @@ class IncomingMessageObserver(private val context: Application) {
 
         signalWebSocket.connect(shouldKeepAliveUnidentified())
         try {
-          while (isConnectionNecessary()) {
+          while (!terminated && isConnectionNecessary()) {
             try {
               Log.d(TAG, "Reading message...")
 
@@ -476,10 +454,6 @@ class IncomingMessageObserver(private val context: Application) {
         Log.i(TAG, "Looping...")
       }
       Log.w(TAG, "Terminated! (${this.hashCode()})")
-
-      // MOLLY: Ensure services are stopped normally
-      ForegroundService.stop(context)
-      BackgroundService.stop(context)
     }
 
     override fun uncaughtException(t: Thread, e: Throwable) {
@@ -487,50 +461,47 @@ class IncomingMessageObserver(private val context: Application) {
     }
   }
 
-  class ForegroundService : Service() {
-    override fun onBind(intent: Intent?): IBinder? {
-      return null
-    }
+  class ForegroundService : SafeForegroundService() {
 
-    override fun onCreate() {
-      // MOLLY: Do not foreground on service restart
-    }
+    companion object {
+      private val startPending = AtomicBoolean(false)
+      private val stopPending = AtomicBoolean(false)
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-      if (intent == null || KeyCachingService.isLocked()) {
-        Log.i(TAG, "Delaying the startup of the foreground service for websocket.")
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        return START_NOT_STICKY
+      fun startIfNotRunning(context: Context) {
+        if (startPending.compareAndSet(false, true)) {
+          SignalExecutors.SERIAL.execute {
+            val started = start(context, ForegroundService::class.java)
+            if (!started) {
+              Log.w(TAG, "Unable to start foreground service for websocket!")
+            }
+            startPending.set(false)
+          }
+        }
       }
 
-      Log.d(TAG, "Foreground service for websocket started.")
-
-      postForegroundNotification()
-
-      return START_STICKY
+      fun stopIfRunning(context: Context) {
+        if (stopPending.compareAndSet(false, true)) {
+          SignalExecutors.SERIAL.execute {
+            stop(context, ForegroundService::class.java)
+            stopPending.set(false)
+          }
+        }
+      }
     }
 
-    private fun postForegroundNotification() {
-      val notification = NotificationCompat.Builder(applicationContext, NotificationChannels.getInstance().BACKGROUND)
-        .setContentTitle(applicationContext.getString(R.string.app_name))
+    override val tag: String = TAG
+    override val notificationId: Int = FOREGROUND_ID
+
+    override fun getForegroundNotification(intent: Intent): Notification {
+      val notification = NotificationCompat.Builder(applicationContext, NotificationChannels.BACKGROUND)
+        .setContentTitle(applicationContext.getString(R.string.IncomingMessageObserver_websocket_service))
         .setContentText(applicationContext.getString(R.string.MessageRetrievalService_ready_to_receive_messages))
         .setPriority(NotificationCompat.PRIORITY_MIN)
         .setCategory(NotificationCompat.CATEGORY_SERVICE)
         .setWhen(0)
         .setSmallIcon(R.drawable.ic_molly_background_connection)
         .build()
-
-      startForeground(FOREGROUND_ID, notification)
-    }
-
-    override fun onDestroy() {
-      Log.d(TAG, "Foreground service for websocket destroyed.")
-    }
-
-    companion object {
-      fun stop(context: Context) {
-        context.stopService(Intent(context, ForegroundService::class.java))
-      }
+      return notification
     }
   }
 

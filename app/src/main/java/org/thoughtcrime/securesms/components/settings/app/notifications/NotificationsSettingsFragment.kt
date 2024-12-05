@@ -14,17 +14,29 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.launch
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.common.ConnectionResult
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import im.molly.unifiedpush.UnifiedPushDefaultDistributorLinkActivity
+import im.molly.unifiedpush.components.settings.app.notifications.MollySocketQrScannerActivity
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.signal.core.util.getParcelableExtraCompat
 import org.signal.core.util.logging.Log
+import org.thoughtcrime.securesms.BuildConfig
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.components.PromptBatterySaverDialogFragment
 import org.thoughtcrime.securesms.components.settings.DSLConfiguration
 import org.thoughtcrime.securesms.components.settings.DSLSettingsFragment
+import org.thoughtcrime.securesms.components.settings.DSLSettingsIcon
 import org.thoughtcrime.securesms.components.settings.DSLSettingsText
 import org.thoughtcrime.securesms.components.settings.PreferenceModel
 import org.thoughtcrime.securesms.components.settings.PreferenceViewHolder
@@ -32,10 +44,15 @@ import org.thoughtcrime.securesms.components.settings.RadioListPreference
 import org.thoughtcrime.securesms.components.settings.RadioListPreferenceViewHolder
 import org.thoughtcrime.securesms.components.settings.configure
 import org.thoughtcrime.securesms.components.settings.models.Banner
+import org.thoughtcrime.securesms.conversation.v2.registerForLifecycle
+import org.thoughtcrime.securesms.events.PushServiceEvent
+import org.thoughtcrime.securesms.keyvalue.SettingsValues.NotificationDeliveryMethod
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.notifications.NotificationChannels
 import org.thoughtcrime.securesms.notifications.TurnOnNotificationsBottomSheet
 import org.thoughtcrime.securesms.util.BottomSheetUtil
+import org.thoughtcrime.securesms.util.CommunicationActions
+import org.thoughtcrime.securesms.util.PlayServicesUtil
 import org.thoughtcrime.securesms.util.RingtoneUtil
 import org.thoughtcrime.securesms.util.SecurePreferenceManager
 import org.thoughtcrime.securesms.util.ViewUtil
@@ -65,6 +82,32 @@ class NotificationsSettingsFragment : DSLSettingsFragment(R.string.preferences__
   private val ledBlinkLabels by lazy { resources.getStringArray(R.array.pref_led_blink_pattern_entries) }
 
   private lateinit var viewModel: NotificationsSettingsViewModel
+
+  private val args: NotificationsSettingsFragmentArgs by navArgs()
+
+  private val linkDefaultDistributorLauncher: ActivityResultLauncher<Unit> =
+    registerForActivityResult(UnifiedPushDefaultDistributorLinkActivity.Contract()) { success ->
+      if (success != true) {
+        // If there are no distributors or
+        // if there are multiple distributors installed, but none of them follow the last
+        // specifications,
+        // we try to fall back to the first we found.
+        viewModel.selectFirstDistributor()
+      }
+      navigateToUnifiedPushSettings()
+    }
+
+  private val qrScanLauncher: ActivityResultLauncher<Unit> =
+    registerForActivityResult(MollySocketQrScannerActivity.Contract()) { mollySocket ->
+      if (mollySocket != null) {
+        viewModel.initializeMollySocket(mollySocket)
+        viewModel.setPreferredNotificationMethod(NotificationDeliveryMethod.UNIFIEDPUSH)
+        linkDefaultDistributorLauncher.launch()
+      }
+    }
+
+  private val layoutManager: LinearLayoutManager?
+    get() = recyclerView?.layoutManager as? LinearLayoutManager
 
   override fun onResume() {
     super.onResume()
@@ -96,7 +139,23 @@ class NotificationsSettingsFragment : DSLSettingsFragment(R.string.preferences__
 
     viewModel.state.observe(viewLifecycleOwner) {
       adapter.submitList(getConfiguration(it).toMappingModelList())
+
+      val errorCode = viewModel.state.value?.playServicesErrorCode
+      if (errorCode != null && errorCode != ConnectionResult.SUCCESS) {
+        layoutManager?.scrollToPosition(adapter.itemCount - 1)
+        showPlayServicesErrorDialog(errorCode)
+        viewModel.setPlayServicesErrorCode(null)
+      }
     }
+
+    viewModel.setPlayServicesErrorCode(args.playServicesErrorCode)
+
+    EventBus.getDefault().registerForLifecycle(subscriber = this, lifecycleOwner = viewLifecycleOwner)
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  fun onPushServiceEvent(event: PushServiceEvent) {
+    viewModel.refresh()
   }
 
   private fun getConfiguration(state: NotificationsSettingsState): DSLConfiguration {
@@ -295,7 +354,6 @@ class NotificationsSettingsFragment : DSLSettingsFragment(R.string.preferences__
         onToggle = { isChecked ->
           if (isChecked && !state.canEnableNotifyWhileLocked) {
             MaterialAlertDialogBuilder(requireContext())
-              .setTitle(R.string.NotificationsSettingsFragment__push_notifications_unavailable)
               .setMessage(R.string.NotificationsSettingsFragment__sorry_this_feature_requires_push_notifications_delivered_via_fcm_or_unifiedpush)
               .setPositiveButton(android.R.string.ok, null)
               .show()
@@ -314,7 +372,101 @@ class NotificationsSettingsFragment : DSLSettingsFragment(R.string.preferences__
           viewModel.setNotifyWhenContactJoinsSignal(!state.notifyWhenContactJoinsSignal)
         }
       )
+
+      dividerPref()
+
+      sectionHeaderPref(R.string.NotificationsSettingsFragment__push_notifications)
+
+      textPref(
+        summary = DSLSettingsText.from(R.string.NotificationsSettingsFragment__select_your_preferred_service_for_push_notifications)
+      )
+
+      val notificationMethods = NotificationDeliveryMethod.entries.filter { method ->
+        when (method) {
+          NotificationDeliveryMethod.FCM -> BuildConfig.USE_PLAY_SERVICES
+          NotificationDeliveryMethod.WEBSOCKET -> true
+          NotificationDeliveryMethod.UNIFIEDPUSH -> !state.isLinkedDevice
+        }
+      }
+
+      val showAlertIcon = when (state.preferredNotificationMethod) {
+        NotificationDeliveryMethod.FCM -> !state.canReceiveFcm
+        NotificationDeliveryMethod.WEBSOCKET -> false
+        NotificationDeliveryMethod.UNIFIEDPUSH -> !state.canReceiveUnifiedPush
+      }
+
+      radioListPref(
+        title = DSLSettingsText.from(R.string.NotificationsSettingsFragment__delivery_service),
+        listItems = notificationMethods.map { resources.getString(it.stringId) }.toTypedArray(),
+        selected = notificationMethods.indexOf(state.preferredNotificationMethod),
+        iconEnd = if (showAlertIcon) DSLSettingsIcon.from(R.drawable.ic_alert, R.color.signal_alert_primary) else null,
+        onSelected = {
+          onNotificationMethodChanged(notificationMethods[it], state.preferredNotificationMethod)
+        }
+      )
+
+      if (!state.isLinkedDevice) {
+        clickPref(
+          title = DSLSettingsText.from(R.string.NotificationsSettingsFragment__configure_unifiedpush),
+          isEnabled = state.preferredNotificationMethod == NotificationDeliveryMethod.UNIFIEDPUSH,
+          onClick = {
+            navigateToUnifiedPushSettings()
+          }
+        )
+      }
     }
+  }
+
+  private fun onNotificationMethodChanged(
+    method: NotificationDeliveryMethod,
+    previousMethod: NotificationDeliveryMethod
+  ) {
+    when (method) {
+      NotificationDeliveryMethod.FCM -> viewModel.setPreferredNotificationMethod(method)
+      NotificationDeliveryMethod.WEBSOCKET -> viewModel.setPreferredNotificationMethod(method)
+      NotificationDeliveryMethod.UNIFIEDPUSH -> {
+        if (method != previousMethod) {
+          MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.NotificationsSettingsFragment__mollysocket_server)
+            .setMessage(R.string.NotificationsSettingsFragment__to_use_unifiedpush_you_need_access_to_a_mollysocket_server)
+            .setPositiveButton(R.string.AddLinkDeviceFragment__scan_qr_code) { _, _ ->
+              qrScanLauncher.launch()
+            }
+            .setNegativeButton(R.string.RegistrationActivity_cancel, null)
+            .setNeutralButton(R.string.LearnMoreTextView_learn_more) { _, _ ->
+              CommunicationActions.openBrowserLink(requireContext(), getString(R.string.mollysocket_setup_url))
+            }
+            .show()
+        } else {
+          navigateToUnifiedPushSettings()
+        }
+      }
+    }
+  }
+
+  private fun navigateToUnifiedPushSettings() {
+    findNavController().safeNavigate(R.id.action_notificationsSettingsFragment_to_unifiedPushFragment)
+  }
+
+  private fun showPlayServicesErrorDialog(errorCode: Int) {
+    val causeId = when (errorCode) {
+      ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED -> {
+        if (PlayServicesUtil.isGooglePlayPackageEnabled(context)) {
+          R.string.RegistrationActivity_google_play_services_is_updating_or_unavailable
+        } else {
+          R.string.NotificationsSettingsFragment__please_check_if_google_play_services_is_installed_and_enabled
+        }
+      }
+
+      else -> R.string.NotificationsSettingsFragment__please_check_if_google_play_services_is_installed_and_enabled
+    }
+
+    MaterialAlertDialogBuilder(requireContext())
+      .setNegativeButton(android.R.string.ok, null)
+      .setMessage(
+        getString(R.string.NotificationsSettingsFragment__an_error_occurred_while_registering_for_push_notifications_s, getString(causeId))
+      )
+      .show()
   }
 
   private fun getRingtoneSummary(uri: Uri): String {

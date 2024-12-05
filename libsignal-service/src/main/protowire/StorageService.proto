@@ -60,7 +60,8 @@ message ManifestRecord {
            uint64     version      = 1;
            uint32     sourceDevice = 3;
   repeated Identifier identifiers  = 2;
-  // Next ID: 4
+           bytes      recordIkm    = 4;
+  // Next ID: 5
 }
 
 message StorageRecord {
@@ -219,6 +220,8 @@ message AccountRecord {
            string                 username                        = 33;
            bool                   hasCompletedUsernameOnboarding  = 34;
            UsernameLink           usernameLink                    = 35;
+           bytes                  backupsSubscriberId             = 36;
+           string                 backupsSubscriberCurrencyCode   = 37;
 }
 
 message StoryDistributionListRecord {

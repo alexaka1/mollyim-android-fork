@@ -18,20 +18,28 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import org.signal.core.util.concurrent.SignalExecutors
+import org.signal.core.util.copyTo
+import org.signal.core.util.logging.Log
+import org.signal.core.util.readNBytesOrThrow
+import org.signal.core.util.stream.LimitedInputStream
 import org.signal.libsignal.zkgroup.profiles.ProfileKey
 import org.thoughtcrime.securesms.attachments.AttachmentId
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment
 import org.thoughtcrime.securesms.backup.v2.BackupMetadata
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
+import org.thoughtcrime.securesms.backup.v2.MessageBackupTier
 import org.thoughtcrime.securesms.backup.v2.local.ArchiveFileSystem
 import org.thoughtcrime.securesms.backup.v2.local.ArchiveResult
 import org.thoughtcrime.securesms.backup.v2.local.LocalArchiver
 import org.thoughtcrime.securesms.backup.v2.local.LocalArchiver.FailureCause
 import org.thoughtcrime.securesms.backup.v2.local.SnapshotFileSystem
+import org.thoughtcrime.securesms.backup.v2.stream.EncryptedBackupReader.Companion.MAC_SIZE
 import org.thoughtcrime.securesms.database.MessageType
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobs.AttachmentUploadJob
+import org.thoughtcrime.securesms.jobs.BackfillDigestJob
 import org.thoughtcrime.securesms.jobs.BackupMessagesJob
 import org.thoughtcrime.securesms.jobs.BackupRestoreJob
 import org.thoughtcrime.securesms.jobs.BackupRestoreMediaJob
@@ -42,15 +50,27 @@ import org.thoughtcrime.securesms.jobs.RestoreLocalAttachmentJob
 import org.thoughtcrime.securesms.jobs.SyncArchivedMediaJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.mms.IncomingMessage
+import org.thoughtcrime.securesms.providers.BlobProvider
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.whispersystems.signalservice.api.NetworkResult
 import org.whispersystems.signalservice.api.backup.MediaName
 import java.io.ByteArrayInputStream
+import java.io.IOException
 import java.io.InputStream
+import java.io.OutputStream
 import java.util.UUID
+import java.util.zip.GZIPInputStream
+import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 import kotlin.time.Duration.Companion.seconds
 
 class InternalBackupPlaygroundViewModel : ViewModel() {
+
+  companion object {
+    private val TAG = Log.tag(InternalBackupPlaygroundViewModel::class)
+  }
 
   var backupData: ByteArray? = null
 
@@ -64,7 +84,8 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
       canReadWriteBackupDirectory = SignalStore.settings.signalBackupDirectory?.let {
         val file = DocumentFile.fromTreeUri(AppDependencies.application, it)
         file != null && file.canWrite() && file.canRead()
-      } ?: false
+      } ?: false,
+      backupTier = SignalStore.backup.backupTier
     )
   )
   val state: State<ScreenState> = _state
@@ -202,13 +223,25 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
           }
 
           else -> {
+            Log.w(TAG, "Error checking remote backup state", result.getCause())
             _state.value = _state.value.copy(remoteBackupState = RemoteBackupState.GeneralError)
           }
         }
       }
   }
 
-  fun restoreFromRemote() {
+  fun wipeAllDataAndRestoreFromRemote() {
+    SignalExecutors.BOUNDED_IO.execute {
+      restoreFromRemote()
+    }
+  }
+
+  fun onBackupTierSelected(backupTier: MessageBackupTier?) {
+    SignalStore.backup.backupTier = backupTier
+    _state.value = _state.value.copy(backupTier = backupTier)
+  }
+
+  private fun restoreFromRemote() {
     _state.value = _state.value.copy(backupState = BackupState.IMPORT_IN_PROGRESS)
 
     disposables += Single.fromCallable {
@@ -408,7 +441,8 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
     val uploadState: BackupUploadState = BackupUploadState.NONE,
     val remoteBackupState: RemoteBackupState = RemoteBackupState.Unknown,
     val plaintext: Boolean,
-    val canReadWriteBackupDirectory: Boolean = false
+    val canReadWriteBackupDirectory: Boolean = false,
+    val backupTier: MessageBackupTier? = null
   )
 
   enum class BackupState(val inProgress: Boolean = false) {
@@ -442,14 +476,15 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
       attachments: List<BackupAttachment> = this.attachments,
       inProgress: Set<AttachmentId> = this.inProgressMediaIds
     ): MediaState {
-      val backupKey = SignalStore.svr.getOrCreateMasterKey().deriveBackupKey()
+      val backupKey = SignalStore.backup.messageBackupKey
+      val mediaRootBackupKey = SignalStore.backup.mediaRootBackupKey
 
       val updatedAttachments = attachments.map {
         val state = if (inProgress.contains(it.dbAttachment.attachmentId)) {
           BackupAttachment.State.IN_PROGRESS
         } else if (it.dbAttachment.archiveMediaName != null) {
           if (it.dbAttachment.remoteDigest != null) {
-            val mediaId = backupKey.deriveMediaId(MediaName(it.dbAttachment.archiveMediaName)).encode()
+            val mediaId = mediaRootBackupKey.deriveMediaId(MediaName(it.dbAttachment.archiveMediaName)).encode()
             if (it.dbAttachment.archiveMediaId == mediaId) {
               BackupAttachment.State.UPLOADED_FINAL
             } else {
@@ -496,5 +531,53 @@ class InternalBackupPlaygroundViewModel : ViewModel() {
 
   fun <T> MutableState<T>.set(update: T.() -> T) {
     this.value = this.value.update()
+  }
+
+  fun haltAllJobs() {
+    AppDependencies.jobManager.cancelAllInQueue(BackfillDigestJob.QUEUE)
+    AppDependencies.jobManager.cancelAllInQueue("ArchiveAttachmentJobs_0")
+    AppDependencies.jobManager.cancelAllInQueue("ArchiveAttachmentJobs_1")
+    AppDependencies.jobManager.cancelAllInQueue("ArchiveThumbnailUploadJob")
+    AppDependencies.jobManager.cancelAllInQueue("BackupRestoreJob")
+    AppDependencies.jobManager.cancelAllInQueue("__LOCAL_BACKUP__")
+  }
+
+  fun fetchRemoteBackupAndWritePlaintext(outputStream: OutputStream?) {
+    check(outputStream != null)
+
+    SignalExecutors.BOUNDED_IO.execute {
+      Log.d(TAG, "Downloading file...")
+      val tempBackupFile = BlobProvider.getInstance().forNonAutoEncryptingSingleSessionOnDisk(AppDependencies.application)
+
+      when (val result = BackupRepository.downloadBackupFile(tempBackupFile)) {
+        is NetworkResult.Success -> Log.i(TAG, "Download successful")
+        else -> {
+          Log.w(TAG, "Failed to download backup file", result.getCause())
+          throw IOException(result.getCause())
+        }
+      }
+
+      val encryptedStream = tempBackupFile.inputStream()
+      val iv = encryptedStream.readNBytesOrThrow(16)
+      val backupKey = SignalStore.backup.messageBackupKey
+      val keyMaterial = backupKey.deriveBackupSecrets(Recipient.self().aci.get())
+      val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding").apply {
+        init(Cipher.DECRYPT_MODE, SecretKeySpec(keyMaterial.aesKey, "AES"), IvParameterSpec(iv))
+      }
+
+      val plaintextStream = GZIPInputStream(
+        CipherInputStream(
+          LimitedInputStream(
+            wrapped = encryptedStream,
+            maxBytes = tempBackupFile.length() - MAC_SIZE
+          ),
+          cipher
+        )
+      )
+
+      Log.d(TAG, "Copying...")
+      plaintextStream.copyTo(outputStream)
+      Log.d(TAG, "Done!")
+    }
   }
 }

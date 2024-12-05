@@ -11,7 +11,6 @@ import org.thoughtcrime.securesms.badges.Badges
 import org.thoughtcrime.securesms.components.settings.app.subscription.DonationSerializationHelper.toDecimalValue
 import org.thoughtcrime.securesms.components.settings.app.subscription.InAppPaymentsRepository
 import org.thoughtcrime.securesms.components.settings.app.subscription.InAppPaymentsRepository.toPaymentSourceType
-import org.thoughtcrime.securesms.components.settings.app.subscription.manage.DonationRedemptionJobStatus
 import org.thoughtcrime.securesms.database.InAppPaymentTable
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.InAppPaymentSubscriberRecord
@@ -26,6 +25,7 @@ import org.whispersystems.signalservice.api.subscriptions.ActiveSubscription
 import org.whispersystems.signalservice.internal.EmptyResponse
 import org.whispersystems.signalservice.internal.ServiceResponse
 import java.util.Locale
+import kotlin.concurrent.withLock
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -89,7 +89,7 @@ class InAppPaymentKeepAliveJob private constructor(
   }
 
   override fun onRun() {
-    synchronized(type) {
+    type.lock.withLock {
       doRun()
     }
   }
@@ -211,23 +211,23 @@ class InAppPaymentKeepAliveJob private constructor(
         return null
       }
 
-      val (badge, label) = if (oldInAppPayment == null) {
+      val badge = if (oldInAppPayment == null) {
         info(type, "Old payment not found in database. Loading badge / label information from donations configuration.")
         val configuration = AppDependencies.donationsService.getDonationsConfiguration(Locale.getDefault())
         if (configuration.result.isPresent) {
           val subscriptionConfig = configuration.result.get().levels[subscription.level]
           if (subscriptionConfig == null) {
             info(type, "Failed to load subscription configuration for level ${subscription.level} for type $type")
-            null to ""
+            null
           } else {
-            Badges.toDatabaseBadge(Badges.fromServiceBadge(subscriptionConfig.badge)) to subscriptionConfig.name
+            Badges.toDatabaseBadge(Badges.fromServiceBadge(subscriptionConfig.badge))
           }
         } else {
           warn(TAG, "Failed to load configuration while processing $type")
-          null to ""
+          null
         }
       } else {
-        oldInAppPayment.data.badge to oldInAppPayment.data.label
+        oldInAppPayment.data.badge
       }
 
       info(type, "End of period has changed. Requesting receipt refresh. (old: $oldEndOfPeriod, new: $endOfCurrentPeriod)")
@@ -250,7 +250,6 @@ class InAppPaymentKeepAliveJob private constructor(
           error = null,
           level = subscription.level.toLong(),
           cancellation = null,
-          label = label,
           recipientId = null,
           additionalMessage = null,
           redemption = InAppPaymentData.RedemptionState(
@@ -311,7 +310,7 @@ class InAppPaymentKeepAliveJob private constructor(
     override fun create(parameters: Parameters, serializedData: ByteArray?): InAppPaymentKeepAliveJob {
       return InAppPaymentKeepAliveJob(
         parameters,
-        InAppPaymentSubscriberRecord.Type.values().first { it.code == JsonJobData.deserialize(serializedData).getInt(DATA_TYPE) }
+        InAppPaymentSubscriberRecord.Type.entries.first { it.code == JsonJobData.deserialize(serializedData).getInt(DATA_TYPE) }
       )
     }
   }

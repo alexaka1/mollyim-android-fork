@@ -29,7 +29,7 @@ import java.io.IOException
  * Provides a [SignalServiceConfiguration] to be used with our service layer.
  * If you're looking for a place to start, look at [getConfiguration].
  */
-open class SignalServiceNetworkAccess(context: Context) {
+class SignalServiceNetworkAccess(context: Context) {
   companion object {
     private val TAG = Log.tag(SignalServiceNetworkAccess::class.java)
 
@@ -46,11 +46,12 @@ open class SignalServiceNetworkAccess(context: Context) {
     private const val COUNTRY_CODE_IRAN = 98
     private const val COUNTRY_CODE_CUBA = 53
     private const val COUNTRY_CODE_UZBEKISTAN = 998
-    private const val COUNTRY_CODE_RUSSIA = 7
     private const val COUNTRY_CODE_VENEZUELA = 58
     private const val COUNTRY_CODE_PAKISTAN = 92
 
     // MOLLY: Add new hostnames and URLs to HOSTNAMES below
+    private const val SIGNALCAPTCHAS_HOST = "signalcaptchas.org"
+    private const val UPDATES2_HOST = "updates2.signal.org"
     private const val G_HOST = "reflector-nrgwuv7kwq-uc.a.run.app"
     private const val F_SERVICE_HOST = "chat-signal.global.ssl.fastly.net"
     private const val F_STORAGE_HOST = "storage.signal.org.global.prod.fastly.net"
@@ -66,7 +67,6 @@ open class SignalServiceNetworkAccess(context: Context) {
     private const val HTTPS_INBOX_GOOGLE_COM = "https://inbox.google.com"
     private const val HTTPS_GITHUB_GITHUBASSETS_COM = "https://github.githubassets.com"
     private const val HTTPS_PINTEREST_COM = "https://pinterest.com"
-    private const val HTTPS_OPEN_SCDN_CO = "https://open.scdn.co"
     private const val HTTPS_WWW_REDDITSTATIC_COM = "https://www.redditstatic.com"
     private const val HTTPS_WWW_GOOGLE_COM_EG = "https://www.google.com.eg"
     private const val HTTPS_WWW_GOOGLE_AE = "https://www.google.ae"
@@ -84,11 +84,13 @@ open class SignalServiceNetworkAccess(context: Context) {
       BuildConfig.SIGNAL_CDN2_URL.stripProtocol(),
       BuildConfig.SIGNAL_CDN3_URL.stripProtocol(),
       BuildConfig.SIGNAL_CDSI_URL.stripProtocol(),
+      // SIGNAL_SERVICE_STATUS_URL
+      BuildConfig.SIGNAL_SVR2_URL.stripProtocol(),
       BuildConfig.SIGNAL_SFU_URL.stripProtocol(),
       BuildConfig.SIGNAL_STAGING_SFU_URL.stripProtocol(),
-      BuildConfig.CONTENT_PROXY_HOST.stripProtocol(),
-      BuildConfig.SIGNAL_CDSI_URL.stripProtocol(),
-      BuildConfig.SIGNAL_SVR2_URL.stripProtocol(),
+      BuildConfig.CONTENT_PROXY_HOST,
+      SIGNALCAPTCHAS_HOST,
+      UPDATES2_HOST,
       G_HOST,
       F_SERVICE_HOST,
       F_STORAGE_HOST,
@@ -104,7 +106,6 @@ open class SignalServiceNetworkAccess(context: Context) {
       HTTPS_INBOX_GOOGLE_COM.stripProtocol(),
       HTTPS_GITHUB_GITHUBASSETS_COM.stripProtocol(),
       HTTPS_PINTEREST_COM.stripProtocol(),
-      HTTPS_OPEN_SCDN_CO.stripProtocol(),
       HTTPS_WWW_REDDITSTATIC_COM.stripProtocol(),
       HTTPS_WWW_GOOGLE_COM_EG.stripProtocol(),
       HTTPS_WWW_GOOGLE_AE.stripProtocol(),
@@ -226,7 +227,8 @@ open class SignalServiceNetworkAccess(context: Context) {
     dns = Networking.dns,
     zkGroupServerPublicParams = zkGroupServerPublicParams,
     genericServerPublicParams = genericServerPublicParams,
-    backupServerPublicParams = backupServerPublicParams
+    backupServerPublicParams = backupServerPublicParams,
+    censored = true
   )
 
   private val censorshipConfiguration: Map<Int, SignalServiceConfiguration> = mapOf(
@@ -252,8 +254,7 @@ open class SignalServiceNetworkAccess(context: Context) {
       listOf(HostConfig(HTTPS_WWW_GOOGLE_COM_PK, G_HOST, GMAIL_CONNECTION_SPEC)) + baseGHostConfigs
     ),
     COUNTRY_CODE_IRAN to fConfig,
-    COUNTRY_CODE_CUBA to fConfig,
-    COUNTRY_CODE_RUSSIA to fConfig
+    COUNTRY_CODE_CUBA to fConfig
   )
 
   private val defaultCensoredConfiguration: SignalServiceConfiguration = buildGConfiguration(baseGHostConfigs) + fConfig
@@ -266,12 +267,11 @@ open class SignalServiceNetworkAccess(context: Context) {
     COUNTRY_CODE_IRAN,
     COUNTRY_CODE_CUBA,
     COUNTRY_CODE_UZBEKISTAN,
-    COUNTRY_CODE_RUSSIA,
     COUNTRY_CODE_VENEZUELA,
     COUNTRY_CODE_PAKISTAN
   )
 
-  open val uncensoredConfiguration: SignalServiceConfiguration = SignalServiceConfiguration(
+  val uncensoredConfiguration: SignalServiceConfiguration = SignalServiceConfiguration(
     signalServiceUrls = arrayOf(SignalServiceUrl(BuildConfig.SIGNAL_URL, serviceTrustStore)),
     signalCdnUrlMap = mapOf(
       0 to arrayOf(SignalCdnUrl(BuildConfig.SIGNAL_CDN_URL, serviceTrustStore)),
@@ -287,14 +287,15 @@ open class SignalServiceNetworkAccess(context: Context) {
     dns = Networking.dns,
     zkGroupServerPublicParams = zkGroupServerPublicParams,
     genericServerPublicParams = genericServerPublicParams,
-    backupServerPublicParams = backupServerPublicParams
+    backupServerPublicParams = backupServerPublicParams,
+    censored = false
   )
 
-  open fun getConfiguration(): SignalServiceConfiguration {
+  fun getConfiguration(): SignalServiceConfiguration {
     return getConfiguration(SignalStore.account.e164)
   }
 
-  open fun getConfiguration(e164: String?): SignalServiceConfiguration {
+  fun getConfiguration(e164: String?): SignalServiceConfiguration {
     if (e164.isNullOrEmpty()) {
       return uncensoredConfiguration
     }
@@ -357,7 +358,8 @@ open class SignalServiceNetworkAccess(context: Context) {
       dns = Networking.dns,
       zkGroupServerPublicParams = zkGroupServerPublicParams,
       genericServerPublicParams = genericServerPublicParams,
-      backupServerPublicParams = backupServerPublicParams
+      backupServerPublicParams = backupServerPublicParams,
+      censored = true
     )
   }
 

@@ -13,8 +13,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.ActivityNavigator
 import org.signal.core.util.logging.Log
-import org.thoughtcrime.securesms.BaseActivity
 import org.thoughtcrime.securesms.MainActivity
+import org.thoughtcrime.securesms.PassphraseRequiredActivity
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.lock.v2.CreateSvrPinActivity
@@ -23,14 +23,14 @@ import org.thoughtcrime.securesms.profiles.AvatarHelper
 import org.thoughtcrime.securesms.profiles.edit.CreateProfileActivity
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.registration.sms.SmsRetrieverReceiver
-import org.thoughtcrime.securesms.registration.ui.restore.RemoteRestoreActivity
+import org.thoughtcrime.securesms.registrationv3.ui.restore.RemoteRestoreActivity
 import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme
 import org.thoughtcrime.securesms.util.RemoteConfig
 
 /**
  * Activity to hold the entire registration process.
  */
-class RegistrationActivity : BaseActivity() {
+class RegistrationActivity : PassphraseRequiredActivity() {
 
   private val TAG = Log.tag(RegistrationActivity::class.java)
 
@@ -43,10 +43,10 @@ class RegistrationActivity : BaseActivity() {
     lifecycle.addObserver(SmsRetrieverObserver())
   }
 
-  override fun onCreate(savedInstanceState: Bundle?) {
+  override fun onCreate(savedInstanceState: Bundle?, ready: Boolean) {
     dynamicTheme.onCreate(this)
 
-    super.onCreate(savedInstanceState)
+    super.onCreate(savedInstanceState, ready)
     setContentView(R.layout.activity_registration_navigation_v2)
 
     sharedViewModel.isReregister = intent.getBooleanExtra(RE_REGISTRATION_EXTRA, false)
@@ -64,11 +64,11 @@ class RegistrationActivity : BaseActivity() {
   }
 
   private fun handleSuccessfulVerify() {
-    if (SignalStore.misc.hasLinkedDevices) {
+    if (SignalStore.account.hasLinkedDevices) {
       SignalStore.misc.shouldShowLinkedDevicesReminder = sharedViewModel.isReregister
     }
 
-    if (SignalStore.storageService.needsAccountRestore()) {
+    if (SignalStore.storageService.needsAccountRestore) {
       Log.i(TAG, "Performing pin restore.")
       startActivity(Intent(this, PinRestoreActivity::class.java))
       finish()
@@ -120,7 +120,7 @@ class RegistrationActivity : BaseActivity() {
 
     @JvmStatic
     fun newIntentForNewRegistration(context: Context, originalIntent: Intent): Intent {
-      return Intent(context, RegistrationActivity::class.java).apply {
+      return Intent(context, getRegistrationClass()).apply {
         putExtra(RE_REGISTRATION_EXTRA, false)
         setData(originalIntent.data)
       }
@@ -128,9 +128,13 @@ class RegistrationActivity : BaseActivity() {
 
     @JvmStatic
     fun newIntentForReRegistration(context: Context): Intent {
-      return Intent(context, RegistrationActivity::class.java).apply {
+      return Intent(context, getRegistrationClass()).apply {
         putExtra(RE_REGISTRATION_EXTRA, true)
       }
+    }
+
+    private fun getRegistrationClass(): Class<*> {
+      return if (RemoteConfig.restoreAfterRegistration) org.thoughtcrime.securesms.registrationv3.ui.RegistrationActivity::class.java else RegistrationActivity::class.java
     }
   }
 }

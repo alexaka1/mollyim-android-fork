@@ -116,7 +116,7 @@ class CallLinkTable(context: Context, databaseHelper: SignalDatabase) : Database
     AppDependencies.databaseObserver.notifyCallLinkObservers(callLink.roomId)
     AppDependencies.databaseObserver.notifyCallUpdateObservers()
 
-    return recipientId!!
+    return recipientId
   }
 
   fun updateCallLinkCredentials(
@@ -244,11 +244,20 @@ class CallLinkTable(context: Context, databaseHelper: SignalDatabase) : Database
             .values(
               DELETION_TIMESTAMP to deletionTimestamp,
               ADMIN_KEY to null,
+              ROOT_KEY to callLinkRootKey.keyBytes,
               REVOKED to true
             )
             .where("$ROOM_ID = ?", callLink.roomId.serialize())
             .run()
-        } else 0
+        } else {
+          writableDatabase.update(TABLE_NAME)
+            .values(
+              ADMIN_KEY to adminPassKey,
+              ROOT_KEY to callLinkRootKey.keyBytes
+            )
+            .where("$ROOM_ID = ?", callLink.roomId.serialize())
+            .run()
+        }
       }
     }
   }

@@ -336,7 +336,7 @@ class ChangeNumberViewModel : ViewModel() {
     }
   }
 
-  fun initiateChangeNumberSession(context: Context, mode: RegistrationRepository.Mode) {
+  fun initiateChangeNumberSession(context: Context, mode: RegistrationRepository.E164VerificationMode) {
     Log.v(TAG, "changeNumber()")
     store.update { it.copy(inProgress = true) }
     viewModelScope.launch {
@@ -392,7 +392,7 @@ class ChangeNumberViewModel : ViewModel() {
   private suspend fun changeNumberWithRecoveryPassword(): Boolean {
     Log.v(TAG, "changeNumberWithRecoveryPassword()")
     SignalStore.svr.recoveryPassword?.let { recoveryPassword ->
-      if (SignalStore.svr.hasPin()) {
+      if (SignalStore.svr.hasOptedInWithAccess()) {
         val result = repository.changeNumberWithRecoveryPassword(recoveryPassword = recoveryPassword, newE164 = number.e164Number)
 
         if (result is ChangeNumberResult.Success) {
@@ -465,7 +465,7 @@ class ChangeNumberViewModel : ViewModel() {
     numberChangeErrorHandler(result)
   }
 
-  private suspend fun requestVerificationCode(context: Context, mode: RegistrationRepository.Mode) {
+  private suspend fun requestVerificationCode(context: Context, mode: RegistrationRepository.E164VerificationMode) {
     Log.v(TAG, "requestVerificationCode()")
     val e164 = number.e164Number
 
@@ -507,7 +507,7 @@ class ChangeNumberViewModel : ViewModel() {
     val currentState = store.value
     val code = currentState.enteredCode ?: throw IllegalStateException("Can't construct registration data without entered code!")
     val e164: String = number.e164Number ?: throw IllegalStateException("Can't construct registration data without E164!")
-    val recoveryPassword = if (currentState.sessionId == null) SignalStore.svr.getRecoveryPassword() else null
+    val recoveryPassword = if (currentState.sessionId == null) SignalStore.svr.recoveryPassword else null
     val fcmToken = RegistrationRepository.getFcmToken(context)
     return RegistrationData(code, e164, password, RegistrationRepository.getRegistrationId(), RegistrationRepository.getProfileKey(e164), fcmToken, RegistrationRepository.getPniRegistrationId(), recoveryPassword)
   }

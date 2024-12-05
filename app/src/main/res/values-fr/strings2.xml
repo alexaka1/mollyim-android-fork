@@ -68,8 +68,6 @@
     <string name="DeviceAddFragment__link_without_scanning">Relier sans scanner</string>
     <string name="RegistrationActivity_molly_needs_access_to_your_contacts_and_media_in_order_to_connect_with_friends">Molly a besoin des autorisations relatives aux contacts et aux médias pour vous aider à trouver vos amis et à envoyer des messages. Vos contacts sont téléversés en utilisant la découverte de contacts privés de Signal, ce qui signifie qu\'ils sont chiffrés de bout en bout et ne sont jamais visibles pour le service Signal.</string>
     <string name="RegistrationActivity_molly_needs_access_to_your_contacts_in_order_to_connect_with_friends">Molly a besoin de l\'autorisation des contacts pour vous aider à trouver vos amis. Vos contacts sont téléversés en utilisant la découverte de contacts privés de Signal, ce qui signifie qu\'ils sont chiffrés de bout en bout et ne sont jamais visibles pour le service Signal.</string>
-    <string name="DozeReminder_optimize_for_timely_notifications">Optimiser pour des notifications en temps opportun</string>
-    <string name="DozeReminder_tap_to_allow_molly_to_retrieve_messages_while_the_device_is_in_standby">Appuyez pour permettre à Molly de récupérer des messages quand l\'appareil est en veille.</string>
     <string name="preferences__beta_versions_are_intended_for_testing_purposes_and_may_contain_bugs">Les versions bêta sont destinées à des fins de test et peuvent contenir des erreurs</string>
     <string name="preferences__include_beta_updates">Inclure les mises à jour bêta</string>
     <string name="BiometricDialogFragment__biometric_verification">Vérification biométrique</string>
@@ -108,7 +106,6 @@
     <string name="NotificationsSettingsFragment__sorry_this_feature_requires_push_notifications_delivered_via_fcm_or_unifiedpush">Désolé, cette fonctionnalité nécessite des notifications poussées livrées via FCM ou UnifiedPush, qui sont actuellement indisponibles.</string>
     <string name="NotificationsSettingsFragment__new_activity_while_locked">Nouvelle activité pendant le verrouillage</string>
     <string name="NotificationsSettingsFragment__receive_notifications_for_messages_or_missed_calls_when_the_app_is_locked">Recevoir des notifications pour des messages ou des appels interrompus quand l\'application est verrouillée.</string>
-    <string name="NotificationsSettingsFragment__push_notifications_unavailable">Notifications poussées indisponibles</string>
     <string name="preferences_appearance__navigation_bar">Barre de navigation</string>
     <string name="preferences_appearance__show_calls">Afficher les appels</string>
     <string name="preferences_appearance__toggle_to_show_or_hide_the_icon_on_the_navigation_bar">Afficher ou masquer l\'icône dans la barre de navigation</string>
@@ -121,4 +118,14 @@
     <string name="LinkDeviceFragment__molly_supports_linking_to_other_android_devices">Molly peut être lié à d\'autres appareils Android avec Molly, ainsi qu\'avec des ordinateurs et des iPads avec Signal.</string>
     <string name="LinkDeviceFragment__for_android_devices_visit_s_to_install_molly">Pour les appareils Android : Visitez %s pour installer Molly.</string>
     <string name="LinkDeviceFragment__use_molly_on_another_devices">Utilisez Molly sur un autre appareil. Vos messages seront synchronisés avec vos appareils liés.</string>
+    <string name="DozeReminder_allow_molly_to_deliver_timely_notifications">Autoriser Molly à fournir des notifications en temps opportun, même lorsque votre appareil est en veille.</string>
+    <string name="DozeReminder_disable_battery_restrictions">Désactiver les limitations de la batterie</string>
+    <string name="GcmRefreshJob_unable_to_register_with_Google_Play_Services">Impossible de s’inscrire auprès de Play Services</string>
+    <string name="GcmRefreshJob_switch_to_an_alternative_push_service_in_settings_notifications">Passer à un service de poussées alternatif dans Paramètres &gt; Notifications ou corrigez le problème avec Play Services.</string>
+    <string name="NotificationsSettingsFragment__push_notifications">Notifications poussées</string>
+    <string name="NotificationsSettingsFragment__select_your_preferred_service_for_push_notifications">Sélectionnez votre service préféré pour les notifications poussées. Si elle n\'est pas disponible, l\'application utilisera automatiquement WebSocket pour assurer la distribution des notifications.</string>
+    <string name="NotificationsSettingsFragment__an_error_occurred_while_registering_for_push_notifications_s">Une erreur s\'est produite lors de l\'enregistrement pour les notifications poussées. %s</string>
+    <string name="NotificationsSettingsFragment__please_check_if_google_play_services_is_installed_and_enabled">Veuillez vérifier si Google Play Services est installé et activé, ou passer à un autre service de notifications poussées.</string>
+    <string name="NotificationsSettingsFragment__delivery_service">Service de distribution</string>
+    <string name="IncomingMessageObserver_websocket_service">Service WebSocket</string>
 </resources>

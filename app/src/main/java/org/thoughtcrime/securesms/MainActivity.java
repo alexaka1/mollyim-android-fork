@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.signal.core.util.BundleExtensions;
 import org.signal.core.util.concurrent.LifecycleDisposable;
 import org.signal.donations.StripeApi;
 import org.thoughtcrime.securesms.calls.YouAreAlreadyInACallSnackbar;
@@ -25,6 +26,7 @@ import org.thoughtcrime.securesms.components.settings.app.AppSettingsActivity;
 import org.thoughtcrime.securesms.components.voice.VoiceNoteMediaController;
 import org.thoughtcrime.securesms.components.voice.VoiceNoteMediaControllerOwner;
 import org.thoughtcrime.securesms.conversationlist.RelinkDevicesReminderBottomSheetFragment;
+import org.thoughtcrime.securesms.conversationlist.RestoreCompleteBottomSheetDialog;
 import org.thoughtcrime.securesms.devicetransfer.olddevice.OldDeviceExitActivity;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.net.DeviceTransferBlockingInterceptor;
@@ -42,9 +44,12 @@ import org.thoughtcrime.securesms.util.SplashScreenUtil;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 import org.thoughtcrime.securesms.util.WindowUtil;
 
+import im.molly.unifiedpush.UnifiedPushDistributor;
+
 public class MainActivity extends PassphraseRequiredActivity implements VoiceNoteMediaControllerOwner {
 
-  public static final int RESULT_CONFIG_CHANGED = Activity.RESULT_FIRST_USER + 901;
+  private static final String KEY_STARTING_TAB      = "STARTING_TAB";
+  public static final  int    RESULT_CONFIG_CHANGED = Activity.RESULT_FIRST_USER + 901;
 
   private final DynamicTheme  dynamicTheme = new DynamicNoActionBarTheme();
   private final MainNavigator navigator    = new MainNavigator(this);
@@ -63,6 +68,13 @@ public class MainActivity extends PassphraseRequiredActivity implements VoiceNot
     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                     Intent.FLAG_ACTIVITY_NEW_TASK |
                     Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+    return intent;
+  }
+
+  public static @NonNull Intent clearTopAndOpenTab(@NonNull Context context, @NonNull ConversationListTab startingTab) {
+    Intent intent = clearTop(context);
+    intent.putExtra(KEY_STARTING_TAB, startingTab);
 
     return intent;
   }
@@ -92,8 +104,14 @@ public class MainActivity extends PassphraseRequiredActivity implements VoiceNot
 
     mediaController = new VoiceNoteMediaController(this, true);
 
+
+    ConversationListTab startingTab = null;
+    if (getIntent().getExtras() != null) {
+      startingTab = BundleExtensions.getSerializableCompat(getIntent().getExtras(), KEY_STARTING_TAB, ConversationListTab.class);
+    }
+
     ConversationListTabRepository         repository = new ConversationListTabRepository();
-    ConversationListTabsViewModel.Factory factory    = new ConversationListTabsViewModel.Factory(repository);
+    ConversationListTabsViewModel.Factory factory    = new ConversationListTabsViewModel.Factory(startingTab, repository);
 
     handleDeeplinkIntent(getIntent());
 
@@ -116,6 +134,9 @@ public class MainActivity extends PassphraseRequiredActivity implements VoiceNot
     switch (state) {
       case NONE:
         break;
+      case PROMPT_UNIFIEDPUSH_SELECT_DISTRIBUTOR_DIALOG:
+        UnifiedPushDistributor.showSelectDistributorDialog(this);
+        break;
       case PROMPT_SPECIFIC_BATTERY_SAVER_DIALOG:
         DeviceSpecificNotificationBottomSheet.show(getSupportFragmentManager());
         break;
@@ -136,6 +157,25 @@ public class MainActivity extends PassphraseRequiredActivity implements VoiceNot
   protected void onNewIntent(Intent intent) {
     super.onNewIntent(intent);
     handleDeeplinkIntent(intent);
+
+    if (intent.getExtras() != null) {
+      ConversationListTab startingTab = BundleExtensions.getSerializableCompat(intent.getExtras(), KEY_STARTING_TAB, ConversationListTab.class);
+      if (startingTab != null) {
+        switch (startingTab) {
+          case CHATS -> conversationListTabsViewModel.onChatsSelected();
+          case CALLS -> {
+            if (TextSecurePreferences.getNavbarShowCalls(this)) {
+              conversationListTabsViewModel.onCallsSelected();
+            }
+          }
+          case STORIES -> {
+            if (Stories.isFeatureEnabled()) {
+              conversationListTabsViewModel.onStoriesSelected();
+            }
+          }
+        }
+      }
+    }
   }
 
   @Override
@@ -148,7 +188,16 @@ public class MainActivity extends PassphraseRequiredActivity implements VoiceNot
   protected void onResume() {
     super.onResume();
     dynamicTheme.onResume(this);
-    if (SignalStore.misc().isOldDeviceTransferLocked()) {
+
+    if (SignalStore.misc().getShouldShowLinkedDevicesReminder()) {
+      SignalStore.misc().setShouldShowLinkedDevicesReminder(false);
+      RelinkDevicesReminderBottomSheetFragment.show(getSupportFragmentManager());
+    }
+
+    if (SignalStore.registration().isRestoringOnNewDevice()) {
+      SignalStore.registration().setRestoringOnNewDevice(false);
+      RestoreCompleteBottomSheetDialog.show(getSupportFragmentManager());
+    } else if (SignalStore.misc().isOldDeviceTransferLocked()) {
       new MaterialAlertDialogBuilder(this)
           .setTitle(R.string.OldDeviceTransferLockedDialog__complete_registration_on_your_new_device)
           .setMessage(R.string.OldDeviceTransferLockedDialog__your_signal_account_has_been_transferred_to_your_new_device)
@@ -159,11 +208,6 @@ public class MainActivity extends PassphraseRequiredActivity implements VoiceNot
           })
           .setCancelable(false)
           .show();
-    }
-
-    if (SignalStore.misc().getShouldShowLinkedDevicesReminder()) {
-      SignalStore.misc().setShouldShowLinkedDevicesReminder(false);
-      RelinkDevicesReminderBottomSheetFragment.show(getSupportFragmentManager());
     }
 
     updateTabVisibility();

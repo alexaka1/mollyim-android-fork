@@ -6,7 +6,12 @@ import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import im.molly.unifiedpush.UnifiedPushDistributor
+import im.molly.unifiedpush.model.MollySocket
+
+import org.thoughtcrime.securesms.ApplicationContext
 import org.thoughtcrime.securesms.dependencies.AppDependencies
+import org.thoughtcrime.securesms.keyvalue.SettingsValues.NotificationDeliveryMethod
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.notifications.DeviceSpecificNotificationConfig
 import org.thoughtcrime.securesms.notifications.NotificationChannels
@@ -108,6 +113,31 @@ class NotificationsSettingsViewModel(private val sharedPreferences: SharedPrefer
     refresh()
   }
 
+  fun setPreferredNotificationMethod(method: NotificationDeliveryMethod) {
+    SignalStore.settings.preferredNotificationMethod = method
+    TextSecurePreferences.setPromptedOptimizeDoze(AppDependencies.application, false)
+    ApplicationContext.getInstance().updatePushNotificationServices()
+    AppDependencies.resetNetwork(true)
+    refresh()
+  }
+
+  fun selectFirstDistributor() {
+    UnifiedPushDistributor.selectFirstDistributor()
+  }
+
+  fun initializeMollySocket(mollySocket: MollySocket) {
+    SignalStore.unifiedpush.apply {
+      airGapped = mollySocket is MollySocket.AirGapped
+      lastReceivedTime = 0
+      mollySocketUrl = (mollySocket as? MollySocket.WebServer)?.url
+      mollySocketVapid = mollySocket.vapid
+    }
+  }
+
+  fun setPlayServicesErrorCode(errorCode: Int?) {
+    store.update { it.copy(playServicesErrorCode = errorCode) }
+  }
+
   /**
    * @param currentState If provided and [calculateSlowNotifications] = false, then we will copy the slow notification state from it
    * @param calculateSlowNotifications If true, calculate the true slow notification state (this is not main-thread safe). Otherwise, it will copy from
@@ -142,7 +172,12 @@ class NotificationsSettingsViewModel(private val sharedPreferences: SharedPrefer
     ),
     notifyWhileLocked = TextSecurePreferences.isPassphraseLockNotificationsEnabled(AppDependencies.application) && SignalStore.account.pushAvailable,
     canEnableNotifyWhileLocked = SignalStore.account.pushAvailable,
-    notifyWhenContactJoinsSignal = SignalStore.settings.isNotifyWhenContactJoinsSignal
+    notifyWhenContactJoinsSignal = SignalStore.settings.isNotifyWhenContactJoinsSignal,
+    isLinkedDevice = SignalStore.account.isLinkedDevice,
+    preferredNotificationMethod = SignalStore.settings.preferredNotificationMethod,
+    playServicesErrorCode = currentState?.playServicesErrorCode,
+    canReceiveFcm = SignalStore.account.canReceiveFcm,
+    canReceiveUnifiedPush = SignalStore.unifiedpush.isAvailableOrAirGapped
   )
 
   private fun canEnableNotifications(): Boolean {

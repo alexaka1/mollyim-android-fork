@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -22,7 +24,7 @@ public class PlayServicesUtil {
     TRANSIENT_ERROR
   }
 
-  public static PlayServicesStatus getPlayServicesStatus(Context context) {
+  public static @NonNull PlayServicesStatus getPlayServicesStatus(Context context) {
     int gcmStatus = 0;
 
     try {
@@ -38,16 +40,9 @@ public class PlayServicesUtil {
       case ConnectionResult.SUCCESS:
         return PlayServicesStatus.SUCCESS;
       case ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED:
-        try {
-          ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo("com.google.android.gms", 0);
-
-          if (applicationInfo != null && !applicationInfo.enabled) {
-            return PlayServicesStatus.MISSING;
-          }
-        } catch (PackageManager.NameNotFoundException e) {
-          Log.w(TAG, e);
+        if (!isGooglePlayPackageEnabled(context)) {
+          return PlayServicesStatus.MISSING;
         }
-
         return PlayServicesStatus.NEEDS_UPDATE;
       case ConnectionResult.SERVICE_DISABLED:
         return PlayServicesStatus.DISABLED;
@@ -61,4 +56,13 @@ public class PlayServicesUtil {
     }
   }
 
+  public static boolean isGooglePlayPackageEnabled(Context context) {
+    try {
+      ApplicationInfo applicationInfo = context.getPackageManager().getApplicationInfo("com.google.android.gms", 0);
+      return applicationInfo.enabled;
+    } catch (PackageManager.NameNotFoundException e) {
+      Log.w(TAG, e);
+      return false;
+    }
+  }
 }

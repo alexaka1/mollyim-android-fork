@@ -37,6 +37,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
 import org.signal.core.util.isNotNullOrBlank
 import org.signal.core.util.logging.Log
+import org.thoughtcrime.securesms.BuildConfig
 import org.thoughtcrime.securesms.LoggingFragment
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.components.ViewBinderDelegate
@@ -431,7 +432,7 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
     }
   }
 
-  private fun handleNonNormalizedNumberError(originalNumber: String, normalizedNumber: String, mode: RegistrationRepository.Mode) {
+  private fun handleNonNormalizedNumberError(originalNumber: String, normalizedNumber: String, mode: RegistrationRepository.E164VerificationMode) {
     try {
       val phoneNumber = PhoneNumberUtil.getInstance().parse(normalizedNumber, null)
 
@@ -450,9 +451,9 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
           spinnerView.setText(phoneNumber.countryCode.toString())
           phoneNumberInputLayout.setText(phoneNumber.nationalNumber.toString())
           when (mode) {
-            RegistrationRepository.Mode.SMS_WITH_LISTENER,
-            RegistrationRepository.Mode.SMS_WITHOUT_LISTENER -> sharedViewModel.requestSmsCode(requireContext())
-            RegistrationRepository.Mode.PHONE_CALL -> sharedViewModel.requestVerificationCall(requireContext())
+            RegistrationRepository.E164VerificationMode.SMS_WITH_LISTENER,
+            RegistrationRepository.E164VerificationMode.SMS_WITHOUT_LISTENER -> sharedViewModel.requestSmsCode(requireContext())
+            RegistrationRepository.E164VerificationMode.PHONE_CALL -> sharedViewModel.requestVerificationCall(requireContext())
           }
           dialogInterface.dismiss()
         }
@@ -543,12 +544,6 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
         fragmentViewModel.setError(EnterPhoneNumberState.Error.PLAY_SERVICES_TRANSIENT)
         return false
       }
-
-      null -> {
-        Log.w(TAG, "Null result received from PlayServicesUtil, marking Play Services as missing.")
-        fragmentViewModel.setError(EnterPhoneNumberState.Error.PLAY_SERVICES_MISSING)
-        return false
-      }
     }
   }
 
@@ -578,7 +573,7 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
       setMessage(message)
       setPositiveButton(android.R.string.ok) { _, _ ->
         Log.d(TAG, "User confirmed number.")
-        if (missingFcmConsentRequired) {
+        if (missingFcmConsentRequired && BuildConfig.USE_PLAY_SERVICES) {
           handlePromptForNoPlayServices()
         } else {
           sharedViewModel.onUserConfirmedPhoneNumber(requireContext())

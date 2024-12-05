@@ -9,11 +9,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.difflib.DiffUtils
 import com.github.difflib.UnifiedDiffUtils
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.signal.core.util.Base64
-import org.signal.core.util.SqlUtil
 import org.signal.core.util.logging.Log
 import org.signal.core.util.readFully
 import org.signal.libsignal.messagebackup.ComparableBackup
@@ -21,12 +21,9 @@ import org.signal.libsignal.messagebackup.MessageBackup
 import org.signal.libsignal.zkgroup.profiles.ProfileKey
 import org.thoughtcrime.securesms.backup.v2.proto.Frame
 import org.thoughtcrime.securesms.backup.v2.stream.PlainTextBackupReader
-import org.thoughtcrime.securesms.database.DistributionListTables
 import org.thoughtcrime.securesms.database.KeyValueDatabase
-import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.keyvalue.SignalStore
-import org.thoughtcrime.securesms.recipients.RecipientId
 import org.whispersystems.signalservice.api.kbs.MasterKey
 import org.whispersystems.signalservice.api.push.ServiceId
 import java.io.ByteArrayInputStream
@@ -46,163 +43,161 @@ class ArchiveImportExportTests {
     val MASTER_KEY = Base64.decode("sHuBMP4ToZk4tcNU+S8eBUeCt8Am5EZnvuqTBJIR4Do")
   }
 
-//  @Test
+  @Before
+  fun setup() {
+    AppDependencies.jobManager.shutdown()
+  }
+
+  @Test
   fun all() {
     runTests()
   }
 
-  @Test
-  fun temp() {
-    runTests { it == "chat_item_standard_message_formatted_text_03.binproto" }
-  }
-
-  // Passing
 //  @Test
   fun accountData() {
     runTests { it.startsWith("account_data_") }
   }
 
-  @Test
+//  @Test
   fun adHocCall() {
-    runTests { it.startsWith("ad_hoc_call") }
+    runTests { it.startsWith("ad_hoc_call_") }
   }
 
-  // Passing
 //  @Test
   fun chat() {
     runTests { it.startsWith("chat_") && !it.contains("_item") }
   }
 
-  // Passing
 //  @Test
   fun chatItemContactMessage() {
     runTests { it.startsWith("chat_item_contact_message_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemExpirationTimerUpdate() {
     runTests { it.startsWith("chat_item_expiration_timer_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemGiftBadge() {
     runTests { it.startsWith("chat_item_gift_badge_") }
   }
 
-  @Test
+//  @Test
   fun chatItemGroupCallUpdate() {
     runTests { it.startsWith("chat_item_group_call_update_") }
   }
 
-  @Test
+//  @Test
   fun chatItemIndividualCallUpdate() {
     runTests { it.startsWith("chat_item_individual_call_update_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemLearnedProfileUpdate() {
     runTests { it.startsWith("chat_item_learned_profile_update_") }
   }
 
-  @Test
+//  @Test
   fun chatItemPaymentNotification() {
     runTests { it.startsWith("chat_item_payment_notification_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemProfileChangeUpdate() {
     runTests { it.startsWith("chat_item_profile_change_update_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemRemoteDelete() {
     runTests { it.startsWith("chat_item_remote_delete_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemSessionSwitchoverUpdate() {
     runTests { it.startsWith("chat_item_session_switchover_update_") }
   }
 
-  @Test
+//  @Test
   fun chatItemSimpleUpdates() {
     runTests { it.startsWith("chat_item_simple_updates_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemStandardMessageFormattedText() {
     runTests { it.startsWith("chat_item_standard_message_formatted_text_") }
   }
 
-  @Test
+//  @Test
   fun chatItemStandardMessageLongText() {
     runTests { it.startsWith("chat_item_standard_message_long_text_") }
   }
 
-  // Passing
+//  @Test
+  fun chatItemStandardMessageSms() {
+    runTests { it.startsWith("chat_item_standard_message_sms_") }
+  }
+
 //  @Test
   fun chatItemStandardMessageSpecialAttachments() {
     runTests { it.startsWith("chat_item_standard_message_special_attachments_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemStandardMessageStandardAttachments() {
     runTests { it.startsWith("chat_item_standard_message_standard_attachments_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemStandardMessageTextOnly() {
     runTests { it.startsWith("chat_item_standard_message_text_only_") }
   }
 
-  @Test
+//  @Test
   fun chatItemStandardMessageWithEdits() {
     runTests { it.startsWith("chat_item_standard_message_with_edits_") }
   }
 
-  @Test
+//  @Test
+  fun chatItemStandardMessageWithLinkPreview() {
+    runTests { it.startsWith("chat_item_standard_message_with_link_preview_") }
+  }
+
+//  @Test
   fun chatItemStandardMessageWithQuote() {
     runTests { it.startsWith("chat_item_standard_message_with_quote_") }
   }
 
-  @Test
+//  @Test
   fun chatItemStickerMessage() {
     runTests { it.startsWith("chat_item_sticker_message_") }
   }
 
-  // Passing
 //  @Test
   fun chatItemThreadMergeUpdate() {
     runTests { it.startsWith("chat_item_thread_merge_update_") }
   }
 
-  @Test
+//  @Test
+  fun chatItemViewOnce() {
+    runTests { it.startsWith("chat_item_view_once_") }
+  }
+
+  //  @Test
   fun recipientCallLink() {
     runTests { it.startsWith("recipient_call_link_") }
   }
 
-  // Passing
 //  @Test
   fun recipientContacts() {
     runTests { it.startsWith("recipient_contacts_") }
   }
 
-  // Passing
 //  @Test
   fun recipientDistributionLists() {
     runTests { it.startsWith("recipient_distribution_list_") }
   }
 
-  // Passing
 //  @Test
   fun recipientGroups() {
     runTests { it.startsWith("recipient_groups_") }
@@ -264,21 +259,7 @@ class ArchiveImportExportTests {
   }
 
   private fun resetAllData() {
-    // Need to delete these first to prevent foreign key crash
-    SignalDatabase.rawDatabase.execSQL("DELETE FROM ${DistributionListTables.ListTable.TABLE_NAME}")
-    SignalDatabase.rawDatabase.execSQL("DELETE FROM ${DistributionListTables.MembershipTable.TABLE_NAME}")
-
-    SqlUtil.getAllTables(SignalDatabase.rawDatabase)
-      .filterNot { it.contains("sqlite") || it.contains("fts") || it.startsWith("emoji_search_") } // If we delete these we'll corrupt the DB
-      .sorted()
-      .forEach { table ->
-        SignalDatabase.rawDatabase.execSQL("DELETE FROM $table")
-        SqlUtil.resetAutoIncrementValue(SignalDatabase.rawDatabase, table)
-      }
-
-    AppDependencies.recipientCache.clear()
-    AppDependencies.recipientCache.clearSelf()
-    RecipientId.clearCache()
+    // All the main database stuff is reset as a normal part of importing
 
     KeyValueDatabase.getInstance(AppDependencies.application).clear()
     SignalStore.resetCache()
@@ -329,11 +310,11 @@ class ArchiveImportExportTests {
     }
 
     if (importComparable.unknownFieldMessages.isNotEmpty()) {
-      return TestResult.Failure(testName, "Imported backup contains unknown fields: ${importComparable.unknownFieldMessages}")
+      return TestResult.Failure(testName, "Imported backup contains unknown fields: ${importComparable.unknownFieldMessages.contentToString()}")
     }
 
     if (exportComparable.unknownFieldMessages.isNotEmpty()) {
-      return TestResult.Failure(testName, "Imported backup contains unknown fields: ${importComparable.unknownFieldMessages}")
+      return TestResult.Failure(testName, "Imported backup contains unknown fields: ${importComparable.unknownFieldMessages.contentToString()}")
     }
 
     val canonicalImport = importComparable.comparableString

@@ -46,6 +46,11 @@ class SearchTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
     private const val TRIGGER_AFTER_INSERT = "message_ai"
     private const val TRIGGER_AFTER_DELETE = "message_ad"
     private const val TRIGGER_AFTER_UPDATE = "message_au"
+    private const val AFTER_MESSAGE_DELETE_TRIGGER = """
+      CREATE TRIGGER $TRIGGER_AFTER_DELETE AFTER DELETE ON ${MessageTable.TABLE_NAME} BEGIN
+        INSERT INTO $FTS_TABLE_NAME($FTS_TABLE_NAME, $ID, $BODY, $THREAD_ID) VALUES('delete', old.${MessageTable.ID}, old.${MessageTable.BODY}, old.${MessageTable.THREAD_ID});
+      END;
+    """
 
     @Language("sql")
     val CREATE_TRIGGERS = arrayOf(
@@ -54,11 +59,7 @@ class SearchTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
           INSERT INTO $FTS_TABLE_NAME($ID, $BODY, $THREAD_ID) VALUES (new.${MessageTable.ID}, new.${MessageTable.BODY}, new.${MessageTable.THREAD_ID});
         END;
       """,
-      """
-        CREATE TRIGGER $TRIGGER_AFTER_DELETE AFTER DELETE ON ${MessageTable.TABLE_NAME} BEGIN
-          INSERT INTO $FTS_TABLE_NAME($FTS_TABLE_NAME, $ID, $BODY, $THREAD_ID) VALUES('delete', old.${MessageTable.ID}, old.${MessageTable.BODY}, old.${MessageTable.THREAD_ID});
-        END;
-      """,
+      AFTER_MESSAGE_DELETE_TRIGGER,
       """
         CREATE TRIGGER $TRIGGER_AFTER_UPDATE AFTER UPDATE ON ${MessageTable.TABLE_NAME} BEGIN
           INSERT INTO $FTS_TABLE_NAME($FTS_TABLE_NAME, $ID, $BODY, $THREAD_ID) VALUES('delete', old.${MessageTable.ID}, old.${MessageTable.BODY}, old.${MessageTable.THREAD_ID});
@@ -138,40 +139,46 @@ class SearchTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
   }
 
   /**
+   * Drop the trigger for updating the search table on deletes. Should only be used for expected large deletes.
+   * The caller must be in a transaction, update the search table manually before message deletes because of FTS indexing
+   * requirements, and be called with a matching [restoreAfterMessageDeleteTrigger] before the transaction completes.
+   */
+  fun dropAfterMessageDeleteTrigger() {
+    check(SignalDatabase.inTransaction)
+    writableDatabase.execSQL("DROP TRIGGER IF EXISTS $TRIGGER_AFTER_DELETE")
+  }
+
+  /**
+   * Restore the trigger for updating the search table on message deletes. Must only be called within the same transaction
+   * after calling [dropAfterMessageDeleteTrigger] and performing the dropped trigger's actions manually.
+   */
+  fun restoreAfterMessageDeleteTrigger() {
+    check(SignalDatabase.inTransaction)
+    writableDatabase.execSQL(AFTER_MESSAGE_DELETE_TRIGGER)
+  }
+
+  /**
    * Re-adds every message to the index. It's fine to insert the same message twice; the table will naturally de-dupe.
-   *
-   * In order to prevent the database from locking up with super large inserts, this will perform the re-index in batches of the size you specify.
-   * It is not guaranteed that every batch will be the same size, but rather that the batches will be _no larger_ than the specified size.
    *
    * Warning: This is a potentially extremely-costly operation! It can take 10+ seconds on large installs and/or slow devices.
    * Be smart about where you call this.
    *
    * @return True if the rebuild was successful, otherwise false.
    */
-  fun rebuildIndex(batchSize: Long = 10_000L): Boolean {
+  fun rebuildIndex(): Boolean {
     try {
-      val maxId: Long = SignalDatabase.messages.getNextId()
-
-      Log.i(TAG, "Re-indexing. Operating on ID's 1-$maxId in steps of $batchSize.")
-
-      for (i in 1..maxId step batchSize) {
-        Log.i(TAG, "Reindexing ID's [$i, ${i + batchSize})")
-
-        writableDatabase.withinTransaction { db ->
-          db.execSQL(
-            """
-            INSERT INTO $FTS_TABLE_NAME ($ID, $BODY)
-                SELECT
-                  ${MessageTable.ID},
-                  ${MessageTable.BODY}
-                FROM
-                  ${MessageTable.TABLE_NAME}
-                WHERE
-                  ${MessageTable.ID} >= $i AND
-                  ${MessageTable.ID} < ${i + batchSize}
-            """
-          )
-        }
+      writableDatabase.withinTransaction { db ->
+        db.execSQL(
+          """
+          INSERT INTO $FTS_TABLE_NAME ($ID, $BODY, $THREAD_ID)
+              SELECT
+                ${MessageTable.ID},
+                ${MessageTable.BODY},
+                ${MessageTable.THREAD_ID}
+              FROM
+                ${MessageTable.TABLE_NAME}
+          """
+        )
       }
     } catch (e: SQLiteException) {
       Log.w(TAG, "Failed to rebuild index!", e)

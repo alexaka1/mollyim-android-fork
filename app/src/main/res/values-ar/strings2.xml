@@ -52,7 +52,6 @@
     <string name="preferences__block_users_youve_never_been_in_contact_with_and_who_are_not_saved_in_your_contacts">احظر المستخدمين الذين لم تتواصل معهم مطلقًا والذين لم يتم حفظهم كجهات اتصال.</string>
     <string name="DonateMegaphone_molly_is_free_software">مولي هو برنامج مجاني</string>
     <string name="BackupsPreferenceFragment__change_schedule">تغيير الجدولة</string>
-    <string name="DozeReminder_tap_to_allow_molly_to_retrieve_messages_while_the_device_is_in_standby">انقر للسماح لمولي باسترداد الرسائل عندما يكون الجهاز في وضع الاستعداد.</string>
     <string name="RegistrationActivity_link_retry">أعد محاولة الربط</string>
     <string name="DeviceListItem_device_d">الجهاز #%d</string>
     <string name="DeviceListItem_primary">الرئيسي</string>
@@ -70,9 +69,7 @@
     <string name="WipeMemoryService_clearing_unencrypted_data_from_ram">يمسح البيانات غير المُعمَّاة من ذاكرة الوصول العشوائي</string>
     <string name="BioTextPreference_no_linked_devices">لا توجد أجهزة مرتبطة</string>
     <string name="NotificationsSettingsFragment__new_activity_while_locked">نشاط جديد أثناء القفل</string>
-    <string name="NotificationsSettingsFragment__push_notifications_unavailable">إشعارات Push غير متوفرة</string>
     <string name="NotificationsSettingsFragment__sorry_this_feature_requires_push_notifications_delivered_via_fcm_or_unifiedpush">عذرًا، تتطلب هذه الميزة إرسال إشعارات Push عبر FCM أو UnifiedPush، وهي غير متوفرة حاليًا.</string>
-    <string name="DozeReminder_optimize_for_timely_notifications">تحسين الإشعارات في الوقت المناسب</string>
     <string name="arrays__weekly">أسبوعيًا</string>
     <string name="MessageRetrievalService_ready_to_receive_messages">جاهز لتلقي الرسائل</string>
     <string name="HelpSettingsFragment__molly_im_website">موقع Molly.im</string>
@@ -124,4 +121,14 @@
     <string name="LinkDeviceFragment__molly_supports_linking_to_other_android_devices">يدعم تطبيق مولي الارتباط بأجهزة أندرويد الأخرى التي تشغّل مولي، بالإضافة إلى أجهزة سطح المكتب وأجهزة iPad التي تشغّل سيجنال.</string>
     <string name="LinkDeviceFragment__for_android_devices_visit_s_to_install_molly">بالنسبة للأجهزة التي تعمل بنظام أندوريد: قم بزيارة %s لتثبيت مولي.</string>
     <string name="LinkDeviceFragment__once_linked_new_messages_sync_across_devices">بمجرد الربط، تتم مزامنة الرسائل الجديدة عبر الأجهزة، ولكن لن يتم نقل سجل الرسائل السابق.</string>
+    <string name="DozeReminder_disable_battery_restrictions">عطّل قيود البطارية</string>
+    <string name="GcmRefreshJob_switch_to_an_alternative_push_service_in_settings_notifications">قم بالتبديل إلى خدمة push بديلة في الإعدادات &gt; الإشعارات أو قم بإصلاح المشكلة باستخدام خدمات Play.</string>
+    <string name="NotificationsSettingsFragment__an_error_occurred_while_registering_for_push_notifications_s">حدث خطأ أثناء التسجيل للحصول على إشعارات push. %s</string>
+    <string name="NotificationsSettingsFragment__please_check_if_google_play_services_is_installed_and_enabled">يُرجى التحقق من تثبيت خدمات Google Play وتمكينها، أو التبديل إلى خدمة push بديلة.</string>
+    <string name="DozeReminder_allow_molly_to_deliver_timely_notifications">اسمح لتطبيق Molly بإرسال الإشعارات في الوقت المناسب، حتى عندما يكون جهازك في وضع الاستعداد.</string>
+    <string name="GcmRefreshJob_unable_to_register_with_Google_Play_Services">غير قادر على التسجيل في خدمات Play</string>
+    <string name="NotificationsSettingsFragment__push_notifications">إشعارات push</string>
+    <string name="NotificationsSettingsFragment__select_your_preferred_service_for_push_notifications">حدد الخدمة المفضلة لديك لتلقي إشعارات push. إذا لم تكن الخدمة متاحة، فسيستخدم التطبيق تلقائيًا WebSocket لضمان تسليم الإشعارات.</string>
+    <string name="NotificationsSettingsFragment__delivery_service">خدمة التوصيل</string>
+    <string name="IncomingMessageObserver_websocket_service">خدمة WebSocket</string>
 </resources>

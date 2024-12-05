@@ -7,6 +7,7 @@ package org.thoughtcrime.securesms.jobs
 
 import okio.ByteString.Companion.toByteString
 import org.signal.core.util.logging.Log
+import org.signal.donations.InAppPaymentType
 import org.signal.libsignal.zkgroup.VerificationFailedException
 import org.signal.libsignal.zkgroup.receipts.ReceiptCredential
 import org.signal.libsignal.zkgroup.receipts.ReceiptCredentialPresentation
@@ -31,6 +32,7 @@ import org.whispersystems.signalservice.api.subscriptions.ActiveSubscription.Sub
 import org.whispersystems.signalservice.internal.ServiceResponse
 import java.io.IOException
 import java.util.Currency
+import kotlin.concurrent.withLock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -65,11 +67,17 @@ class InAppPaymentRecurringContextJob private constructor(
      * meaning the job will always load the freshest data it can about the payment.
      */
     fun createJobChain(inAppPayment: InAppPaymentTable.InAppPayment, makePrimary: Boolean = false): Chain {
-      return AppDependencies.jobManager
-        .startChain(create(inAppPayment))
-        .then(InAppPaymentRedemptionJob.create(inAppPayment, makePrimary))
-        .then(RefreshOwnProfileJob())
-        .then(MultiDeviceProfileContentUpdateJob())
+      return if (inAppPayment.type == InAppPaymentType.RECURRING_BACKUP) {
+        AppDependencies.jobManager
+          .startChain(create(inAppPayment))
+          .then(InAppPaymentRedemptionJob.create(inAppPayment, makePrimary))
+      } else {
+        AppDependencies.jobManager
+          .startChain(create(inAppPayment))
+          .then(InAppPaymentRedemptionJob.create(inAppPayment, makePrimary))
+          .then(RefreshOwnProfileJob())
+          .then(MultiDeviceProfileContentUpdateJob())
+      }
     }
   }
 
@@ -121,7 +129,7 @@ class InAppPaymentRecurringContextJob private constructor(
   }
 
   override fun onRun() {
-    synchronized(InAppPaymentsRepository.resolveMutex(inAppPaymentId)) {
+    InAppPaymentsRepository.resolveLock(inAppPaymentId).withLock {
       doRun()
     }
   }

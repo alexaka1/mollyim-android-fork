@@ -19,7 +19,8 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.events.PartProgressEvent
 import org.thoughtcrime.securesms.jobmanager.Job
 import org.thoughtcrime.securesms.jobmanager.JobLogger.format
-import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint
+import org.thoughtcrime.securesms.jobmanager.impl.BatteryNotLowConstraint
+import org.thoughtcrime.securesms.jobmanager.impl.WifiConstraint
 import org.thoughtcrime.securesms.jobs.protos.RestoreAttachmentJobData
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.mms.MmsException
@@ -107,9 +108,9 @@ class RestoreAttachmentJob private constructor(
   private constructor(messageId: Long, attachmentId: AttachmentId, manual: Boolean, queue: String) : this(
     Parameters.Builder()
       .setQueue(queue)
-      .addConstraint(NetworkConstraint.KEY)
+      .addConstraint(WifiConstraint.KEY)
+      .addConstraint(BatteryNotLowConstraint.KEY)
       .setLifespan(TimeUnit.DAYS.toMillis(30))
-      .setMaxAttempts(3)
       .build(),
     messageId,
     attachmentId,
@@ -129,8 +130,16 @@ class RestoreAttachmentJob private constructor(
   }
 
   @Throws(Exception::class)
-  public override fun onRun() {
-    doWork()
+  override fun onRun() {
+    try {
+      doWork()
+    } catch (e: IOException) {
+      if (BackupRepository.checkForOutOfStorageError(TAG)) {
+        throw RetryLaterException(e)
+      } else {
+        throw e
+      }
+    }
 
     if (!SignalDatabase.messages.isStory(messageId)) {
       AppDependencies.messageNotifier.updateNotification(context, forConversation(0))
@@ -170,7 +179,7 @@ class RestoreAttachmentJob private constructor(
     } else {
       Log.w(TAG, format(this, "onFailure() messageId: $messageId  attachmentId: $attachmentId"))
 
-      markFailed(messageId, attachmentId)
+      markFailed(attachmentId)
     }
   }
 
@@ -220,11 +229,11 @@ class RestoreAttachmentJob private constructor(
 
       val downloadResult = if (useArchiveCdn) {
         archiveFile = SignalDatabase.attachments.getOrCreateArchiveTransferFile(attachmentId)
-        val cdnCredentials = BackupRepository.getCdnReadCredentials(attachment.archiveCdn).successOrThrow().headers
+        val cdnCredentials = BackupRepository.getCdnReadCredentials(BackupRepository.CredentialType.MEDIA, attachment.archiveCdn).successOrThrow().headers
 
         messageReceiver
           .retrieveArchivedAttachment(
-            SignalStore.svr.getOrCreateMasterKey().deriveBackupKey().deriveMediaSecrets(MediaName(attachment.archiveMediaName!!)),
+            SignalStore.backup.mediaRootBackupKey.deriveMediaSecrets(MediaName(attachment.archiveMediaName!!)),
             cdnCredentials,
             archiveFile,
             pointer,
@@ -255,7 +264,7 @@ class RestoreAttachmentJob private constructor(
       }
     } catch (e: InvalidAttachmentException) {
       Log.w(TAG, "Experienced exception while trying to download an attachment.", e)
-      markFailed(messageId, attachmentId)
+      markFailed(attachmentId)
     } catch (e: NonSuccessfulResponseCodeException) {
       if (SignalStore.backup.backsUpMedia) {
         if (e.code == 404 && !forceTransitTier && attachment.remoteLocation?.isNotBlank() == true) {
@@ -263,36 +272,37 @@ class RestoreAttachmentJob private constructor(
           retrieveAttachment(messageId, attachmentId, attachment, true)
           return
         } else if (e.code == 401 && useArchiveCdn) {
-          SignalStore.backup.cdnReadCredentials = null
+          SignalStore.backup.mediaCredentials.cdnReadCredentials = null
+          SignalStore.backup.cachedMediaCdnPath = null
           throw RetryLaterException(e)
         }
       }
 
       Log.w(TAG, "Experienced exception while trying to download an attachment.", e)
-      markFailed(messageId, attachmentId)
+      markFailed(attachmentId)
     } catch (e: MmsException) {
       Log.w(TAG, "Experienced exception while trying to download an attachment.", e)
-      markFailed(messageId, attachmentId)
+      markFailed(attachmentId)
     } catch (e: MissingConfigurationException) {
       Log.w(TAG, "Experienced exception while trying to download an attachment.", e)
-      markFailed(messageId, attachmentId)
+      markFailed(attachmentId)
     } catch (e: InvalidMessageException) {
       Log.w(TAG, "Experienced an InvalidMessageException while trying to download an attachment.", e)
       if (e.cause is InvalidMacException) {
         Log.w(TAG, "Detected an invalid mac. Treating as a permanent failure.")
-        markPermanentlyFailed(messageId, attachmentId)
+        markPermanentlyFailed(attachmentId)
       } else {
-        markFailed(messageId, attachmentId)
+        markFailed(attachmentId)
       }
     }
   }
 
-  private fun markFailed(messageId: Long, attachmentId: AttachmentId) {
-    SignalDatabase.attachments.setTransferProgressFailed(attachmentId, messageId)
+  private fun markFailed(attachmentId: AttachmentId) {
+    SignalDatabase.attachments.setRestoreTransferState(attachmentId, AttachmentTable.TRANSFER_PROGRESS_FAILED)
   }
 
-  private fun markPermanentlyFailed(messageId: Long, attachmentId: AttachmentId) {
-    SignalDatabase.attachments.setTransferProgressPermanentFailure(attachmentId, messageId)
+  private fun markPermanentlyFailed(attachmentId: AttachmentId) {
+    SignalDatabase.attachments.setRestoreTransferState(attachmentId, AttachmentTable.TRANSFER_PROGRESS_PERMANENT_FAILURE)
   }
 
   class Factory : Job.Factory<RestoreAttachmentJob?> {

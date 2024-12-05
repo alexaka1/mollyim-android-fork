@@ -58,6 +58,7 @@ import org.thoughtcrime.securesms.registration.fcm.PushChallengeRequest
 import org.thoughtcrime.securesms.registration.viewmodel.SvrAuthCredentialSet
 import org.thoughtcrime.securesms.service.DirectoryRefreshListener
 import org.thoughtcrime.securesms.service.RotateSignedPreKeyListener
+import org.thoughtcrime.securesms.util.RemoteConfig
 import org.thoughtcrime.securesms.util.TextSecurePreferences
 import org.whispersystems.signalservice.api.NetworkResult
 import org.whispersystems.signalservice.api.SvrNoDataException
@@ -220,7 +221,7 @@ object RegistrationRepository {
       NotificationManagerCompat.from(context).cancel(NotificationIds.UNREGISTERED_NOTIFICATION_ID)
 
       val masterKey = if (data.masterKey != null) MasterKey(data.masterKey.toByteArray()) else null
-      SvrRepository.onRegistrationComplete(masterKey, data.pin, hasPin, data.reglockEnabled, isLinkedDevice = SignalStore.account.isLinkedDevice)
+      SvrRepository.onRegistrationComplete(masterKey, data.pin, hasPin, data.reglockEnabled)
 
       AppDependencies.resetNetwork(restartMessageObserver = true)
       PreKeysSyncJob.enqueue()
@@ -273,7 +274,8 @@ object RegistrationRepository {
     withContext(Dispatchers.IO) {
       val credentialSet = SvrAuthCredentialSet(svr2Credentials = svr2Credentials, svr3Credentials = svr3Credentials)
       val masterKey = SvrRepository.restoreMasterKeyPreRegistration(credentialSet, pin)
-      SignalStore.svr.setMasterKey(masterKey, pin)
+      SignalStore.storageService.storageKeyForInitialDataRestore = masterKey.deriveStorageServiceKey()
+      SignalStore.svr.setPin(pin)
       return@withContext masterKey
     }
 
@@ -350,7 +352,7 @@ object RegistrationRepository {
   /**
    * Asks the service to send a verification code through one of our supported channels (SMS, phone call).
    */
-  suspend fun requestSmsCode(context: Context, sessionId: String, e164: String, password: String, mode: Mode): VerificationCodeRequestResult =
+  suspend fun requestSmsCode(context: Context, sessionId: String, e164: String, password: String, mode: E164VerificationMode): VerificationCodeRequestResult =
     withContext(Dispatchers.IO) {
       val api: RegistrationApi = AccountManagerFactory.getInstance().createUnauthenticated(context, e164, SignalServiceAddress.DEFAULT_DEVICE_ID, password).registrationApi
 
@@ -419,7 +421,7 @@ object RegistrationRepository {
         registrationLock = registrationLock,
         unidentifiedAccessKey = unidentifiedAccessKey,
         unrestrictedUnidentifiedAccess = universalUnidentifiedAccess,
-        capabilities = AppCapabilities.getCapabilities(true),
+        capabilities = AppCapabilities.getCapabilities(true, RemoteConfig.storageServiceEncryptionV2),
         discoverableByPhoneNumber = SignalStore.phoneNumberPrivacy.phoneNumberDiscoverabilityMode == PhoneNumberPrivacyValues.PhoneNumberDiscoverabilityMode.DISCOVERABLE,
         name = null,
         pniRegistrationId = registrationData.pniRegistrationId,
@@ -480,8 +482,8 @@ object RegistrationRepository {
         } else {
           Log.i(TAG, "Push challenge timed out.")
         }
-        Log.i(TAG, "Push challenge unsuccessful. Updating registration state accordingly.")
-        return@withContext NetworkResult.ApplicationError<RegistrationSessionMetadataResponse>(NullPointerException())
+        Log.i(TAG, "Push challenge unsuccessful. Continuing with session created without one.")
+        return@withContext sessionCreationResponse
       } catch (ex: Exception) {
         Log.w(TAG, "Exception caught, but the earlier try block should have caught it?", ex)
         return@withContext NetworkResult.ApplicationError<RegistrationSessionMetadataResponse>(ex)
@@ -587,7 +589,6 @@ object RegistrationRepository {
     return started == true
   }
 
-  @VisibleForTesting
   fun generateSignedAndLastResortPreKeys(identity: IdentityKeyPair, metadataStore: PreKeyMetadataStore): PreKeyCollection {
     val signedPreKey = PreKeyUtil.generateSignedPreKey(metadataStore.nextSignedPreKeyId, identity.privateKey)
     val lastResortKyberPreKey = PreKeyUtil.generateLastResortKyberPreKey(metadataStore.nextKyberPreKeyId, identity.privateKey)
@@ -604,7 +605,7 @@ object RegistrationRepository {
     fun produceMasterKey(): MasterKey
   }
 
-  enum class Mode(val isSmsRetrieverSupported: Boolean, val transport: PushServiceSocket.VerificationCodeTransport) {
+  enum class E164VerificationMode(val isSmsRetrieverSupported: Boolean, val transport: PushServiceSocket.VerificationCodeTransport) {
     SMS_WITH_LISTENER(true, PushServiceSocket.VerificationCodeTransport.SMS),
     SMS_WITHOUT_LISTENER(false, PushServiceSocket.VerificationCodeTransport.SMS),
     PHONE_CALL(false, PushServiceSocket.VerificationCodeTransport.VOICE)
@@ -621,15 +622,4 @@ object RegistrationRepository {
       latch.countDown()
     }
   }
-
-  data class AccountRegistrationResult(
-    val uuid: String,
-    val pni: String,
-    val storageCapable: Boolean,
-    val number: String,
-    val masterKey: MasterKey?,
-    val pin: String?,
-    val aciPreKeyCollection: PreKeyCollection,
-    val pniPreKeyCollection: PreKeyCollection
-  )
 }

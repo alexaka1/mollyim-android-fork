@@ -14,6 +14,12 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.processors.PublishProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.signal.core.util.concurrent.SignalExecutors
 import org.signal.core.util.logging.Log
 import org.signal.donations.InAppPaymentType
@@ -49,6 +55,7 @@ import org.whispersystems.signalservice.internal.push.exceptions.InAppPaymentPro
 import java.security.SecureRandom
 import java.util.Currency
 import java.util.Optional
+import java.util.concurrent.locks.Lock
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -75,6 +82,31 @@ object InAppPaymentsRepository {
     return Completable.fromAction {
       SignalDatabase.inAppPayments.update(inAppPayment)
     }.subscribeOn(Schedulers.io())
+  }
+
+  /**
+   * Returns a flow of InAppPayment objects for the latest RECURRING_BACKUP object.
+   */
+  fun observeLatestBackupPayment(): Flow<InAppPaymentTable.InAppPayment> {
+    return callbackFlow {
+      fun refresh() {
+        val latest = SignalDatabase.inAppPayments.getLatestInAppPaymentByType(InAppPaymentType.RECURRING_BACKUP)
+        if (latest != null) {
+          trySendBlocking(latest)
+        }
+      }
+
+      val observer = InAppPaymentObserver {
+        refresh()
+      }
+
+      refresh()
+
+      AppDependencies.databaseObserver.registerInAppPaymentObserver(observer)
+      awaitClose {
+        AppDependencies.databaseObserver.unregisterObserver(observer)
+      }
+    }.conflate().distinctUntilChanged()
   }
 
   /**
@@ -177,8 +209,12 @@ object InAppPaymentsRepository {
     return when (inAppPayment.type) {
       InAppPaymentType.UNKNOWN -> error("Unsupported type UNKNOWN.")
       InAppPaymentType.ONE_TIME_GIFT, InAppPaymentType.ONE_TIME_DONATION -> "$JOB_PREFIX${inAppPayment.id.serialize()}"
-      InAppPaymentType.RECURRING_DONATION, InAppPaymentType.RECURRING_BACKUP -> "$JOB_PREFIX${inAppPayment.type.code}"
+      InAppPaymentType.RECURRING_DONATION, InAppPaymentType.RECURRING_BACKUP -> getRecurringJobQueueKey(inAppPayment.type)
     }
+  }
+
+  fun getRecurringJobQueueKey(inAppPaymentType: InAppPaymentType): String {
+    return "$JOB_PREFIX${inAppPaymentType.code}"
   }
 
   /**
@@ -195,10 +231,11 @@ object InAppPaymentsRepository {
   /**
    * Returns the object to utilize as a mutex for recurring subscriptions.
    */
-  fun resolveMutex(inAppPaymentId: InAppPaymentTable.InAppPaymentId): Any {
+  @WorkerThread
+  fun resolveLock(inAppPaymentId: InAppPaymentTable.InAppPaymentId): Lock {
     val payment = SignalDatabase.inAppPayments.getById(inAppPaymentId) ?: error("Not found")
 
-    return payment.type.requireSubscriberType()
+    return payment.type.requireSubscriberType().lock
   }
 
   /**
@@ -223,6 +260,7 @@ object InAppPaymentsRepository {
       DonationErrorSource.ONE_TIME -> InAppPaymentType.ONE_TIME_DONATION
       DonationErrorSource.MONTHLY -> InAppPaymentType.RECURRING_DONATION
       DonationErrorSource.GIFT -> InAppPaymentType.ONE_TIME_GIFT
+      DonationErrorSource.BACKUPS -> InAppPaymentType.RECURRING_BACKUP
       DonationErrorSource.GIFT_REDEMPTION -> InAppPaymentType.UNKNOWN
       DonationErrorSource.KEEP_ALIVE -> InAppPaymentType.UNKNOWN
       DonationErrorSource.UNKNOWN -> InAppPaymentType.UNKNOWN
@@ -265,7 +303,7 @@ object InAppPaymentsRepository {
       InAppPaymentType.ONE_TIME_GIFT -> DonationErrorSource.GIFT
       InAppPaymentType.ONE_TIME_DONATION -> DonationErrorSource.ONE_TIME
       InAppPaymentType.RECURRING_DONATION -> DonationErrorSource.MONTHLY
-      InAppPaymentType.RECURRING_BACKUP -> DonationErrorSource.UNKNOWN // TODO [message-backups] error handling
+      InAppPaymentType.RECURRING_BACKUP -> DonationErrorSource.BACKUPS
     }
   }
 
@@ -490,14 +528,6 @@ object InAppPaymentsRepository {
    * Emits a stream of status updates for donations of the given type. Only One-time donations and recurring donations are currently supported.
    */
   fun observeInAppPaymentRedemption(type: InAppPaymentType): Observable<DonationRedemptionJobStatus> {
-    val jobStatusObservable: Observable<DonationRedemptionJobStatus> = when (type) {
-      InAppPaymentType.UNKNOWN -> Observable.empty()
-      InAppPaymentType.ONE_TIME_GIFT -> Observable.empty()
-      InAppPaymentType.ONE_TIME_DONATION -> Observable.empty()
-      InAppPaymentType.RECURRING_DONATION -> Observable.empty()
-      InAppPaymentType.RECURRING_BACKUP -> Observable.empty()
-    }
-
     val fromDatabase: Observable<DonationRedemptionJobStatus> = Observable.create { emitter ->
       val observer = InAppPaymentObserver {
         val latestInAppPayment = SignalDatabase.inAppPayments.getLatestInAppPaymentByType(type)
@@ -508,7 +538,7 @@ object InAppPaymentsRepository {
       AppDependencies.databaseObserver.registerInAppPaymentObserver(observer)
       emitter.setCancellable { AppDependencies.databaseObserver.unregisterObserver(observer) }
     }.switchMap { inAppPaymentOptional ->
-      val inAppPayment = inAppPaymentOptional.getOrNull() ?: return@switchMap jobStatusObservable
+      val inAppPayment = inAppPaymentOptional.getOrNull() ?: return@switchMap Observable.just(DonationRedemptionJobStatus.None)
 
       val value = when (inAppPayment.state) {
         InAppPaymentTable.State.CREATED -> error("This should have been filtered out.")
@@ -537,15 +567,7 @@ object InAppPaymentsRepository {
       Observable.just(value)
     }
 
-    return fromDatabase
-      .switchMap {
-        if (it == DonationRedemptionJobStatus.None) {
-          jobStatusObservable
-        } else {
-          Observable.just(it)
-        }
-      }
-      .distinctUntilChanged()
+    return fromDatabase.distinctUntilChanged()
   }
 
   fun scheduleSyncForAccountRecordChange() {

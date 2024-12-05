@@ -17,7 +17,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,16 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.signal.core.ui.theme.SignalTheme
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.logging.Log
-import org.thoughtcrime.securesms.BaseActivity
+import org.thoughtcrime.securesms.PassphraseRequiredActivity
 import org.thoughtcrime.securesms.components.webrtc.CallParticipantsState
 import org.thoughtcrime.securesms.components.webrtc.WebRtcAudioDevice
 import org.thoughtcrime.securesms.components.webrtc.WebRtcCallViewModel
@@ -48,6 +47,7 @@ import org.thoughtcrime.securesms.events.WebRtcViewModel
 import org.thoughtcrime.securesms.messagerequests.CalleeMustAcceptMessageRequestActivity
 import org.thoughtcrime.securesms.permissions.Permissions
 import org.thoughtcrime.securesms.recipients.Recipient
+import org.thoughtcrime.securesms.safety.SafetyNumberBottomSheet
 import org.thoughtcrime.securesms.util.FullscreenHelper
 import org.thoughtcrime.securesms.util.VibrateUtil
 import org.thoughtcrime.securesms.util.viewModel
@@ -57,7 +57,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Entry-point for receiving and making Signal calls.
  */
-class CallActivity : BaseActivity(), CallControlsCallback {
+class CallActivity : PassphraseRequiredActivity(), CallControlsCallback {
 
   companion object {
     private val TAG = Log.tag(CallActivity::class.java)
@@ -82,16 +82,14 @@ class CallActivity : BaseActivity(), CallControlsCallback {
     super.attachBaseContext(newBase)
   }
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+  override fun onCreate(savedInstanceState: Bundle?, ready: Boolean) {
+    super.onCreate(savedInstanceState, ready)
 
     val fullscreenHelper = FullscreenHelper(this)
 
     lifecycleDisposable.bindTo(this)
-    val compositeDisposable = CompositeDisposable()
-    lifecycleDisposable.add(compositeDisposable)
 
-    val callInfoCallbacks = CallInfoCallbacks(this, controlsAndInfoViewModel, compositeDisposable)
+    val callInfoCallbacks = CallInfoCallbacks(this, controlsAndInfoViewModel)
 
     observeCallEvents()
     viewModel.processCallIntent(CallIntent(intent))
@@ -101,6 +99,8 @@ class CallActivity : BaseActivity(), CallControlsCallback {
         viewModel.callActions.collect {
           when (it) {
             CallViewModel.Action.EnableVideo -> onVideoToggleClick(true)
+            is CallViewModel.Action.ShowGroupCallSafetyNumberChangeDialog -> SafetyNumberBottomSheet.forGroupCall(it.untrustedIdentities).show(supportFragmentManager)
+            CallViewModel.Action.SwitchToSpeaker -> Unit // TODO - Switch user to speaker view.
           }
         }
       }
@@ -110,7 +110,7 @@ class CallActivity : BaseActivity(), CallControlsCallback {
       val lifecycleOwner = LocalLifecycleOwner.current
       val callControlsState by webRtcCallViewModel.getCallControlsState(lifecycleOwner).subscribeAsState(initial = CallControlsState())
       val callParticipantsState by webRtcCallViewModel.callParticipantsState.subscribeAsState(initial = CallParticipantsState())
-      val callScreenState by viewModel.callScreenState.collectAsState()
+      val callScreenState by viewModel.callScreenState.collectAsStateWithLifecycle()
       val recipient by remember(callScreenState.callRecipientId) {
         Recipient.observable(callScreenState.callRecipientId)
       }.subscribeAsState(Recipient.UNKNOWN)
@@ -151,7 +151,7 @@ class CallActivity : BaseActivity(), CallControlsCallback {
         }
       }
 
-      val callScreenDialogType by viewModel.dialog.collectAsState(CallScreenDialogType.NONE)
+      val callScreenDialogType by viewModel.dialog.collectAsStateWithLifecycle(CallScreenDialogType.NONE)
 
       SignalTheme {
         Surface {
@@ -322,6 +322,10 @@ class CallActivity : BaseActivity(), CallControlsCallback {
 
   override fun onEndCallClick() {
     viewModel.hangup()
+  }
+
+  override fun onVideoTooltipDismissed() {
+    viewModel.onVideoTooltipDismissed()
   }
 
   private fun observeCallEvents() {

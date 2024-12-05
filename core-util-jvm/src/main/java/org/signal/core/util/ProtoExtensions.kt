@@ -20,12 +20,24 @@ import java.util.LinkedList
 
 private const val TAG = "ProtoExtension"
 
+fun ByteString?.isEmpty(): Boolean {
+  return this == null || this.size == 0
+}
+
 fun ByteString?.isNotEmpty(): Boolean {
   return this != null && this.size > 0
 }
 
 fun ByteString?.isNullOrEmpty(): Boolean {
   return this == null || this.size == 0
+}
+
+fun ByteString.nullIfEmpty(): ByteString? {
+  return if (this.isEmpty()) {
+    null
+  } else {
+    this
+  }
 }
 
 /**

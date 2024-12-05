@@ -8,6 +8,7 @@ package org.thoughtcrime.securesms.jobs
 import org.signal.core.util.Stopwatch
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.backup.ArchiveUploadProgress
+import org.thoughtcrime.securesms.backup.v2.ArchiveValidator
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.dependencies.AppDependencies
@@ -65,7 +66,12 @@ class BackupMessagesJob private constructor(parameters: Parameters) : Job(parame
 
   override fun getFactoryKey(): String = KEY
 
-  override fun onFailure() = Unit
+  override fun onFailure() {
+    if (!isCanceled) {
+      Log.w(TAG, "Failed to backup user messages. Marking failure state.")
+      SignalStore.backup.markMessageBackupFailure()
+    }
+  }
 
   override fun run(): Result {
     val stopwatch = Stopwatch("BackupMessagesJob")
@@ -77,16 +83,47 @@ class BackupMessagesJob private constructor(parameters: Parameters) : Job(parame
     val tempBackupFile = BlobProvider.getInstance().forNonAutoEncryptingSingleSessionOnDisk(AppDependencies.application)
 
     val outputStream = FileOutputStream(tempBackupFile)
-    BackupRepository.export(outputStream = outputStream, append = { tempBackupFile.appendBytes(it) }, plaintext = false)
+    val backupKey = SignalStore.backup.messageBackupKey
+    BackupRepository.export(outputStream = outputStream, messageBackupKey = backupKey, append = { tempBackupFile.appendBytes(it) }, plaintext = false, cancellationSignal = { this.isCanceled })
     stopwatch.split("export")
+
+    when (val result = ArchiveValidator.validate(tempBackupFile, backupKey)) {
+      ArchiveValidator.ValidationResult.Success -> {
+        Log.d(TAG, "Successfully passed validation.")
+      }
+      is ArchiveValidator.ValidationResult.ReadError -> {
+        Log.w(TAG, "Failed to read the file during validation!", result.exception)
+        return Result.retry(defaultBackoff())
+      }
+      is ArchiveValidator.ValidationResult.ValidationError -> {
+        // TODO [backup] UX
+        Log.w(TAG, "The backup file fails validation! Message: " + result.exception.message)
+        return Result.failure()
+      }
+    }
+    stopwatch.split("validate")
+
+    if (isCanceled) {
+      return Result.failure()
+    }
 
     ArchiveUploadProgress.onMessageBackupCreated()
 
+    // TODO [backup] Need to make this resumable
     FileInputStream(tempBackupFile).use {
       when (val result = BackupRepository.uploadBackupFile(it, tempBackupFile.length())) {
-        is NetworkResult.Success -> Log.i(TAG, "Successfully uploaded backup file.")
-        is NetworkResult.NetworkError -> return Result.retry(defaultBackoff())
-        is NetworkResult.StatusCodeError -> return Result.retry(defaultBackoff())
+        is NetworkResult.Success -> {
+          Log.i(TAG, "Successfully uploaded backup file.")
+          SignalStore.backup.hasBackupBeenUploaded = true
+        }
+        is NetworkResult.NetworkError -> {
+          Log.i(TAG, "Network failure", result.getCause())
+          return Result.retry(defaultBackoff())
+        }
+        is NetworkResult.StatusCodeError -> {
+          Log.i(TAG, "Status code failure", result.getCause())
+          return Result.retry(defaultBackoff())
+        }
         is NetworkResult.ApplicationError -> throw result.throwable
       }
     }
@@ -110,14 +147,15 @@ class BackupMessagesJob private constructor(parameters: Parameters) : Job(parame
     stopwatch.split("used-space")
     stopwatch.stop(TAG)
 
-    if (SignalDatabase.attachments.doAnyAttachmentsNeedArchiveUpload()) {
+    if (SignalStore.backup.backsUpMedia && SignalDatabase.attachments.doAnyAttachmentsNeedArchiveUpload()) {
       Log.i(TAG, "Enqueuing attachment backfill job.")
       AppDependencies.jobManager.add(ArchiveAttachmentBackfillJob())
     } else {
-      Log.i(TAG, "No attachments need to be uploaded, we can finish.")
+      Log.i(TAG, "No attachments need to be uploaded, we can finish. Tier: ${SignalStore.backup.backupTier}")
       ArchiveUploadProgress.onMessageBackupFinishedEarly()
     }
 
+    SignalStore.backup.clearMessageBackupFailure()
     return Result.success()
   }
 

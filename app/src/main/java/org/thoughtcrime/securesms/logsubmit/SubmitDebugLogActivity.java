@@ -1,5 +1,6 @@
 package org.thoughtcrime.securesms.logsubmit;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -41,6 +42,7 @@ import org.thoughtcrime.securesms.util.views.CircularProgressMaterialButton;
 
 import java.util.List;
 
+@SuppressLint("BaseActivitySubclass")
 public class SubmitDebugLogActivity extends BaseActivity implements SubmitDebugLogAdapter.Listener {
 
   private static final int CODE_SAVE = 24601;
@@ -325,7 +327,7 @@ public class SubmitDebugLogActivity extends BaseActivity implements SubmitDebugL
     dialogView.setText(spannableDialogText);
     dialogView.setMovementMethod(LongClickMovementMethod.getInstance(this));
 
-    ViewUtil.setPadding(dialogView, (int) ThemeUtil.getThemedDimen(this, R.attr.dialogPreferredPadding));
+    ViewUtil.setPadding(dialogView, (int) ThemeUtil.getThemedDimen(this, androidx.appcompat.R.attr.dialogPreferredPadding));
 
     builder.setView(dialogView);
     builder.show();

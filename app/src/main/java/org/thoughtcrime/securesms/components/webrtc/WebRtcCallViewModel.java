@@ -74,6 +74,7 @@ public class WebRtcCallViewModel extends ViewModel {
   private final LiveData<Integer>                             groupMemberCount          = Transformations.map(groupMembers, List::size);
   private final Observable<Boolean>                           shouldShowSpeakerHint     = participantsState.map(this::shouldShowSpeakerHint);
   private final MutableLiveData<Boolean>                      isLandscapeEnabled        = new MutableLiveData<>();
+  private final MutableLiveData<Boolean>                      canEnterPipMode           = new MutableLiveData<>(false);
   private final Observer<List<GroupMemberEntry.FullMember>>   groupMemberStateUpdater   = m -> participantsState.onNext(CallParticipantsState.update(participantsState.getValue(), m));
   private final MutableLiveData<WebRtcEphemeralState>         ephemeralState            = new MutableLiveData<>();
   private final BehaviorProcessor<RecipientId>                recipientId               = BehaviorProcessor.createDefault(RecipientId.UNKNOWN);
@@ -91,7 +92,6 @@ public class WebRtcCallViewModel extends ViewModel {
   private boolean               wasInOutgoingRingingMode              = false;
   private long                  callConnectedTime                     = -1;
   private boolean               answerWithVideoAvailable              = false;
-  private boolean               canEnterPipMode                       = false;
   private List<CallParticipant> previousParticipantsList              = Collections.emptyList();
   private boolean               callStarting                          = false;
   private boolean               switchOnFirstScreenShare              = true;
@@ -113,6 +113,10 @@ public class WebRtcCallViewModel extends ViewModel {
 
   public LiveRecipient getRecipient() {
     return liveRecipient.getValue();
+  }
+
+  public Flowable<Recipient> getRecipientFlowable() {
+    return recipientId.switchMap(id -> Recipient.observable(id).toFlowable(BackpressureStrategy.LATEST)).observeOn(AndroidSchedulers.mainThread());
   }
 
   public void setRecipient(@NonNull Recipient recipient) {
@@ -209,7 +213,7 @@ public class WebRtcCallViewModel extends ViewModel {
     return ephemeralState;
   }
 
-  public boolean canEnterPipMode() {
+  public LiveData<Boolean> canEnterPipMode() {
     return canEnterPipMode;
   }
 
@@ -280,7 +284,7 @@ public class WebRtcCallViewModel extends ViewModel {
 
   @MainThread
   public void updateFromWebRtcViewModel(@NonNull WebRtcViewModel webRtcViewModel, boolean enableVideo) {
-    canEnterPipMode = !webRtcViewModel.getState().isPreJoinOrNetworkUnavailable();
+    canEnterPipMode.setValue(!webRtcViewModel.getState().isPreJoinOrNetworkUnavailable());
     if (callStarting && webRtcViewModel.getState().isPassedPreJoin()) {
       callStarting = false;
     }
@@ -316,7 +320,7 @@ public class WebRtcCallViewModel extends ViewModel {
                          webRtcViewModel.isRemoteVideoEnabled(),
                          webRtcViewModel.isRemoteVideoOffer(),
                          localParticipant.isMoreThanOneCameraAvailable(),
-                         Util.hasItems(webRtcViewModel.getRemoteParticipants()),
+                         webRtcViewModel.getRemoteDevicesCount().orElse(0L) > 0,
                          webRtcViewModel.getActiveDevice(),
                          webRtcViewModel.getAvailableDevices(),
                          webRtcViewModel.getRemoteDevicesCount().orElse(0),
