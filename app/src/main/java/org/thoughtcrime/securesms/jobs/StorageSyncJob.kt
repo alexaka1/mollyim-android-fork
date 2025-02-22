@@ -147,7 +147,7 @@ class StorageSyncJob private constructor(parameters: Parameters) : BaseJob(param
 
   @Throws(IOException::class, RetryLaterException::class, UntrustedIdentityException::class)
   override fun onRun() {
-    if (!SignalStore.svr.hasOptedInWithAccess() && !SignalStore.svr.hasOptedOut() && !SignalStore.storageService.hasStorageKeyFromPrimary()) {
+    if (!SignalStore.svr.hasOptedInWithAccess() && !SignalStore.svr.hasOptedOut()) {
       Log.i(TAG, "Doesn't have a PIN. Skipping.")
       return
     }
@@ -369,7 +369,7 @@ class StorageSyncJob private constructor(parameters: Parameters) : BaseJob(param
 
       Log.i(TAG, "Saved new manifest. Now at version: ${remoteWriteOperation.manifest.versionString}")
       SignalStore.storageService.manifest = remoteWriteOperation.manifest
-      SignalStore.storageService.storageKeyForInitialDataRestore = null
+      SignalStore.svr.masterKeyForInitialDataRestore = null
 
       stopwatch.split("remote-write")
 

@@ -8,6 +8,7 @@ import androidx.annotation.Px;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 
+import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.webrtc.audio.SignalAudioManager;
 
@@ -62,7 +63,6 @@ public final class WebRtcControls {
          false);
   }
 
-  @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
   public WebRtcControls(boolean isLocalVideoEnabled,
                  boolean isRemoteVideoEnabled,
                  boolean isMoreThanOneCameraAvailable,
@@ -247,7 +247,7 @@ public final class WebRtcControls {
   }
 
   public boolean showSmallHeader() {
-    return isAtLeastOutgoing();
+    return isAtLeastOutgoing() || callState == CallState.RECONNECTING;
   }
 
   public boolean showFullScreenShade() {

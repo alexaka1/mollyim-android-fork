@@ -2,24 +2,17 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.io.ByteArrayOutputStream
 
 plugins {
-  id("com.android.application")
-  id("kotlin-android")
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.jetbrains.kotlin.android)
+  alias(libs.plugins.compose.compiler)
   id("androidx.navigation.safeargs")
-  id("org.jetbrains.kotlin.android")
-  id("app.cash.exhaustive")
   id("kotlin-parcelize")
   id("com.squareup.wire")
   id("molly")
 }
 
-// Sort baseline.profm for reproducible builds
-// See issue: https://issuetracker.google.com/issues/231837768
-apply {
-  from("fix-profm.gradle")
-}
-
-val canonicalVersionCode = 1489
-val canonicalVersionName = "7.26.1"
+val canonicalVersionCode = 1512
+val canonicalVersionName = "7.33.2"
 val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 val mollyRevision = 1
@@ -222,6 +215,7 @@ android {
 
     // MOLLY: Rely on the built-in variables FLAVOR and BUILD_TYPE instead of BUILD_*_TYPE
     buildConfigField("String", "BADGE_STATIC_ROOT", "\"https://updates2.signal.org/static/badges/\"")
+    buildConfigField("String", "STRIPE_BASE_URL", "\"https://api.stripe.com/v1\"")
     buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"pk_live_6cmGZopuTsV8novGgJJW9JpC00vLIgtQ1D\"")
     buildConfigField("boolean", "TRACING_ENABLED", "false")
 
@@ -254,7 +248,6 @@ android {
         "proguard/proguard-shortcutbadger.pro",
         "proguard/proguard-retrofit.pro",
         "proguard/proguard-klinker.pro",
-        "proguard/proguard-mobilecoin.pro",
         "proguard/proguard-retrolambda.pro",
         "proguard/proguard-okhttp.pro",
         "proguard/proguard-ez-vcard.pro",
@@ -282,6 +275,8 @@ android {
       isMinifyEnabled = false
       matchingFallbacks += "debug"
       applicationIdSuffix = ".instrumentation"
+
+      buildConfigField("String", "STRIPE_BASE_URL", "\"http://127.0.0.1:8080/stripe\"")
     }
 
     create("spinner") {
@@ -431,6 +426,7 @@ dependencies {
   implementation(project(":core-ui"))
 
   implementation(libs.androidx.fragment.ktx)
+  implementation(libs.androidx.fragment.compose)
   implementation(libs.androidx.appcompat) {
     version {
       strictly("1.6.1")
@@ -486,7 +482,6 @@ dependencies {
   implementation(libs.conscrypt.android)
   implementation(libs.signal.aesgcmprovider)
   implementation(libs.libsignal.android)
-  implementation(libs.mobilecoin)
   implementation(libs.molly.ringrtc)
   implementation(libs.leolin.shortcutbadger)
   implementation(libs.emilsjolander.stickylistheaders)
@@ -530,7 +525,7 @@ dependencies {
   implementation(libs.molly.native.utils)
   implementation(libs.molly.glide.webp.decoder)
   implementation(libs.gosimple.nbvcxz)
-  "fossImplementation"("org.osmdroid:osmdroid-android:6.1.16")
+  "fossImplementation"(libs.osmdroid.android)
   implementation(libs.unifiedpush.connector) {
     exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
     exclude(group = "com.google.protobuf", module = "protobuf-java")
@@ -548,9 +543,7 @@ dependencies {
   }
 
   testImplementation(testLibs.junit.junit)
-  testImplementation(testLibs.assertj.core)
-  testImplementation(testLibs.mockito.core)
-  testImplementation(testLibs.mockito.kotlin)
+  testImplementation(testLibs.assertk)
   testImplementation(testLibs.androidx.test.core)
   testImplementation(testLibs.robolectric.robolectric) {
     exclude(group = "com.google.protobuf", module = "protobuf-java")
@@ -566,16 +559,18 @@ dependencies {
     }
   }
   testImplementation(testLibs.conscrypt.openjdk.uber)
-  testImplementation(testLibs.hamcrest.hamcrest)
   testImplementation(testLibs.mockk)
   testImplementation(testFixtures(project(":libsignal-service")))
   testImplementation(testLibs.espresso.core)
 
+  androidTestImplementation(platform(libs.androidx.compose.bom))
+  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
   androidTestImplementation(testLibs.androidx.test.ext.junit)
   androidTestImplementation(testLibs.espresso.core)
   androidTestImplementation(testLibs.androidx.test.core)
   androidTestImplementation(testLibs.androidx.test.core.ktx)
   androidTestImplementation(testLibs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(testLibs.assertk)
   androidTestImplementation(testLibs.mockk.android)
   androidTestImplementation(testLibs.square.okhttp.mockserver)
   androidTestImplementation(testLibs.diff.utils)

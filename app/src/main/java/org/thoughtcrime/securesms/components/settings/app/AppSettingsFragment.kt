@@ -211,7 +211,7 @@ private fun AppSettingsContent(
             }
           }
 
-          BackupFailureState.COULD_NOT_COMPLETE_BACKUP -> {
+          BackupFailureState.BACKUP_FAILED, BackupFailureState.COULD_NOT_COMPLETE_BACKUP -> {
             item {
               Dividers.Default()
 
@@ -219,6 +219,22 @@ private fun AppSettingsContent(
                 text = stringResource(R.string.AppSettingsFragment__couldnt_complete_backup),
                 onClick = {
                   BackupRepository.markBackupFailedIndicatorClicked()
+                  callbacks.navigate(R.id.action_appSettingsFragment_to_remoteBackupsSettingsFragment)
+                }
+              )
+
+              Dividers.Default()
+            }
+          }
+
+          BackupFailureState.ALREADY_REDEEMED -> {
+            item {
+              Dividers.Default()
+
+              BackupsWarningRow(
+                text = stringResource(R.string.AppSettingsFragment__couldnt_redeem_your_backups_subscription),
+                onClick = {
+                  BackupRepository.markBackupAlreadyRedeemedIndicatorClicked()
                   callbacks.navigate(R.id.action_appSettingsFragment_to_remoteBackupsSettingsFragment)
                 }
               )

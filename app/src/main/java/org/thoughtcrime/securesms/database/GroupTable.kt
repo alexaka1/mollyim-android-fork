@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.text.TextUtils
+import androidx.annotation.CheckResult
 import androidx.annotation.WorkerThread
 import androidx.core.content.contentValuesOf
 import okio.ByteString
@@ -30,6 +31,7 @@ import org.signal.core.util.requireLong
 import org.signal.core.util.requireNonNullString
 import org.signal.core.util.requireString
 import org.signal.core.util.select
+import org.signal.core.util.toInt
 import org.signal.core.util.update
 import org.signal.core.util.withinTransaction
 import org.signal.libsignal.zkgroup.InvalidInputException
@@ -74,10 +76,11 @@ import java.security.SecureRandom
 import java.time.Instant
 import java.util.Optional
 import java.util.stream.Collectors
-import javax.annotation.CheckReturnValue
 import kotlin.math.abs
 
-class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseTable(context, databaseHelper), RecipientIdDatabaseReference {
+class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
+  DatabaseTable(context, databaseHelper),
+  RecipientIdDatabaseReference {
 
   companion object {
     private val TAG = Log.tag(GroupTable::class.java)
@@ -510,6 +513,13 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
     return Reader(cursor)
   }
 
+  fun getInactiveGroups(): Reader {
+    val query = SqlUtil.buildQuery("$TABLE_NAME.$ACTIVE = ?", false.toInt())
+    val select = "${joinedGroupSelect()} WHERE ${query.where}"
+
+    return Reader(readableDatabase.query(select, query.whereArgs))
+  }
+
   fun getActiveGroupCount(): Int {
     return readableDatabase
       .select("COUNT(*)")
@@ -576,7 +586,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
     return null
   }
 
-  @CheckReturnValue
+  @CheckResult
   fun create(groupId: GroupId.V1, title: String?, members: Collection<RecipientId>, avatar: SignalServiceAttachmentPointer?): Boolean {
     if (groupExists(groupId.deriveV2MigrationGroupId())) {
       throw LegacyGroupInsertException(groupId)
@@ -585,12 +595,12 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
     return create(groupId, title, members, avatar, null, null, null)
   }
 
-  @CheckReturnValue
+  @CheckResult
   fun create(groupId: GroupId.Mms, title: String?, members: Collection<RecipientId>): Boolean {
     return create(groupId, if (title.isNullOrEmpty()) null else title, members, null, null, null, null)
   }
 
-  @CheckReturnValue
+  @CheckResult
   fun create(groupMasterKey: GroupMasterKey, groupState: DecryptedGroup, groupSendEndorsements: ReceivedGroupSendEndorsements?): GroupId.V2? {
     val groupId = GroupId.v2(groupMasterKey)
 
@@ -634,7 +644,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
   /**
    * @param groupMasterKey null for V1, must be non-null for V2 (presence dictates group version).
    */
-  @CheckReturnValue
+  @CheckResult
   private fun create(
     groupId: GroupId,
     title: String?,
@@ -988,7 +998,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
 
   fun getGroupSendFullToken(threadId: Long, recipientId: RecipientId): GroupSendFullToken? {
     val threadRecipient = SignalDatabase.threads.getRecipientForThreadId(threadId)
-    if (threadRecipient == null || !threadRecipient.isGroup) {
+    if (threadRecipient == null || !threadRecipient.isPushV2Group) {
       return null
     }
 
@@ -1089,7 +1099,9 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
     }
   }
 
-  class Reader(val cursor: Cursor?) : Closeable, ContactSearchIterator<GroupRecord> {
+  class Reader(val cursor: Cursor?) :
+    Closeable,
+    ContactSearchIterator<GroupRecord> {
 
     fun getNext(): GroupRecord? {
       return if (cursor == null || !cursor.moveToNext()) {
@@ -1112,7 +1124,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
           recipientId = RecipientId.from(cursor.requireNonNullString(RECIPIENT_ID)),
           title = cursor.requireString(TITLE),
           serializedMembers = cursor.requireString(MEMBER_GROUP_CONCAT),
-          serializedUnmigratedV1Members = cursor.requireString(UNMIGRATED_V1_MEMBERS),
+          serializedUnmigratedV1Members = null,
           avatarId = cursor.requireLong(AVATAR_ID),
           avatarKey = cursor.requireBlob(AVATAR_KEY),
           avatarContentType = cursor.requireString(AVATAR_CONTENT_TYPE),
@@ -1153,6 +1165,10 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
 
     val bannedMembers: Set<ServiceId> by lazy {
       DecryptedGroupUtil.bannedMembersToServiceIdSet(decryptedGroup.bannedMembers)
+    }
+
+    val avatarKey: String by lazy {
+      decryptedGroup.avatar
     }
 
     fun isAdmin(recipient: Recipient): Boolean {
@@ -1395,7 +1411,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) : DatabaseT
       ""
     } else {
       val glob = buildCaseInsensitiveGlobPattern(titleSearchQuery)
-      ", ($TITLE GLOB \"$glob\") as $TITLE_SEARCH_RANK"
+      ", ($TITLE GLOB '$glob') as $TITLE_SEARCH_RANK"
     }
 
     return """

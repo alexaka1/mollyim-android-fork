@@ -90,12 +90,14 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <!-- For vestigial telecom integration service -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
 
     <application android:name=".ApplicationContext"
                  android:icon="@mipmap/ic_launcher"
                  android:label="@string/app_name"
+                 android:memtagMode="async"
                  android:supportsRtl="true"
                  android:resizeableActivity="true"
                  android:fullBackupOnly="false"
@@ -129,7 +131,7 @@
     <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
     <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
 
-    <activity android:name=".WebRtcCallActivity"
+    <activity android:name=".components.webrtc.v2.WebRtcCallActivity"
               android:theme="@style/TextSecure.DarkTheme.WebRTCCall"
               android:excludeFromRecents="true"
               android:supportsPictureInPicture="true"
@@ -139,18 +141,6 @@
               android:resizeableActivity="true"
               android:launchMode="singleTask"
               android:exported="false" />
-
-        <activity
-            android:name=".components.webrtc.v2.CallActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout"
-            android:excludeFromRecents="true"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:resizeableActivity="true"
-            android:supportsPictureInPicture="true"
-            android:taskAffinity=".calling"
-            android:theme="@style/TextSecure.DarkTheme.WebRTCCall"
-            android:windowSoftInputMode="stateAlwaysHidden" />
 
         <activity android:name=".messagerequests.CalleeMustAcceptMessageRequestActivity"
               android:theme="@style/TextSecure.DarkNoActionBar"
@@ -221,7 +211,8 @@
 
       <meta-data
           android:name="android.service.chooser.chooser_target_service"
-                android:value="androidx.sharetarget.ChooserTargetServiceCompat" />
+          android:value="androidx.sharetarget.ChooserTargetServiceCompat"
+          tools:targetApi="23" />
 
     </activity>
 
@@ -841,7 +832,7 @@
     <activity android:name=".restore.RestoreActivity"
               android:launchMode="singleTask"
               android:theme="@style/Theme.Signal.DayNight.NoActionBar"
-              android:windowSoftInputMode="stateHidden"
+              android:windowSoftInputMode="stateHidden|adjustResize"
               android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
               android:exported="false"/>
 
@@ -970,12 +961,6 @@
               android:exported="false"/>
 
     <activity
-        android:name=".payments.preferences.PaymentsActivity"
-        android:theme="@style/TextSecure.LightRegistrationTheme"
-        android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
-        android:exported="false"/>
-
-    <activity
         android:name=".lock.v2.CreateSvrPinActivity"
         android:theme="@style/TextSecure.LightRegistrationTheme"
         android:windowSoftInputMode="adjustResize"
@@ -1095,12 +1080,6 @@
 
     <service
         android:enabled="true"
-        android:name=".service.webrtc.WebRtcCallService"
-        android:foregroundServiceType="dataSync"
-        android:exported="false"/>
-
-    <service
-        android:enabled="true"
         android:exported="false"
         android:name=".service.KeyCachingService"
         android:foregroundServiceType="remoteMessaging"/>
@@ -1120,7 +1099,8 @@
         android:name=".service.webrtc.AndroidCallConnectionService"
         android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
         android:foregroundServiceType="phoneCall"
-        android:exported="true">
+        android:exported="true"
+        tools:targetApi="28">
         <intent-filter>
             <action android:name="android.telecom.ConnectionService" />
         </intent-filter>
@@ -1226,10 +1206,6 @@
 
     <receiver
         android:name=".service.TrimThreadsByDateManager$TrimThreadsByDateAlarm"
-        android:exported="false"/>
-
-    <receiver
-        android:name=".payments.backup.phrase.ClearClipboardAlarmReceiver"
         android:exported="false"/>
 
     <provider android:name=".providers.AvatarProvider"
@@ -1364,7 +1340,7 @@
     <service
         android:name=".service.webrtc.ActiveCallManager$ActiveCallForegroundService"
         android:exported="false"
-        android:foregroundServiceType="dataSync|microphone" />
+        android:foregroundServiceType="dataSync|microphone|camera" />
 
     <receiver android:name=".service.webrtc.ActiveCallManager$ActiveCallServiceReceiver" android:exported="false">
         <intent-filter>

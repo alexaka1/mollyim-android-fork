@@ -867,6 +867,11 @@ public class ConversationListFragment extends MainFragment implements ActionMode
         }),
         new MediaRestoreProgressBanner(new MediaRestoreProgressBanner.RestoreProgressBannerListener() {
           @Override
+          public void onBannerClick() {
+            startActivity(AppSettingsActivity.backupsSettings(requireContext()));
+          }
+
+          @Override
           public void onActionClick(@NonNull BackupStatusData backupStatusData) {
             if (backupStatusData instanceof BackupStatusData.NotEnoughFreeSpace) {
               BackupAlertBottomSheet.create(new BackupAlert.DiskFull(((BackupStatusData.NotEnoughFreeSpace) backupStatusData).getRequiredSpace()))
@@ -970,7 +975,6 @@ public class ConversationListFragment extends MainFragment implements ActionMode
     lifecycleDisposable.add(viewModel.getMegaphoneState().subscribe(this::onMegaphoneChanged));
     lifecycleDisposable.add(viewModel.getConversationsState().subscribe(this::onConversationListChanged));
     lifecycleDisposable.add(viewModel.getHasNoConversations().subscribe(this::updateEmptyState));
-    lifecycleDisposable.add(viewModel.getNotificationProfiles().subscribe(profiles -> requireCallback().updateNotificationProfileStatus(profiles)));
     lifecycleDisposable.add(viewModel.getWebSocketState().subscribe(pipeState -> requireCallback().updateProxyStatus(pipeState)));
     lifecycleDisposable.add(viewModel.getChatFolderState().subscribe(this::onChatFoldersChanged));
 
@@ -987,7 +991,11 @@ public class ConversationListFragment extends MainFragment implements ActionMode
     lifecycleDisposable.add(
         viewModel.getSelectedState().subscribe(conversations -> {
           defaultAdapter.setSelectedConversations(conversations);
-          updateMultiSelectState();
+          if (conversations.isEmpty()) {
+            endActionModeIfActive();
+          } else {
+            updateMultiSelectState();
+          }
         })
     );
   }
@@ -1189,7 +1197,7 @@ public class ConversationListFragment extends MainFragment implements ActionMode
     alert.setTitle(context.getResources().getQuantityString(R.plurals.ConversationListFragment_delete_selected_conversations,
                                                             conversationsCount, conversationsCount));
 
-    if (SignalStore.account().hasLinkedDevices() && Recipient.self().getDeleteSyncCapability().isSupported()) {
+    if (SignalStore.account().hasLinkedDevices()) {
       alert.setMessage(context.getResources().getQuantityString(R.plurals.ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_linked_device,
                                                                 conversationsCount, conversationsCount));
     } else {
@@ -1217,8 +1225,10 @@ public class ConversationListFragment extends MainFragment implements ActionMode
 
           @Override
           protected Void doInBackground(Void... params) {
+            Log.d(TAG, "[handleDelete] Deleting " + selectedConversations.size() + " chats");
             SignalDatabase.threads().deleteConversations(selectedConversations, true);
             AppDependencies.getMessageNotifier().updateNotification(requireActivity());
+            Log.d(TAG, "[handleDelete] Delete complete");
             return null;
           }
 
@@ -1387,12 +1397,6 @@ public class ConversationListFragment extends MainFragment implements ActionMode
       handleCreateConversation(conversation.getThreadRecord().getThreadId(), conversation.getThreadRecord().getRecipient(), conversation.getThreadRecord().getDistributionType());
     } else {
       viewModel.toggleConversationSelected(conversation);
-
-      if (viewModel.currentSelectedConversations().isEmpty()) {
-        endActionModeIfActive();
-      } else {
-        updateMultiSelectState();
-      }
     }
   }
 
@@ -1443,8 +1447,8 @@ public class ConversationListFragment extends MainFragment implements ActionMode
       items.add(new ActionItem(R.drawable.symbol_archive_up_24, getResources().getString(R.string.ConversationListFragment_unarchive), () -> handleArchive(id, false)));
     } else {
       if (viewModel.getCurrentFolder().getFolderType() == ChatFolderRecord.FolderType.ALL &&
-          conversation.getThreadRecord().getRecipient().isIndividual() ||
-          conversation.getThreadRecord().getRecipient().isPushV2Group()) {
+          (conversation.getThreadRecord().getRecipient().isIndividual() ||
+          conversation.getThreadRecord().getRecipient().isPushV2Group())) {
         List<ChatFolderRecord> folders = viewModel.getFolders().stream().map(ChatFolderMappingModel::getChatFolder).collect(Collectors.toList());
         items.add(new ActionItem(R.drawable.symbol_folder_add, getString(R.string.ConversationListFragment_add_to_folder), () ->
           AddToFolderBottomSheet.showChatFolderSheet(folders, conversation.getThreadRecord().getThreadId(), conversation.getThreadRecord().getRecipient().isIndividual()).show(getParentFragmentManager(), BottomSheetUtil.STANDARD_BOTTOM_SHEET_FRAGMENT_TAG)
@@ -1970,8 +1974,6 @@ public class ConversationListFragment extends MainFragment implements ActionMode
     @NonNull View getUnreadPaymentsDot();
 
     @NonNull Stub<Toolbar> getBasicToolbar();
-
-    void updateNotificationProfileStatus(@NonNull List<NotificationProfile> notificationProfiles);
 
     void updateProxyStatus(@NonNull WebSocketConnectionState state);
 

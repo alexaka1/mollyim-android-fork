@@ -1,11 +1,8 @@
 package org.thoughtcrime.securesms.components.settings.app.internal
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -27,12 +24,14 @@ import org.thoughtcrime.securesms.components.settings.DSLSettingsFragment
 import org.thoughtcrime.securesms.components.settings.DSLSettingsText
 import org.thoughtcrime.securesms.components.settings.app.privacy.advanced.AdvancedPrivacySettingsRepository
 import org.thoughtcrime.securesms.components.settings.configure
+import org.thoughtcrime.securesms.conversation.ConversationIntents
 import org.thoughtcrime.securesms.database.JobDatabase
 import org.thoughtcrime.securesms.database.LocalMetricsDatabase
 import org.thoughtcrime.securesms.database.LogDatabase
 import org.thoughtcrime.securesms.database.MegaphoneDatabase
 import org.thoughtcrime.securesms.database.OneTimePreKeyTable
 import org.thoughtcrime.securesms.database.SignalDatabase
+import org.thoughtcrime.securesms.database.model.MessageRecord
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobmanager.JobTracker
 import org.thoughtcrime.securesms.jobs.DownloadLatestEmojiDataJob
@@ -46,8 +45,8 @@ import org.thoughtcrime.securesms.jobs.StorageForcePushJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.megaphone.MegaphoneRepository
 import org.thoughtcrime.securesms.megaphone.Megaphones
-import org.thoughtcrime.securesms.payments.DataExportUtil
 import org.thoughtcrime.securesms.recipients.Recipient
+import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.storage.StorageSyncHelper
 import org.thoughtcrime.securesms.util.ConversationUtil
 import org.thoughtcrime.securesms.util.Util
@@ -144,23 +143,22 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
         }
       )
 
-      dividerPref()
-
-      sectionHeaderPref(DSLSettingsText.from("Miscellaneous"))
-
       clickPref(
-        title = DSLSettingsText.from("Search for a recipient"),
-        summary = DSLSettingsText.from("Search by ID, ACI, or PNI."),
+        title = DSLSettingsText.from("Jump to message"),
+        summary = DSLSettingsText.from("Find and jump to a message via its sentTimestamp."),
         onClick = {
-          findNavController().safeNavigate(InternalSettingsFragmentDirections.actionInternalSettingsFragmentToInternalSearchFragment())
+          promptUserForSentTimestamp()
         }
       )
+      dividerPref()
+
+      sectionHeaderPref(DSLSettingsText.from("Playgrounds"))
 
       clickPref(
-        title = DSLSettingsText.from("SVR Playground"),
-        summary = DSLSettingsText.from("Quickly test various SVR options and error conditions."),
+        title = DSLSettingsText.from("SQLite Playground"),
+        summary = DSLSettingsText.from("Run raw SQLite queries."),
         onClick = {
-          findNavController().safeNavigate(InternalSettingsFragmentDirections.actionInternalSettingsFragmentToInternalSvrPlaygroundFragment())
+          findNavController().safeNavigate(InternalSettingsFragmentDirections.actionInternalSettingsFragmentToInternalSqlitePlaygroundFragment())
         }
       )
 
@@ -177,6 +175,26 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
         summary = DSLSettingsText.from("Test and view storage service stuff."),
         onClick = {
           findNavController().safeNavigate(InternalSettingsFragmentDirections.actionInternalSettingsFragmentToInternalStorageServicePlaygroundFragment())
+        }
+      )
+
+      clickPref(
+        title = DSLSettingsText.from("SVR Playground"),
+        summary = DSLSettingsText.from("Quickly test various SVR options and error conditions."),
+        onClick = {
+          findNavController().safeNavigate(InternalSettingsFragmentDirections.actionInternalSettingsFragmentToInternalSvrPlaygroundFragment())
+        }
+      )
+
+      dividerPref()
+
+      sectionHeaderPref(DSLSettingsText.from("Miscellaneous"))
+
+      clickPref(
+        title = DSLSettingsText.from("Search for a recipient"),
+        summary = DSLSettingsText.from("Search by ID, ACI, or PNI."),
+        onClick = {
+          findNavController().safeNavigate(InternalSettingsFragmentDirections.actionInternalSettingsFragmentToInternalSearchFragment())
         }
       )
 
@@ -292,18 +310,6 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
         summary = DSLSettingsText.from("Click to clear all local metrics state."),
         onClick = {
           clearAllLocalMetricsState()
-        }
-      )
-
-      dividerPref()
-
-      sectionHeaderPref(DSLSettingsText.from("Payments"))
-
-      clickPref(
-        title = DSLSettingsText.from("Copy payments data"),
-        summary = DSLSettingsText.from("Copy all payment records to clipboard."),
-        onClick = {
-          copyPaymentsDataToClipboard()
         }
       )
 
@@ -724,7 +730,6 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
                 SignalStore.account.setRegistered(false)
                 SignalStore.registration.clearRegistrationComplete()
                 SignalStore.registration.hasUploadedProfile = false
-                SignalStore.registration.debugClearSkippedTransferOrRestore()
                 Toast.makeText(context, "Unregistered!", Toast.LENGTH_SHORT).show()
               }
 
@@ -734,42 +739,6 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
             }
           }
         }
-      }
-      .setNegativeButton(android.R.string.cancel, null)
-      .show()
-  }
-
-  private fun copyPaymentsDataToClipboard() {
-    MaterialAlertDialogBuilder(requireContext())
-      .setMessage(
-        """
-    Local payments history will be copied to the clipboard.
-    It may therefore compromise privacy.
-    However, no private keys will be copied.
-        """.trimIndent()
-      )
-      .setPositiveButton(
-        "Copy"
-      ) { _: DialogInterface?, _: Int ->
-        val context: Context = AppDependencies.application
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-        SimpleTask.run<Any?>(
-          SignalExecutors.UNBOUNDED,
-          {
-            val tsv = DataExportUtil.createTsv()
-            val clip = ClipData.newPlainText(context.getString(R.string.app_name), tsv)
-            clipboard.setPrimaryClip(clip)
-            null
-          },
-          {
-            Toast.makeText(
-              context,
-              "Payments have been copied",
-              Toast.LENGTH_SHORT
-            ).show()
-          }
-        )
       }
       .setNegativeButton(android.R.string.cancel, null)
       .show()
@@ -892,5 +861,44 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
     }) {
       Toast.makeText(requireContext(), "Dumped to logs", Toast.LENGTH_SHORT).show()
     }
+  }
+
+  private fun promptUserForSentTimestamp() {
+    val input = EditText(requireContext()).apply {
+      inputType = android.text.InputType.TYPE_CLASS_NUMBER
+    }
+
+    MaterialAlertDialogBuilder(requireContext())
+      .setTitle("Enter sentTimestamp")
+      .setView(input)
+      .setPositiveButton(android.R.string.ok) { _, _ ->
+        val number = input.text.toString().toLongOrNull()
+        if (number == null) {
+          Toast.makeText(requireContext(), "Failed to parse timestamp!", Toast.LENGTH_SHORT).show()
+          return@setPositiveButton
+        }
+
+        val messages = SignalDatabase.messages.getMessagesBySentTimestamp(number)
+        if (messages.isEmpty()) {
+          Toast.makeText(requireContext(), "Could not find a message with that timestamp!", Toast.LENGTH_SHORT).show()
+          return@setPositiveButton
+        }
+
+        if (messages.size > 1) {
+          Toast.makeText(requireContext(), "There's ${messages.size} messages with that timestamp! Go run SQL or something.", Toast.LENGTH_SHORT).show()
+          return@setPositiveButton
+        }
+
+        val message: MessageRecord = messages[0]
+        val startingPosition = SignalDatabase.messages.getMessagePositionInConversation(message.threadId, message.dateReceived)
+        val intent = ConversationIntents
+          .createBuilderSync(requireContext(), RecipientId.UNKNOWN, message.threadId)
+          .withStartingPosition(startingPosition)
+          .build()
+
+        startActivity(intent)
+      }
+      .setNegativeButton("Cancel", null)
+      .show()
   }
 }

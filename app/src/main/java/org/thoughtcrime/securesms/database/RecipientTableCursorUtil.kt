@@ -7,7 +7,6 @@ package org.thoughtcrime.securesms.database
 
 import android.content.Context
 import android.database.Cursor
-import com.google.protobuf.InvalidProtocolBufferException
 import org.signal.core.util.Base64
 import org.signal.core.util.Bitmask
 import org.signal.core.util.logging.Log
@@ -93,7 +92,7 @@ object RecipientTableCursorUtil {
     val chatWallpaper: ChatWallpaper? = if (serializedWallpaper != null) {
       try {
         ChatWallpaperFactory.create(Wallpaper.ADAPTER.decode(serializedWallpaper))
-      } catch (e: InvalidProtocolBufferException) {
+      } catch (e: IOException) {
         Log.w(TAG, "Failed to parse wallpaper.", e)
         null
       }
@@ -106,7 +105,7 @@ object RecipientTableCursorUtil {
     val chatColors: ChatColors? = if (serializedChatColors != null) {
       try {
         ChatColors.forChatColor(ChatColors.Id.forLongValue(customChatColorsId), ChatColor.ADAPTER.decode(serializedChatColors))
-      } catch (e: InvalidProtocolBufferException) {
+      } catch (e: IOException) {
         Log.w(TAG, "Failed to parse chat colors.", e)
         null
       }
@@ -176,8 +175,6 @@ object RecipientTableCursorUtil {
     val capabilities = cursor.requireLong(RecipientTable.CAPABILITIES)
     return RecipientRecord.Capabilities(
       rawBits = capabilities,
-      deleteSync = Recipient.Capability.deserialize(Bitmask.read(capabilities, Capabilities.DELETE_SYNC, Capabilities.BIT_LENGTH).toInt()),
-      versionedExpirationTimer = Recipient.Capability.deserialize(Bitmask.read(capabilities, Capabilities.VERSIONED_EXPIRATION_TIMER, Capabilities.BIT_LENGTH).toInt()),
       storageServiceEncryptionV2 = Recipient.Capability.deserialize(Bitmask.read(capabilities, Capabilities.STORAGE_SERVICE_ENCRYPTION_V2, Capabilities.BIT_LENGTH).toInt())
     )
   }
@@ -187,7 +184,7 @@ object RecipientTableCursorUtil {
     if (serializedBadgeList != null) {
       try {
         badgeList = BadgeList.ADAPTER.decode(serializedBadgeList)
-      } catch (e: InvalidProtocolBufferException) {
+      } catch (e: IOException) {
         Log.w(TAG, e)
       }
     }
@@ -228,7 +225,7 @@ object RecipientTableCursorUtil {
     return cursor.optionalBlob(RecipientTable.EXTRAS).map { b: ByteArray ->
       try {
         RecipientExtras.ADAPTER.decode(b)
-      } catch (e: InvalidProtocolBufferException) {
+      } catch (e: IOException) {
         Log.w(TAG, e)
         throw AssertionError(e)
       }

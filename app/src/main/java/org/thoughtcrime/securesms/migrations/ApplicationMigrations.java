@@ -126,7 +126,7 @@ public class ApplicationMigrations {
     static final int EMOJI_SEARCH_INDEX_CHECK      = 93;
     static final int IDENTITY_FIX                  = 94;
     static final int COPY_USERNAME_TO_SIGNAL_STORE = 95;
-    static final int RECHECK_PAYMENTS              = 96;
+    //static final int RECHECK_PAYMENTS            = 96; // MOLLY: No payments
     static final int THREAD_COUNT_DB_MIGRATION     = 97;
     static final int SYNC_KEYS_MIGRATION           = 98;
     static final int SELF_REGISTERTED_STATE        = 99;
@@ -150,9 +150,19 @@ public class ApplicationMigrations {
     static final int SVR2_ENCLAVE_UPDATE_2         = 117;
     static final int WALLPAPER_MIGRATION_CLEANUP   = 118;
     static final int AEP_INTRODUCTION              = 119;
+    static final int GROUP_EXTRAS_DB_FIX           = 120;
+    static final int EMOJI_SEARCH_INDEX_CHECK_2    = 121;
+    static final int QUOTE_AUTHOR_FIX              = 122;
+    static final int BAD_E164_FIX                  = 123;
+    static final int GPB_TOKEN_MIGRATION           = 124;
+    static final int GROUP_ADD_MIGRATION           = 125;
+    static final int SSRE2_CAPABILITY              = 126;
+//    static final int FIX_INACTIVE_GROUPS           = 127;
+    static final int DUPLICATE_E164_FIX            = 128;
+    static final int FTS_TRIGGER_FIX               = 129;
   }
 
-  public static final int CURRENT_VERSION = 119;
+  public static final int CURRENT_VERSION = 129;
 
  /**
    * This *must* be called after the {@link JobManager} has been instantiated, but *before* the call
@@ -587,10 +597,6 @@ public class ApplicationMigrations {
       jobs.put(Version.COPY_USERNAME_TO_SIGNAL_STORE, new CopyUsernameToSignalStoreMigrationJob());
     }
 
-    if (lastSeenVersion < Version.RECHECK_PAYMENTS) {
-      jobs.put(Version.RECHECK_PAYMENTS, new RecheckPaymentsMigrationJob());
-    }
-
     if (lastSeenVersion < Version.THREAD_COUNT_DB_MIGRATION) {
       jobs.put(Version.THREAD_COUNT_DB_MIGRATION, new DatabaseMigrationJob());
     }
@@ -677,6 +683,46 @@ public class ApplicationMigrations {
 
     if (lastSeenVersion < Version.AEP_INTRODUCTION) {
       jobs.put(Version.AEP_INTRODUCTION, new AepMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.GROUP_EXTRAS_DB_FIX) {
+      jobs.put(Version.GROUP_EXTRAS_DB_FIX, new DatabaseMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.EMOJI_SEARCH_INDEX_CHECK_2) {
+      jobs.put(Version.EMOJI_SEARCH_INDEX_CHECK_2, new EmojiSearchIndexCheckMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.QUOTE_AUTHOR_FIX) {
+      jobs.put(Version.QUOTE_AUTHOR_FIX, new DatabaseMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.BAD_E164_FIX) {
+      jobs.put(Version.BAD_E164_FIX, new BadE164MigrationJob());
+    }
+
+    if (lastSeenVersion < Version.GPB_TOKEN_MIGRATION) {
+      jobs.put(Version.GPB_TOKEN_MIGRATION, new GooglePlayBillingPurchaseTokenMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.GROUP_ADD_MIGRATION) {
+      jobs.put(Version.GROUP_ADD_MIGRATION, new DatabaseMigrationJob());
+    }
+
+    if (lastSeenVersion < Version.SSRE2_CAPABILITY) {
+      jobs.put(Version.SSRE2_CAPABILITY, new AttributesMigrationJob());
+    }
+
+//    if (lastSeenVersion < Version.FIX_INACTIVE_GROUPS) {
+//      jobs.put(Version.FIX_INACTIVE_GROUPS, new InactiveGroupCheckMigrationJob());
+//    }
+
+    if (lastSeenVersion < Version.DUPLICATE_E164_FIX) {
+      jobs.put(Version.DUPLICATE_E164_FIX, new DuplicateE164MigrationJob());
+    }
+
+    if (lastSeenVersion < Version.FTS_TRIGGER_FIX) {
+      jobs.put(Version.FTS_TRIGGER_FIX, new DatabaseMigrationJob());
     }
 
     return jobs;

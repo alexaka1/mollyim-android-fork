@@ -53,8 +53,6 @@ import org.thoughtcrime.securesms.net.SignalWebSocketHealthMonitor;
 import org.thoughtcrime.securesms.net.StandardUserAgentInterceptor;
 import org.thoughtcrime.securesms.notifications.MessageNotifier;
 import org.thoughtcrime.securesms.notifications.OptimizedMessageNotifier;
-import org.thoughtcrime.securesms.payments.MobileCoinConfig;
-import org.thoughtcrime.securesms.payments.Payments;
 import org.thoughtcrime.securesms.push.SecurityEventListener;
 import org.thoughtcrime.securesms.push.SignalServiceNetworkAccess;
 import org.thoughtcrime.securesms.recipients.LiveRecipientCache;
@@ -269,18 +267,6 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
     return new DatabaseObserver();
   }
 
-  @SuppressWarnings("ConstantConditions")
-  @Override
-  public @NonNull Payments providePayments(@NonNull SignalServiceAccountManager signalServiceAccountManager) {
-    MobileCoinConfig network;
-
-    if      (BuildConfig.MOBILE_COIN_ENVIRONMENT.equals("mainnet")) network = MobileCoinConfig.getMainNet(signalServiceAccountManager);
-    else if (BuildConfig.MOBILE_COIN_ENVIRONMENT.equals("testnet")) network = MobileCoinConfig.getTestNet(signalServiceAccountManager);
-    else throw new AssertionError("Unknown network " + BuildConfig.MOBILE_COIN_ENVIRONMENT);
-
-    return new Payments(network);
-  }
-
   @Override
   public @NonNull SignalCallManager provideSignalCallManager() {
     return new SignalCallManager(context);
@@ -408,12 +394,23 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
     return new WebSocketFactory() {
       @Override
       public WebSocketConnection createWebSocket() {
-        return new OkHttpWebSocketConnection("normal",
-                                             signalServiceConfigurationSupplier.get(),
-                                             Optional.of(new DynamicCredentialsProvider()),
-                                             BuildConfig.SIGNAL_AGENT,
-                                             healthMonitor,
-                                             Stories.isFeatureEnabled());
+        if (RemoteConfig.libSignalWebSocketEnabled()) {
+          Network network = libSignalNetworkSupplier.get();
+          return new LibSignalChatConnection(
+              "libsignal-auth",
+              network,
+              new DynamicCredentialsProvider(),
+              Stories.isFeatureEnabled(),
+              healthMonitor
+          );
+        } else {
+          return new OkHttpWebSocketConnection("normal",
+                                               signalServiceConfigurationSupplier.get(),
+                                               Optional.of(new DynamicCredentialsProvider()),
+                                               BuildConfig.SIGNAL_AGENT,
+                                               healthMonitor,
+                                               Stories.isFeatureEnabled());
+        }
       }
 
       @Override
@@ -427,7 +424,7 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
               BuildConfig.SIGNAL_AGENT,
               healthMonitor,
               Stories.isFeatureEnabled(),
-              LibSignalNetworkExtensions.createChatService(libSignalNetworkSupplier.get(), null, Stories.isFeatureEnabled()),
+              libSignalNetworkSupplier.get(),
               shadowPercentage,
               bridge
           );
@@ -454,7 +451,7 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
 
   @Override
   public @NonNull BillingApi provideBillingApi() {
-    return BillingFactory.create(GooglePlayBillingDependencies.INSTANCE, RemoteConfig.messageBackups() && !Environment.IS_STAGING);
+    return BillingFactory.create(GooglePlayBillingDependencies.INSTANCE, RemoteConfig.messageBackups() && Environment.Backups.supportsGooglePlayBilling());
   }
 
   @Override

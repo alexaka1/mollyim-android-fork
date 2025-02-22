@@ -70,6 +70,7 @@ import org.thoughtcrime.securesms.util.JsonUtils.SaneJSONObject
 import org.thoughtcrime.securesms.util.LRUCache
 import org.thoughtcrime.securesms.util.TextSecurePreferences
 import org.thoughtcrime.securesms.util.isScheduled
+import org.whispersystems.signalservice.api.push.ServiceId
 import org.whispersystems.signalservice.api.storage.SignalAccountRecord
 import org.whispersystems.signalservice.api.storage.SignalContactRecord
 import org.whispersystems.signalservice.api.storage.SignalGroupV1Record
@@ -329,7 +330,7 @@ class ThreadTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
       return
     }
 
-    val syncThreadTrimDeletes = SignalStore.settings.shouldSyncThreadTrimDeletes() && Recipient.self().deleteSyncCapability.isSupported
+    val syncThreadTrimDeletes = SignalStore.settings.shouldSyncThreadTrimDeletes()
     val threadTrimsToSync = mutableListOf<ThreadDeleteSyncInfo>()
 
     readableDatabase
@@ -1261,13 +1262,15 @@ class ThreadTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
   }
 
   fun deleteConversations(selectedConversations: Set<Long>, syncThreadDeletes: Boolean = true) {
+    Log.d(TAG, "[deleteConversations] Deleting ${selectedConversations.size} chats syncThreadDeletes: $syncThreadDeletes")
     val recipientIds = getRecipientIdsForThreadIds(selectedConversations)
 
     val addressableMessages = mutableListOf<ThreadDeleteSyncInfo>()
 
     val queries: List<SqlUtil.Query> = SqlUtil.buildCollectionQuery(ID, selectedConversations)
+    Log.d(TAG, "[deleteConversations] Enter transaction")
     writableDatabase.withinTransaction { db ->
-      if (syncThreadDeletes && Recipient.self().deleteSyncCapability.isSupported) {
+      if (syncThreadDeletes) {
         for (threadId in selectedConversations) {
           val mostRecentMessages = messages.getMostRecentAddressableMessages(threadId, excludeExpiring = false)
           val mostRecentNonExpiring = if (mostRecentMessages.size == MessageTable.ADDRESSABLE_MESSAGE_LIMIT && mostRecentMessages.any { it.expiresIn > 0 }) {
@@ -1278,17 +1281,27 @@ class ThreadTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
 
           addressableMessages += ThreadDeleteSyncInfo(threadId, mostRecentMessages, mostRecentNonExpiring)
         }
+        Log.d(TAG, "[deleteConversations] Retrieved sync thread delete addressable messages (${addressableMessages.size})")
+      } else {
+        Log.d(TAG, "[deleteConversations] No addressable messages needed")
       }
 
+      Log.d(TAG, "[deleteConversations] Deactivating threads")
       for (query in queries) {
         db.deactivateThread(query)
       }
 
+      Log.d(TAG, "[deleteConversations] Deleting messages in thread")
       messages.deleteMessagesInThread(selectedConversations)
+      Log.d(TAG, "[deleteConversations] Trimming attachments")
       attachments.trimAllAbandonedAttachments()
+      Log.d(TAG, "[deleteConversations] Deleting abandoned group receipts")
       groupReceipts.deleteAbandonedRows()
+      Log.d(TAG, "[deleteConversations] Deleting abandoned mentions")
       mentions.deleteAbandonedMentions()
+      Log.d(TAG, "[deleteConversations] Clearing drafts")
       drafts.clearDrafts(selectedConversations)
+      Log.d(TAG, "[deleteConversations] Updating threadId cache")
       synchronized(threadIdCache) {
         for (recipientId in recipientIds) {
           threadIdCache.remove(recipientId)
@@ -1296,6 +1309,7 @@ class ThreadTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
       }
     }
 
+    Log.d(TAG, "[deleteConversations] Enqueue jobs and notify listeners")
     DeleteAbandonedAttachmentsJob.enqueue()
 
     if (syncThreadDeletes) {
@@ -1533,7 +1547,12 @@ class ThreadTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
 
       for (pinned: AccountRecord.PinnedConversation in record.proto.pinnedConversations) {
         val pinnedRecipient: Recipient? = if (pinned.contact != null) {
-          Recipient.externalPush(pinned.contact!!.toSignalServiceAddress())
+          if (ServiceId.parseOrNull(pinned.contact!!.serviceId) != null) {
+            Recipient.externalPush(pinned.contact!!.toSignalServiceAddress())
+          } else {
+            Log.w(TAG, "Failed to parse serviceId!")
+            null
+          }
         } else if (pinned.legacyGroupId != null) {
           try {
             Recipient.externalGroupExact(GroupId.v1(pinned.legacyGroupId!!.toByteArray()))
@@ -1923,11 +1942,9 @@ class ThreadTable(context: Context, databaseHelper: SignalDatabase) : DatabaseTa
       SNIPPET_EXTRAS to null,
       SNIPPET_MESSAGE_EXTRAS to null,
       UNREAD_COUNT to 0,
-      ARCHIVED to 0,
       STATUS to 0,
       HAS_DELIVERY_RECEIPT to 0,
       HAS_READ_RECEIPT to 0,
-      EXPIRES_IN to 0,
       LAST_SEEN to 0,
       HAS_SENT to 0,
       LAST_SCROLLED to 0,

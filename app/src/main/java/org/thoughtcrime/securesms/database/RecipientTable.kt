@@ -8,7 +8,6 @@ import android.net.Uri
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.contentValuesOf
-import app.cash.exhaustive.Exhaustive
 import okio.ByteString.Companion.toByteString
 import org.signal.core.util.Base64
 import org.signal.core.util.Bitmask
@@ -105,7 +104,6 @@ import org.whispersystems.signalservice.api.profiles.SignalServiceProfile
 import org.whispersystems.signalservice.api.push.ServiceId
 import org.whispersystems.signalservice.api.push.ServiceId.ACI
 import org.whispersystems.signalservice.api.push.ServiceId.PNI
-import org.whispersystems.signalservice.api.push.SignalServiceAddress
 import org.whispersystems.signalservice.api.storage.SignalAccountRecord
 import org.whispersystems.signalservice.api.storage.SignalContactRecord
 import org.whispersystems.signalservice.api.storage.SignalGroupV1Record
@@ -416,8 +414,6 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     @JvmStatic
     fun maskCapabilitiesToLong(capabilities: SignalServiceProfile.Capabilities): Long {
       var value: Long = 0
-      value = Bitmask.update(value, Capabilities.DELETE_SYNC, Capabilities.BIT_LENGTH, Recipient.Capability.fromBoolean(capabilities.isDeleteSync).serialize().toLong())
-      value = Bitmask.update(value, Capabilities.VERSIONED_EXPIRATION_TIMER, Capabilities.BIT_LENGTH, Recipient.Capability.fromBoolean(capabilities.isVersionedExpirationTimer).serialize().toLong())
       value = Bitmask.update(value, Capabilities.STORAGE_SERVICE_ENCRYPTION_V2, Capabilities.BIT_LENGTH, Recipient.Capability.fromBoolean(capabilities.isStorageServiceEncryptionV2).serialize().toLong())
       return value
     }
@@ -2134,67 +2130,6 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
   }
 
   /**
-   * @return True if setting the phone number resulted in changed recipientId, otherwise false.
-   */
-  fun setPhoneNumber(id: RecipientId, e164: String): Boolean {
-    val db = writableDatabase
-
-    db.beginTransaction()
-    return try {
-      setPhoneNumberOrThrow(id, e164)
-      db.setTransactionSuccessful()
-      false
-    } catch (e: SQLiteConstraintException) {
-      Log.w(TAG, "[setPhoneNumber] Hit a conflict when trying to update $id. Possibly merging.")
-
-      val existing: RecipientRecord = getRecord(id)
-      val newId = getAndPossiblyMerge(existing.aci, e164)
-      Log.w(TAG, "[setPhoneNumber] Resulting id: $newId")
-
-      db.setTransactionSuccessful()
-      newId != existing.id
-    } finally {
-      db.endTransaction()
-    }
-  }
-
-  private fun removePhoneNumber(recipientId: RecipientId) {
-    val values = ContentValues().apply {
-      putNull(E164)
-      putNull(PNI_COLUMN)
-    }
-
-    if (update(recipientId, values)) {
-      rotateStorageId(recipientId)
-    }
-  }
-
-  /**
-   * Should only use if you are confident that this will not result in any contact merging.
-   */
-  @Throws(SQLiteConstraintException::class)
-  fun setPhoneNumberOrThrow(id: RecipientId, e164: String) {
-    val contentValues = ContentValues(1).apply {
-      put(E164, e164)
-    }
-    if (update(id, contentValues)) {
-      rotateStorageId(id)
-      AppDependencies.databaseObserver.notifyRecipientChanged(id)
-      StorageSyncHelper.scheduleSyncForDataChange()
-    }
-  }
-
-  @Throws(SQLiteConstraintException::class)
-  fun setPhoneNumberOrThrowSilent(id: RecipientId, e164: String) {
-    val contentValues = ContentValues(1).apply {
-      put(E164, e164)
-    }
-    if (update(id, contentValues)) {
-      rotateStorageId(id)
-    }
-  }
-
-  /**
    * Associates the provided IDs together. The assumption here is that all of the IDs correspond to the local user and have been verified.
    */
   fun linkIdsForSelf(aci: ACI, pni: PNI, e164: String) {
@@ -2531,7 +2466,6 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     var changedNumberId: RecipientId? = null
 
     for (operation in changeSet.operations) {
-      @Exhaustive
       when (operation) {
         is PnpOperation.RemoveE164,
         is PnpOperation.RemovePni,
@@ -2568,7 +2502,6 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
   fun writePnpChangeSetToDisk(changeSet: PnpChangeSet, inputPni: PNI?, pniVerified: Boolean): RecipientId {
     var hadThreadMerge = false
     for (operation in changeSet.operations) {
-      @Exhaustive
       when (operation) {
         is PnpOperation.RemoveE164 -> {
           writableDatabase
@@ -3298,7 +3231,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
   fun getSystemContacts(): List<RecipientId> {
     val results: MutableList<RecipientId> = LinkedList()
 
-    readableDatabase.query(TABLE_NAME, ID_PROJECTION, "$SYSTEM_JOINED_NAME IS NOT NULL AND $SYSTEM_JOINED_NAME != \"\"", null, null, null, null).use { cursor ->
+    readableDatabase.query(TABLE_NAME, ID_PROJECTION, "$SYSTEM_JOINED_NAME IS NOT NULL AND $SYSTEM_JOINED_NAME != \'\'", null, null, null, null).use { cursor ->
       while (cursor != null && cursor.moveToNext()) {
         results.add(RecipientId.from(cursor.getLong(cursor.getColumnIndexOrThrow(ID))))
       }
@@ -3659,53 +3592,43 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     }
   }
 
-  fun applyBlockedUpdate(blocked: List<SignalServiceAddress>, groupIds: List<ByteArray?>) {
-    val blockedE164 = blocked
-      .filter { b: SignalServiceAddress -> b.number.isPresent }
-      .map { b: SignalServiceAddress -> b.number.get() }
-      .toList()
+  fun applyBlockedUpdate(blockedE164s: List<String>, blockedAcis: List<ACI>, blockedGroupIds: List<ByteArray?>) {
+    writableDatabase.withinTransaction { db ->
+      db.updateAll(TABLE_NAME)
+        .values(BLOCKED to 0)
+        .run()
 
-    val blockedUuid = blocked
-      .map { b: SignalServiceAddress -> b.serviceId.toString().lowercase() }
-      .toList()
+      val blockValues = contentValuesOf(
+        BLOCKED to 1,
+        PROFILE_SHARING to 0
+      )
 
-    val db = writableDatabase
-    db.beginTransaction()
-    try {
-      val resetBlocked = ContentValues().apply {
-        put(BLOCKED, 0)
-      }
-      db.update(TABLE_NAME, resetBlocked, null, null)
+      val e164Query = SqlUtil.buildFastCollectionQuery(E164, blockedE164s)
+      db.update(TABLE_NAME)
+        .values(blockValues)
+        .where(e164Query.where, e164Query.whereArgs)
+        .run()
 
-      val setBlocked = ContentValues().apply {
-        put(BLOCKED, 1)
-        put(PROFILE_SHARING, 0)
-      }
+      val aciQuery = SqlUtil.buildFastCollectionQuery(ACI_COLUMN, blockedAcis.map { it.toString() })
+      db.update(TABLE_NAME)
+        .values(blockValues)
+        .where(aciQuery.where, aciQuery.whereArgs)
+        .run()
 
-      for (e164 in blockedE164) {
-        db.update(TABLE_NAME, setBlocked, "$E164 = ?", arrayOf(e164))
-      }
-
-      for (uuid in blockedUuid) {
-        db.update(TABLE_NAME, setBlocked, "$ACI_COLUMN = ?", arrayOf(uuid))
-      }
-
-      val groupIdStrings: MutableList<V1> = ArrayList(groupIds.size)
-      for (raw in groupIds) {
+      val groupIds: List<GroupId.V1> = blockedGroupIds.mapNotNull { raw ->
         try {
-          groupIdStrings.add(GroupId.v1(raw))
+          GroupId.v1(raw)
         } catch (e: BadGroupIdException) {
           Log.w(TAG, "[applyBlockedUpdate] Bad GV1 ID!")
+          null
         }
       }
 
-      for (groupId in groupIdStrings) {
-        db.update(TABLE_NAME, setBlocked, "$GROUP_ID = ?", arrayOf(groupId.toString()))
-      }
-
-      db.setTransactionSuccessful()
-    } finally {
-      db.endTransaction()
+      val groupIdQuery = SqlUtil.buildFastCollectionQuery(GROUP_ID, groupIds.map { it.toString() })
+      db.update(TABLE_NAME)
+        .values(blockValues)
+        .where(groupIdQuery.where, groupIdQuery.whereArgs)
+        .run()
     }
 
     AppDependencies.recipientCache.clear()
@@ -3993,6 +3916,13 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
         return GetOrInsertResult(RecipientId.from(id), true)
       }
     }
+  }
+
+  /**
+   * Exposes the merge functionality for the sake of an app migration.
+   */
+  fun mergeForMigration(primaryId: RecipientId, secondaryId: RecipientId) {
+    merge(primaryId, secondaryId, pniVerified = true)
   }
 
   /**
@@ -4654,8 +4584,8 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
 //    const val GIFT_BADGES = 6
 //    const val PNP = 7
 //    const val PAYMENT_ACTIVATION = 8
-    const val DELETE_SYNC = 9
-    const val VERSIONED_EXPIRATION_TIMER = 10
+//    const val DELETE_SYNC = 9
+//    const val VERSIONED_EXPIRATION_TIMER = 10
     const val STORAGE_SERVICE_ENCRYPTION_V2 = 11
 
     // IMPORTANT: We cannot sore more than 32 capabilities in the bitmask.

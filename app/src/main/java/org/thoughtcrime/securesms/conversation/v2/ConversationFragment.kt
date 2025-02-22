@@ -42,6 +42,7 @@ import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.annotation.MainThread
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -99,7 +100,6 @@ import org.signal.core.util.dp
 import org.signal.core.util.logging.Log
 import org.signal.core.util.orNull
 import org.signal.core.util.setActionItemTint
-import org.signal.donations.InAppPaymentType
 import org.signal.ringrtc.CallLinkRootKey
 import org.thoughtcrime.securesms.BlockUnblockDialog
 import org.thoughtcrime.securesms.GroupMembersDialog
@@ -266,7 +266,6 @@ import org.thoughtcrime.securesms.mms.StickerSlide
 import org.thoughtcrime.securesms.mms.VideoSlide
 import org.thoughtcrime.securesms.nicknames.NicknameActivity
 import org.thoughtcrime.securesms.notifications.v2.ConversationId
-import org.thoughtcrime.securesms.payments.preferences.PaymentsActivity
 import org.thoughtcrime.securesms.permissions.Permissions
 import org.thoughtcrime.securesms.profiles.manage.EditProfileActivity
 import org.thoughtcrime.securesms.profiles.spoofing.ReviewCardDialogFragment
@@ -882,13 +881,13 @@ class ConversationFragment :
       .conversationThreadState
       .subscribeOn(Schedulers.io())
       .doOnSuccess { state ->
-        updateMessageRequestAcceptedState(state.meta.messageRequestData.isMessageRequestAccepted)
         SignalLocalMetrics.ConversationOpen.onDataLoaded()
         conversationItemDecorations.setFirstUnreadCount(state.meta.unreadCount)
         colorizer.onGroupMembershipChanged(state.meta.groupMemberAcis)
       }
       .observeOn(AndroidSchedulers.mainThread())
       .doOnSuccess { state ->
+        updateMessageRequestAcceptedState(state.meta.messageRequestData.isMessageRequestAccepted)
         moveToStartPosition(state.meta)
       }
       .flatMapObservable { it.items.data }
@@ -1269,25 +1268,6 @@ class ConversationFragment :
     }
   }
 
-  private fun calculateCharactersRemaining() {
-    val messageBody: String = binding.conversationInputPanel.embeddedTextEditor.textTrimmed.toString()
-    val charactersLeftView: TextView = binding.conversationInputSpaceLeft
-    val characterState = MessageSendType.SignalMessageSendType.calculateCharacters(messageBody)
-
-    if (characterState.charactersRemaining <= 15 || characterState.messagesSpent > 1) {
-      charactersLeftView.text = String.format(
-        Locale.getDefault(),
-        "%d/%d (%d)",
-        characterState.charactersRemaining,
-        characterState.maxTotalMessageSize,
-        characterState.messagesSpent
-      )
-      charactersLeftView.visibility = View.VISIBLE
-    } else {
-      charactersLeftView.visibility = View.GONE
-    }
-  }
-
   private fun registerForResults() {
     addToContactsLauncher = registerForActivityResult(AddToContactsContract()) {}
     conversationActivityResultContracts = ConversationActivityResultContracts(this, ActivityResultCallbacks())
@@ -1302,14 +1282,9 @@ class ConversationFragment :
     updateMessageRequestAcceptedState(!viewModel.hasMessageRequestState)
   }
 
+  @MainThread
   private fun updateMessageRequestAcceptedState(isMessageRequestAccepted: Boolean) {
-    if (binding.conversationItemRecycler.isInLayout) {
-      binding.conversationItemRecycler.doAfterNextLayout {
-        adapter.setMessageRequestIsAccepted(isMessageRequestAccepted)
-      }
-    } else {
-      adapter.setMessageRequestIsAccepted(isMessageRequestAccepted)
-    }
+    adapter.setMessageRequestIsAccepted(isMessageRequestAccepted)
   }
 
   private fun invalidateOptionsMenu() {
@@ -2369,7 +2344,7 @@ class ConversationFragment :
 
     val attachments = SaveAttachmentUtil.getAttachmentsForRecord(record)
 
-    SaveAttachmentUtil.showWarningDialog(requireContext(), attachments.size) { _, _ ->
+    SaveAttachmentUtil.showWarningDialogIfNecessary(requireContext(), attachments.size) {
       if (StorageUtil.canWriteToMediaStore()) {
         performAttachmentSave(attachments)
       } else {
@@ -2412,18 +2387,6 @@ class ConversationFragment :
     parts.forEach { adapter.toggleSelection(it) }
     binding.conversationItemRecycler.invalidateItemDecorations()
     actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(actionModeCallback)
-  }
-
-  private fun handleViewPaymentDetails(conversationMessage: ConversationMessage) {
-    val record: MmsMessageRecord = conversationMessage.messageRecord as? MmsMessageRecord ?: return
-    val payment = record.payment
-    if (payment == null || record.isPaymentTombstone) {
-      showPaymentTombstoneLearnMoreDialog()
-      return
-    }
-    if (record.isPaymentNotification) {
-      startActivity(PaymentsActivity.navigateToPaymentDetails(requireContext(), payment.uuid))
-    }
   }
 
   private fun showPaymentTombstoneLearnMoreDialog() {
@@ -2470,13 +2433,14 @@ class ConversationFragment :
     override fun isSwipeAvailable(conversationMessage: ConversationMessage): Boolean {
       val recipient = viewModel.recipientSnapshot ?: return false
 
-      return actionMode == null && MenuState.canReplyToMessage(
-        recipient,
-        MenuState.isActionMessage(conversationMessage.messageRecord),
-        conversationMessage.messageRecord,
-        viewModel.hasMessageRequestState,
-        conversationGroupViewModel.isNonAdminInAnnouncementGroup()
-      )
+      return actionMode == null &&
+        MenuState.canReplyToMessage(
+          recipient,
+          MenuState.isActionMessage(conversationMessage.messageRecord),
+          conversationMessage.messageRecord,
+          viewModel.hasMessageRequestState,
+          conversationGroupViewModel.isNonAdminInAnnouncementGroup()
+        )
     }
   }
 
@@ -2858,10 +2822,6 @@ class ConversationFragment :
       DoubleTapEditEducationSheet(conversationMessage).show(childFragmentManager, DoubleTapEditEducationSheet.KEY)
     }
 
-    override fun onPaymentTombstoneClicked() {
-      this@ConversationFragment.showPaymentTombstoneLearnMoreDialog()
-    }
-
     override fun onDisplayMediaNoLongerAvailableSheet() {
       if (SignalStore.backup.areBackupsEnabled) {
         UpgradeToStartMediaBackupSheet().show(parentFragmentManager, BottomSheetUtil.STANDARD_BOTTOM_SHEET_FRAGMENT_TAG)
@@ -3030,15 +2990,6 @@ class ConversationFragment :
       )
     }
 
-    override fun onActivatePaymentsClicked() {
-      startActivity(Intent(requireContext(), PaymentsActivity::class.java))
-    }
-
-    override fun onSendPaymentClicked(recipientId: RecipientId) {
-      val recipient = viewModel.recipientSnapshot ?: return
-      AttachmentManager.selectPayment(this@ConversationFragment, recipient)
-    }
-
     override fun onScheduledIndicatorClicked(view: View, conversationMessage: ConversationMessage) = Unit
 
     override fun onUrlClicked(url: String): Boolean {
@@ -3199,7 +3150,7 @@ class ConversationFragment :
 
                 binding.conversationItemRecycler.suppressLayout(false)
                 if (selectedConversationModel.audioUri != null) {
-                  getVoiceNoteMediaController().resumePlayback(selectedConversationModel.audioUri, messageRecord.getId())
+                  getVoiceNoteMediaController().resumePlayback(selectedConversationModel.audioUri, messageRecord.id)
                 }
 
                 WindowUtil.setLightStatusBarFromTheme(requireActivity())
@@ -3269,12 +3220,12 @@ class ConversationFragment :
     }
 
     private fun MessageRecord.getAudioUriForLongClick(): Uri? {
-      val playbackState = getVoiceNoteMediaController().voiceNotePlaybackState.value
-      if (playbackState == null || !playbackState.isPlaying) {
+      if (!hasAudio()) {
         return null
       }
 
-      if (hasAudio() || !isMms) {
+      val playbackState = getVoiceNoteMediaController().voiceNotePlaybackState.value
+      if (playbackState == null || !playbackState.isPlaying) {
         return null
       }
 
@@ -3592,7 +3543,6 @@ class ConversationFragment :
         ConversationReactionOverlay.Action.DOWNLOAD -> handleSaveAttachment(conversationMessage.messageRecord as MmsMessageRecord)
         ConversationReactionOverlay.Action.COPY -> handleCopyMessage(conversationMessage.multiselectCollection.toSet())
         ConversationReactionOverlay.Action.MULTISELECT -> handleEnterMultiselect(conversationMessage)
-        ConversationReactionOverlay.Action.PAYMENT_DETAILS -> handleViewPaymentDetails(conversationMessage)
         ConversationReactionOverlay.Action.VIEW_INFO -> handleDisplayDetails(conversationMessage)
         ConversationReactionOverlay.Action.DELETE -> handleDeleteMessages(conversationMessage.multiselectCollection.toSet())
       }
@@ -3896,7 +3846,10 @@ class ConversationFragment :
 
   //region Compose + Send Callbacks
 
-  private inner class SendButtonListener : View.OnClickListener, OnEditorActionListener, SendButton.ScheduledSendListener {
+  private inner class SendButtonListener :
+    View.OnClickListener,
+    OnEditorActionListener,
+    SendButton.ScheduledSendListener {
     override fun onClick(v: View) {
       sendMessage()
     }
@@ -3963,7 +3916,6 @@ class ConversationFragment :
     }
 
     override fun afterTextChanged(s: Editable) {
-      calculateCharactersRemaining()
       if (composeText.textTrimmed.isEmpty() || beforeLength == 0) {
         composeText.postDelayed({
           if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
@@ -4205,7 +4157,6 @@ class ConversationFragment :
           AttachmentKeyboardButton.GALLERY -> conversationActivityResultContracts.launchGallery(recipient.id, composeText.textTrimmed, inputPanel.quote.isPresent)
           AttachmentKeyboardButton.CONTACT -> conversationActivityResultContracts.launchSelectContact()
           AttachmentKeyboardButton.LOCATION -> conversationActivityResultContracts.launchSelectLocation(recipient.chatColors)
-          AttachmentKeyboardButton.PAYMENT -> AttachmentManager.selectPayment(this@ConversationFragment, recipient)
           AttachmentKeyboardButton.FILE -> {
             if (!conversationActivityResultContracts.launchSelectFile()) {
               toast(R.string.AttachmentManager_cant_open_media_selection, Toast.LENGTH_LONG)
@@ -4225,7 +4176,10 @@ class ConversationFragment :
     override fun create(): Fragment = KeyboardPagerFragment()
   }
 
-  private inner class KeyboardEvents : OnBackPressedCallback(false), InputAwareConstraintLayout.Listener, InsetAwareConstraintLayout.KeyboardStateListener {
+  private inner class KeyboardEvents :
+    OnBackPressedCallback(false),
+    InputAwareConstraintLayout.Listener,
+    InsetAwareConstraintLayout.KeyboardStateListener {
     override fun handleOnBackPressed() {
       container.hideInput()
     }

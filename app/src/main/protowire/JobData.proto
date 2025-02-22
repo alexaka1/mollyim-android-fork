@@ -137,3 +137,23 @@ message UploadAttachmentToArchiveJobData {
   uint64 attachmentId = 1;
   ResumableUpload uploadSpec = 2;
 }
+
+message BackupMediaSnapshotSyncJobData {
+  uint64 syncTime = 1;
+}
+
+message DeviceNameChangeJobData {
+  uint32 deviceId = 1;
+}
+
+message BackupMessagesJobData {
+  uint64 syncTime = 1;
+  string dataFile = 2;
+  ResumableUpload uploadSpec = 3;
+  string resumableUri = 4;
+}
+
+message NewLinkedDeviceNotificationJobData {
+  uint32 deviceId = 1;
+  uint64 deviceCreatedAt = 2;
+}

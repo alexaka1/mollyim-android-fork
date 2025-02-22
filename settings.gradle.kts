@@ -9,7 +9,13 @@ pluginManagement {
 dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories {
-    google()
+    google {
+      content {
+        includeGroupByRegex("com\\.android(\\..*)?")
+        includeGroupByRegex("com\\.google(\\..*)?")
+        includeGroupByRegex("androidx?(\\..*)?")
+      }
+    }
     mavenCentral()
     mavenLocal {
       content {
@@ -47,13 +53,6 @@ dependencyResolutionManagement {
         includeModule("org.signal", "sqlcipher-android")
       }
     }
-    maven {
-      url = uri("https://dl.cloudsmith.io/qxAgwaeEE1vN8aLU/mobilecoin/mobilecoin/maven/")
-      content {
-        includeModule("com.mobilecoin", "android-bindings")
-        includeModule("com.mobilecoin", "android-sdk")
-      }
-    }
   }
   versionCatalogs {
     // libs.versions.toml is automatically registered.
@@ -67,7 +66,7 @@ dependencyResolutionManagement {
 }
 
 // To build libsignal from source, set the libsignalClientPath property in gradle.properties.
-val libsignalClientPath = if (extra.has("libsignalClientPath")) extra.get("libsignalClientPath") else null;
+val libsignalClientPath = if (extra.has("libsignalClientPath")) extra.get("libsignalClientPath") else null
 if (libsignalClientPath is String) {
   includeBuild(rootDir.resolve(libsignalClientPath + "/java")) {
     name = "libsignal-client"

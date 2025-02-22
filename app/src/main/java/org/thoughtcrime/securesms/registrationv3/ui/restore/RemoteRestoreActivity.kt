@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,10 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -61,9 +56,12 @@ import org.thoughtcrime.securesms.backup.v2.RestoreV2Event
 import org.thoughtcrime.securesms.backup.v2.ui.subscription.MessageBackupsTypeFeature
 import org.thoughtcrime.securesms.backup.v2.ui.subscription.MessageBackupsTypeFeatureRow
 import org.thoughtcrime.securesms.conversation.v2.registerForLifecycle
+import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.profiles.edit.CreateProfileActivity
 import org.thoughtcrime.securesms.registrationv3.ui.shared.RegistrationScreen
 import org.thoughtcrime.securesms.util.DateUtils
+import org.thoughtcrime.securesms.util.PlayStoreUtil
+import org.thoughtcrime.securesms.util.viewModel
 import java.util.Locale
 
 /**
@@ -71,12 +69,19 @@ import java.util.Locale
  */
 class RemoteRestoreActivity : PassphraseRequiredActivity() {
   companion object {
-    fun getIntent(context: Context): Intent {
-      return Intent(context, RemoteRestoreActivity::class.java)
+
+    private const val KEY_ONLY_OPTION = "ONLY_OPTION"
+
+    fun getIntent(context: Context, isOnlyOption: Boolean = false): Intent {
+      return Intent(context, RemoteRestoreActivity::class.java).apply {
+        putExtra(KEY_ONLY_OPTION, isOnlyOption)
+      }
     }
   }
 
-  private val viewModel: RemoteRestoreViewModel by viewModels()
+  private val viewModel: RemoteRestoreViewModel by viewModel {
+    RemoteRestoreViewModel(intent.getBooleanExtra(KEY_ONLY_OPTION, false))
+  }
 
   override fun onCreate(savedInstanceState: Bundle?, ready: Boolean) {
     super.onCreate(savedInstanceState, ready)
@@ -101,8 +106,18 @@ class RemoteRestoreActivity : PassphraseRequiredActivity() {
           RestoreFromBackupContent(
             state = state,
             onRestoreBackupClick = { viewModel.restore() },
-            onCancelClick = { finish() },
-            onErrorDialogDismiss = { viewModel.clearError() }
+            onCancelClick = {
+              if (state.isRemoteRestoreOnlyOption) {
+                viewModel.skipRestore()
+                startActivity(MainActivity.clearTop(this))
+              }
+
+              finish()
+            },
+            onErrorDialogDismiss = { viewModel.clearError() },
+            onUpdateSignal = {
+              PlayStoreUtil.openPlayStoreOrOurApkDownloadPage(this)
+            }
           )
         }
       }
@@ -136,27 +151,62 @@ private fun RestoreFromBackupContent(
   state: RemoteRestoreViewModel.ScreenState,
   onRestoreBackupClick: () -> Unit = {},
   onCancelClick: () -> Unit = {},
-  onErrorDialogDismiss: () -> Unit = {}
+  onErrorDialogDismiss: () -> Unit = {},
+  onUpdateSignal: () -> Unit = {}
 ) {
-  val subtitle = buildAnnotatedString {
-    append(
-      stringResource(
-        id = R.string.RemoteRestoreActivity__backup_created_at,
-        DateUtils.formatDateWithoutDayOfWeek(Locale.getDefault(), state.backupTime),
-        DateUtils.getOnlyTimeString(LocalContext.current, state.backupTime)
+  when (state.loadState) {
+    RemoteRestoreViewModel.ScreenState.LoadState.LOADING -> {
+      Dialogs.IndeterminateProgressDialog(
+        message = stringResource(R.string.RemoteRestoreActivity__fetching_backup_details)
       )
-    )
-    append(" ")
-    if (state.backupTier != MessageBackupTier.PAID) {
-      withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) {
-        append(stringResource(id = R.string.RemoteRestoreActivity__only_media_sent_or_received))
-      }
     }
+
+    RemoteRestoreViewModel.ScreenState.LoadState.LOADED -> {
+      BackupAvailableContent(
+        state = state,
+        onRestoreBackupClick = onRestoreBackupClick,
+        onCancelClick = onCancelClick,
+        onErrorDialogDismiss = onErrorDialogDismiss,
+        onUpdateSignal = onUpdateSignal
+      )
+    }
+
+    RemoteRestoreViewModel.ScreenState.LoadState.NOT_FOUND -> {
+      RestoreFailedDialog(onDismiss = onCancelClick)
+    }
+
+    RemoteRestoreViewModel.ScreenState.LoadState.FAILURE -> {
+      RestoreFailedDialog(onDismiss = onCancelClick)
+    }
+  }
+}
+
+@Composable
+private fun BackupAvailableContent(
+  state: RemoteRestoreViewModel.ScreenState,
+  onRestoreBackupClick: () -> Unit,
+  onCancelClick: () -> Unit,
+  onErrorDialogDismiss: () -> Unit,
+  onUpdateSignal: () -> Unit
+) {
+  val subtitle = if (state.backupSize.bytes > 0) {
+    stringResource(
+      id = R.string.RemoteRestoreActivity__backup_created_at_with_size,
+      DateUtils.formatDateWithoutDayOfWeek(Locale.getDefault(), state.backupTime),
+      DateUtils.getOnlyTimeString(LocalContext.current, state.backupTime),
+      state.backupSize.toUnitString()
+    )
+  } else {
+    stringResource(
+      id = R.string.RemoteRestoreActivity__backup_created_at,
+      DateUtils.formatDateWithoutDayOfWeek(Locale.getDefault(), state.backupTime),
+      DateUtils.getOnlyTimeString(LocalContext.current, state.backupTime)
+    )
   }
 
   RegistrationScreen(
     title = stringResource(id = R.string.RemoteRestoreActivity__restore_from_backup),
-    subtitle = if (state.isLoaded()) subtitle else null,
+    subtitle = subtitle,
     bottomContent = {
       Column {
         if (state.isLoaded()) {
@@ -172,44 +222,30 @@ private fun RestoreFromBackupContent(
           onClick = onCancelClick,
           modifier = Modifier.fillMaxWidth()
         ) {
-          Text(text = stringResource(id = android.R.string.cancel))
+          Text(text = stringResource(id = if (state.isRemoteRestoreOnlyOption) R.string.RemoteRestoreActivity__skip_restore else android.R.string.cancel))
         }
       }
     }
   ) {
-    when (state.loadState) {
-      RemoteRestoreViewModel.ScreenState.LoadState.LOADING -> {
-        Dialogs.IndeterminateProgressDialog(
-          message = stringResource(R.string.RemoteRestoreActivity__fetching_backup_details)
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .background(color = SignalTheme.colors.colorSurface2, shape = RoundedCornerShape(18.dp))
+        .padding(horizontal = 20.dp)
+        .padding(top = 20.dp, bottom = 18.dp)
+    ) {
+      Text(
+        text = stringResource(id = R.string.RemoteRestoreActivity__your_backup_includes),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(bottom = 6.dp)
+      )
+
+      getFeatures(state.backupTier).forEach {
+        MessageBackupsTypeFeatureRow(
+          messageBackupsTypeFeature = it,
+          iconTint = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.padding(start = 16.dp, top = 6.dp)
         )
-      }
-
-      RemoteRestoreViewModel.ScreenState.LoadState.LOADED -> {
-        Column(
-          modifier = Modifier
-            .fillMaxWidth()
-            .background(color = SignalTheme.colors.colorSurface2, shape = RoundedCornerShape(18.dp))
-            .padding(horizontal = 20.dp)
-            .padding(top = 20.dp, bottom = 18.dp)
-        ) {
-          Text(
-            text = stringResource(id = R.string.RemoteRestoreActivity__your_backup_includes),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 6.dp)
-          )
-
-          getFeatures(state.backupTier).forEach {
-            MessageBackupsTypeFeatureRow(
-              messageBackupsTypeFeature = it,
-              iconTint = MaterialTheme.colorScheme.primary,
-              modifier = Modifier.padding(start = 16.dp, top = 6.dp)
-            )
-          }
-        }
-      }
-
-      RemoteRestoreViewModel.ScreenState.LoadState.FAILURE -> {
-        RestoreFailedDialog(onDismiss = onCancelClick)
       }
     }
 
@@ -217,7 +253,13 @@ private fun RestoreFromBackupContent(
       RemoteRestoreViewModel.ImportState.None -> Unit
       RemoteRestoreViewModel.ImportState.InProgress -> RestoreProgressDialog(state.restoreProgress)
       is RemoteRestoreViewModel.ImportState.Restored -> Unit
-      RemoteRestoreViewModel.ImportState.Failed -> RestoreFailedDialog(onDismiss = onErrorDialogDismiss)
+      RemoteRestoreViewModel.ImportState.Failed -> {
+        if (SignalStore.backup.hasInvalidBackupVersion) {
+          InvalidBackupVersionDialog(onUpdateSignal = onUpdateSignal, onDismiss = onErrorDialogDismiss)
+        } else {
+          RestoreFailedDialog(onDismiss = onErrorDialogDismiss)
+        }
+      }
     }
   }
 }
@@ -230,6 +272,7 @@ private fun RestoreFromBackupContentPreview() {
       state = RemoteRestoreViewModel.ScreenState(
         backupTier = MessageBackupTier.PAID,
         backupTime = System.currentTimeMillis(),
+        backupSize = 1234567.bytes,
         importState = RemoteRestoreViewModel.ImportState.None,
         restoreProgress = null
       )
@@ -366,8 +409,8 @@ fun RestoreFailedDialog(
   onDismiss: () -> Unit = {}
 ) {
   Dialogs.SimpleAlertDialog(
-    title = "Restore Failed", // TODO [backups] Remote restore error placeholder copy
-    body = "Unable to restore from backup. Please try again.", // TODO [backups] Placeholder copy
+    title = stringResource(R.string.RemoteRestoreActivity__couldnt_transfer),
+    body = stringResource(R.string.RemoteRestoreActivity__error_occurred),
     confirm = stringResource(android.R.string.ok),
     onConfirm = onDismiss,
     onDismiss = onDismiss
@@ -379,5 +422,28 @@ fun RestoreFailedDialog(
 private fun RestoreFailedDialogPreview() {
   Previews.Preview {
     RestoreFailedDialog()
+  }
+}
+
+@Composable
+fun InvalidBackupVersionDialog(
+  onUpdateSignal: () -> Unit = {},
+  onDismiss: () -> Unit = {}
+) {
+  Dialogs.SimpleAlertDialog(
+    title = stringResource(R.string.RemoteRestoreActivity__couldnt_restore),
+    body = stringResource(R.string.RemoteRestoreActivity__update_latest),
+    confirm = stringResource(R.string.RemoteRestoreActivity__update_signal),
+    onConfirm = onUpdateSignal,
+    dismiss = stringResource(R.string.RemoteRestoreActivity__not_now),
+    onDismiss = onDismiss
+  )
+}
+
+@SignalPreview
+@Composable
+private fun InvalidBackupVersionDialogPreview() {
+  Previews.Preview {
+    InvalidBackupVersionDialog()
   }
 }

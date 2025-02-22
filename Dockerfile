@@ -1,11 +1,11 @@
-FROM docker.io/eclipse-temurin:17.0.12_7-jdk-jammy@sha256:d41eff8f20494968aaa1f5bbea4547303076b915d38f7d642441bd16538b45e3 AS builder
+FROM docker.io/eclipse-temurin:17.0.14_7-jdk-alpine-3.21@sha256:b16e661d76d3af0d226d0585063dbcafe7fb8a4ef31cfcaaec71d39c41269420 AS builder
 
 ARG ANDROID_SDK_DIST=commandlinetools-linux-11076708_latest.zip
 ARG ANDROID_SDK_SHA256=2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258
 
 ENV ANDROID_HOME=/opt/android-sdk-linux
 
-RUN apt-get update && apt-get install -y unzip git
+RUN apk add --no-cache curl git gcompat
 
 RUN mkdir -p "${ANDROID_HOME}"
 
@@ -23,11 +23,11 @@ RUN yes | sdkmanager --licenses
 RUN sdkmanager "platform-tools"
 
 ARG NDK_VERSION=27.0.12077973
-ARG COMPILE_SDK_VERSION=34
 ARG BUILD_TOOLS_VERSION=34.0.0
+ARG COMPILE_SDK_VERSION=android-35
 
 RUN sdkmanager "ndk;${NDK_VERSION}"
-RUN sdkmanager "platforms;android-${COMPILE_SDK_VERSION}"
+RUN sdkmanager "platforms;${COMPILE_SDK_VERSION}"
 RUN sdkmanager "build-tools;${BUILD_TOOLS_VERSION}"
 
 COPY gradlew /molly/
