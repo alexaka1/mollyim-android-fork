@@ -58,13 +58,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import org.signal.core.ui.Buttons
-import org.signal.core.ui.Dialogs
-import org.signal.core.ui.Dividers
-import org.signal.core.ui.DropdownMenus
-import org.signal.core.ui.Previews
-import org.signal.core.ui.Scaffolds
-import org.signal.core.ui.SignalPreview
+import org.signal.core.ui.compose.Buttons
+import org.signal.core.ui.compose.Dialogs
+import org.signal.core.ui.compose.Dividers
+import org.signal.core.ui.compose.DropdownMenus
+import org.signal.core.ui.compose.Previews
+import org.signal.core.ui.compose.Scaffolds
+import org.signal.core.ui.compose.SignalPreview
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.BiometricDeviceAuthentication
 import org.thoughtcrime.securesms.BiometricDeviceLockContract
@@ -212,10 +212,7 @@ class LinkDeviceFragment : ComposeFragment() {
         onDeviceRemovalConfirmed = { device -> viewModel.removeDevice(device) },
         onSyncFailureRetryRequested = { viewModel.onSyncErrorRetryRequested() },
         onSyncFailureIgnored = { viewModel.onSyncErrorIgnored() },
-        onSyncFailureLearnMore = {
-          viewModel.onSyncErrorIgnored()
-          CommunicationActions.openBrowserLink(requireContext(), requireContext().getString(R.string.LinkDeviceFragment__learn_more_url))
-        },
+        onSyncFailureLearnMore = { CommunicationActions.openBrowserLink(requireContext(), requireContext().getString(R.string.LinkDeviceFragment__learn_more_url)) },
         onSyncFailureContactSupport = { viewModel.onSyncErrorContactSupport() },
         onSyncCancelled = { viewModel.onSyncCancelled() },
         onEditDevice = { device ->
@@ -260,7 +257,11 @@ class LinkDeviceFragment : ComposeFragment() {
   private inner class BiometricAuthenticationListener : BiometricPrompt.AuthenticationCallback() {
     override fun onAuthenticationError(errorCode: Int, errorString: CharSequence) {
       Log.w(TAG, "Authentication error: $errorCode")
-      onAuthenticationFailed()
+      if (errorCode == BiometricPrompt.ERROR_CANCELED) {
+        biometricDeviceLockLauncher.launch(getString(R.string.LinkDeviceFragment__unlock_to_link))
+      } else {
+        onAuthenticationFailed()
+      }
     }
 
     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
@@ -577,6 +578,7 @@ fun DeviceRow(device: Device, setDeviceToRemove: (Device) -> Unit, onEditDevice:
               )
             }
           },
+          enabled = device.canRename,
           onClick = {
             onEditDevice(device)
             controller.hide()

@@ -9,7 +9,6 @@ import android.view.View;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
@@ -21,6 +20,7 @@ import org.thoughtcrime.securesms.components.emoji.EmojiPageViewGridAdapter.Emoj
 import org.thoughtcrime.securesms.components.emoji.EmojiPageViewGridAdapter.VariationSelectorListener;
 import org.thoughtcrime.securesms.util.ContextUtil;
 import org.thoughtcrime.securesms.util.DrawableUtil;
+import org.thoughtcrime.securesms.util.ThemeUtil;
 import org.thoughtcrime.securesms.util.ViewUtil;
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingModel;
 
@@ -108,8 +108,14 @@ public class EmojiPageView extends RecyclerView implements VariationSelectorList
 
     setLayoutManager(layoutManager);
 
-    Drawable drawable = DrawableUtil.tint(ContextUtil.requireDrawable(getContext(), R.drawable.triangle_bottom_right_corner), ContextCompat.getColor(getContext(), R.color.signal_button_secondary_text_disabled));
+    Drawable drawable = DrawableUtil.tint(ContextUtil.requireDrawable(getContext(), R.drawable.triangle_bottom_right_corner), ThemeUtil.getThemedColor(getContext(), R.attr.signal_button_secondary_text_disabled));
     addItemDecoration(new EmojiItemDecoration(allowVariations, drawable));
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    getParent().requestDisallowInterceptTouchEvent(true);
+    return super.dispatchTouchEvent(ev);
   }
 
   public void presentForEmojiKeyboard() {

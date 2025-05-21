@@ -177,7 +177,7 @@ class LinkDeviceViewModel : ViewModel() {
     if (LinkDeviceRepository.isValidQr(uri)) {
       _state.update {
         it.copy(
-          qrCodeState = if (uri.supportsLinkAndSync() && RemoteConfig.linkAndSync) QrCodeState.VALID_WITH_SYNC else QrCodeState.VALID_WITHOUT_SYNC,
+          qrCodeState = if (uri.supportsLinkAndSync()) QrCodeState.VALID_WITH_SYNC else QrCodeState.VALID_WITHOUT_SYNC,
           linkUri = uri,
           showFrontCamera = null
         )
@@ -221,7 +221,7 @@ class LinkDeviceViewModel : ViewModel() {
       Log.i(TAG, "Adding device with sync.")
       addDeviceWithSync(linkUri)
     } else {
-      Log.i(TAG, "Adding device without sync. (uri: ${linkUri.supportsLinkAndSync()}, remoteConfig: ${RemoteConfig.linkAndSync})")
+      Log.i(TAG, "Adding device without sync. (uri: ${linkUri.supportsLinkAndSync()})")
       addDeviceWithoutSync(linkUri)
     }
   }
@@ -284,7 +284,7 @@ class LinkDeviceViewModel : ViewModel() {
     Log.d(TAG, "[addDeviceWithSync] Got result: $result")
 
     if (result !is LinkDeviceResult.Success) {
-      Log.w(TAG, "[addDeviceWithSync] Unable to link device $result")
+      Log.w(TAG, "[addDeviceWithSync] Unable to link device $result", if (result is LinkDeviceResult.NetworkError) result.error else null)
       _state.update {
         it.copy(
           dialogState = DialogState.None
@@ -373,7 +373,7 @@ class LinkDeviceViewModel : ViewModel() {
     }
 
     if (result !is LinkDeviceResult.Success) {
-      Log.w(TAG, "Unable to link device $result")
+      Log.w(TAG, "Unable to link device $result", if (result is LinkDeviceResult.NetworkError) result.error else null)
       _state.update {
         it.copy(
           dialogState = DialogState.None

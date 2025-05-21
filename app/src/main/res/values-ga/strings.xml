@@ -148,6 +148,7 @@
     <!-- BlockedUsersActivity -->
     <string name="BlockedUsersActivity__blocked_users">Úsáideoirí bactha</string>
     <string name="BlockedUsersActivity__add_blocked_user">Cuir úsáideoir bactha leis</string>
+    <string name="BlockedUsersActivity__cannot_block_yourself">Ní féidir leat bac a chur ort féin</string>
     <string name="BlockedUsersActivity__blocked_users_will">Ní bheidh úsáideoirí bactha in ann glaonna a chur ort ná teachtaireachtaí a sheoladh chugat.</string>
     <string name="BlockedUsersActivity__no_blocked_users">Níl aon úsáideoirí bactha ann</string>
     <string name="BlockedUsersActivity__block_user">Cuir bac ar an úsáideoir?</string>
@@ -556,6 +557,8 @@
     <string name="ConversationActivity__invite_to_signal">Tabhair cuireadh chuig Molly</string>
     <!-- Snackbar message shown after dismissing the full screen sms export megaphone indicating we\'ll do it again soon -->
     <string name="ConversationActivity__you_will_be_reminded_again_soon">Cuirfear i gcuimhne duit arís go luath.</string>
+    <!-- Toast message shown when trying to record a voice message during an ongoing call -->
+    <string name="ConversationFragment_cannot_record_voice_message_during_call">Cannot record voice message during call.</string>
 
     <!-- Title for dialog shown when first sending formatted text -->
     <string name="SendingFormattingTextDialog_title">Téacs formáidithe á sheoladh</string>
@@ -593,14 +596,6 @@
         <item quantity="many">Má shábháiltear %1$d mír de na meáin sa stóras, beidh aipeanna eile ar do ghléas in ann iad a rochtain.\n\nLean ar aghaidh?</item>
         <item quantity="other">Má shábháiltear %1$d mír de na meáin sa stóras, beidh aipeanna eile ar do ghléas in ann iad a rochtain.\n\nLean ar aghaidh?</item>
     </plurals>
-    <plurals name="ConversationFragment_error_while_saving_attachments_to_sd_card">
-        <item quantity="one">Tharla earráid agus an ceangaltán á shábháil sa stóras!</item>
-        <item quantity="two">Tharla earráid agus na ceangaltáin á sábháil sa stóras!</item>
-        <item quantity="few">Tharla earráid agus na ceangaltáin á sábháil sa stóras!</item>
-        <item quantity="many">Tharla earráid agus na ceangaltáin á sábháil sa stóras!</item>
-        <item quantity="other">Tharla earráid agus na ceangaltáin á sábháil sa stóras!</item>
-    </plurals>
-    <string name="ConversationFragment_unable_to_write_to_sd_card_exclamation">Ní féidir scríobh chun stóras.</string>
     <plurals name="ConversationFragment_saving_n_attachments">
         <item quantity="one">Ceangaltán á shábháil</item>
         <item quantity="two">%1$d cheangaltán á sábháil</item>
@@ -614,16 +609,6 @@
         <item quantity="few">%1$d cheangaltán á sábháil sa stóras…</item>
         <item quantity="many">%1$d gceangaltán á sábháil sa stóras…</item>
         <item quantity="other">%1$d ceangaltán á sábháil sa stóras…</item>
-    </plurals>
-    <!-- Dialog title asking to save media to your phone\'s storage -->
-    <string name="ConversationFragment__save_to_phone">Sábháil chuig an nguthán?</string>
-    <!-- Dialog message explaining that media will be saved to your phone and can potentially be accessed by other phones. -->
-    <plurals name="ConversationFragment__this_media_will_be_saved">
-        <item quantity="one">Sábhálfar an meán seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann é a rochtain ag brath ar cheadanna do ghutháin.</item>
-        <item quantity="two">Sábhálfar na meáin seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann iad a rochtain ag brath ar cheadanna do ghutháin.</item>
-        <item quantity="few">Sábhálfar na meáin seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann iad a rochtain ag brath ar cheadanna do ghutháin.</item>
-        <item quantity="many">Sábhálfar na meáin seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann iad a rochtain ag brath ar cheadanna do ghutháin.</item>
-        <item quantity="other">Sábhálfar na meáin seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann iad a rochtain ag brath ar cheadanna do ghutháin.</item>
     </plurals>
     <!-- Checkbox shown in dialog to not show the dialog again in future cases -->
     <string name="ConversationFragment_dont_show_again">Ná taispeáin an dialóg arís</string>
@@ -702,6 +687,18 @@
     <string name="ConversationFragment_reported_as_spam_and_blocked">Tuairiscithe mar thurscar agus bac curtha air nó uirthi</string>
     <!-- Dialog message shown after accepting a message request and tapping on options from the conversation event -->
     <string name="ConversationFragment_you_accepted_a_message_request_from_s">Ghlac tú le hiarratas teachtaireachta ó %1$s. Más botún a bhí ann, is féidir leat gníomh a roghnú thíos.</string>
+    <!-- Text shown in conversation header when in a message request state and to carefully review the user -->
+    <string name="ConversationFragment_review_carefully">Déan athbhreithniú go cúramach</string>
+    <!-- Text shown in conversation header when in a message request state that profile names are not verified. Placeholder will be \'Profile names\' -->
+    <string name="ConversationFragment_profile_names_not_verified">Níl %1$s fíoraithe</string>
+    <!-- Text shown in conversation header when in a message request state that group names are not verified. Placeholder will be \'Group names\' -->
+    <string name="ConversationFragment_group_names_not_verified">Níl %1$s fíoraithe</string>
+    <!-- Placeholder text shown in conversation header that when clicked will open a dialog about profile names -->
+    <string name="ConversationFragment_profile_names">ainmneacha próifíle</string>
+    <!-- Placeholder text shown in conversation header that when clicked will open a dialog about group names -->
+    <string name="ConversationFragment_group_names">ainmneacha grúpa</string>
+    <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
+    <string name="ConversationFragment_photo_failed">Theip ar íoslódáil an ghrianghraif. Triail arís.</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Leideanna Sábháilteachta</string>
@@ -713,6 +710,10 @@
     <string name="SafetyTips_previous_tip">Leid roimhe seo</string>
     <!-- Button text to move to the next tip -->
     <string name="SafetyTips_next_tip">An chéad leid eile</string>
+    <!-- Title of tip 0 -->
+    <string name="SafetyTips_tip0_title">Ainmneacha bréige agus cuntais bhréige</string>
+    <!-- Message of tip 0 -->
+    <string name="SafetyTips_tip0_message">Ní iarrfaidh Molly do chód clárúcháin ná UAP ort choíche. Bí ar d\'fhaichill ar iarratais a dhéanann daoine eile a phearsanú. Roghnaíonn sealbhóir an chuntais ainm na próifíle agus níl an t-ainm fíoraithe.</string>
     <!-- Title of tip 1 -->
     <string name="SafetyTips_tip1_title">Camscéimeanna criptea-airgeadra nó airgid</string>
     <!-- Message of tip 1 -->
@@ -729,6 +730,21 @@
     <string name="SafetyTips_tip4_title">Gnólachtaí agus institiúidí bréagacha</string>
     <!-- Message of tip 4 -->
     <string name="SafetyTips_tip4_message">Bí san airdeall ar ghnólachtaí nó ar ghníomhaireachtaí rialtais a dhéanann teagmháil leat. Is féidir turscar a bheith i dteachtaireachtaí a bhaineann le gníomhaireachtaí cánach, teachtairí agus eile.</string>
+
+    <!-- Bottom sheet text explaining that profile names are chosen by the account holder. Placeholder will be \'Profile names\' -->
+    <string name="ProfileNameBottomSheet__profile_names_on_signal">Roghnaíonn sealbhóir an chuntais %1$s ar Signal.</string>
+    <!-- Bottom sheet text explaining that profile names are not verified. -->
+    <string name="ProfileNameBottomSheet__profile_names_arent_verified">Níl ainmneacha próifíle fíoraithe</string>
+    <!-- Bottom sheet text explaining that accounts can impersonate other people and to be cautious -->
+    <string name="ProfileNameBottomSheet__be_cautious_of_accounts">Bí ar d\'fhaichill ar chuntais a dhéanann daoine eile a phearsanú</string>
+    <!-- Bottom sheet text explaining that personal information should not be shared with strangers -->
+    <string name="ProfileNameBottomSheet__dont_share_personal">Ná comhroinn faisnéis phearsanta le daoine nach bhfuil aithne agat orthu</string>
+    <!-- Bottom sheet text explaining that group names are chosen by the group members. Placeholder will be \'Group names\' -->
+    <string name="ProfileNameBottomSheet__group_names_on_signal">Roghnaíonn baill den ghrúpa %1$s.</string>
+    <!-- Bottom sheet text explaining that groups can impersonate organizations and to be cautious -->
+    <string name="ProfileNameBottomSheet__be_cautious_of_groups">Bí ar d\'fhaichill ar ghrúpaí a dhéanann eagraíochtaí agus gnóthais a phearsanú</string>
+    <!-- Bottom sheet text explaining that profile names of group members are not verified -->
+    <string name="ProfileNameBottomSheet__profile_names_in_groups">Níl ainmneacha próifíle ag baill i ngrúpaí fíoraithe</string>
 
     <!-- Label for a button displayed in conversation list to clear the chat filter -->
     <string name="ConversationListFragment__clear_filter">Glan an scagaire</string>
@@ -819,8 +835,14 @@
     <string name="AddToFolderBottomSheet_choose_a_folder">Roghnaigh fillteán</string>
     <!-- Toast shown when a chat has been added to a folder, where %s is the name of the folder -->
     <string name="AddToFolderBottomSheet_added_to_s">Curtha le \"%1$s\"</string>
-    <!-- Toast shown when a user tries to add a chat to a folder, but the folder already has that chat. %s is the name of the folder -->
-    <string name="AddToFolderBottomSheet_this_chat_is_already">Tá an comhrá seo san fhillteán \"%1$s\" cheana</string>
+    <!-- Toast shown when a user tries to add chats to a folder, but the folder already has those chats. %s is the name of the folder -->
+    <plurals name="AddToFolderBottomSheet_these_chat_are_already_in_s">
+        <item quantity="one">Tá an comhrá sin in \"%1$s\" cheana</item>
+        <item quantity="two">Tá na comhráite sin in \"%1$s\" cheana</item>
+        <item quantity="few">Tá na comhráite sin in \"%1$s\" cheana</item>
+        <item quantity="many">Tá na comhráite sin in \"%1$s\" cheana</item>
+        <item quantity="other">Tá na comhráite sin in \"%1$s\" cheana</item>
+    </plurals>
 
     <!-- Show in conversation list overflow menu to open selection bottom sheet -->
     <string name="ConversationListFragment__notification_profile">Próifíl fógraí</string>
@@ -1051,7 +1073,7 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Use this Signal account on desktop or iPad.</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Úsáid an cuntas Signal seo ar dheasc nó iPad.</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">Nasc gléas nua</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
@@ -1092,19 +1114,19 @@
     <!-- Button that dismisses the bottom sheet -->
     <string name="LinkDeviceFragment__continue">Ar aghaidh</string>
     <!-- Option on button to contact support -->
-    <string name="LinkDeviceFragment__contact_support">Contact support</string>
+    <string name="LinkDeviceFragment__contact_support">Déan teagmháil leis an bhfoireann tacaíochta</string>
     <!-- Title of dialog asking users if they want to submit debug logs when contacting support -->
-    <string name="LinkDeviceFragment__submit_debug_log">Submit debug log?</string>
+    <string name="LinkDeviceFragment__submit_debug_log">Cuir isteach loga dífhabhtaithe?</string>
     <!-- Body of dialog explaining what debug logs are and that they are optional to submit -->
-    <string name="LinkDeviceFragment__your_debug_logs">Your debug logs will help us troubleshoot your issue faster. Submitting your logs is optional.</string>
+    <string name="LinkDeviceFragment__your_debug_logs">Cabhróidh na logaí dífhabhtaithe linn d\'fhadhb a réiteach níos sciobtha. É sin ráite, níl siad riachtanach.</string>
     <!-- Button option to submit debug log when contacting support -->
-    <string name="LinkDeviceFragment__submit_with_debug">Submit with debug log</string>
+    <string name="LinkDeviceFragment__submit_with_debug">Seol loga dífhabhtaithe isteach freisin</string>
     <!-- Button option to not submit debug log when contacting support -->
-    <string name="LinkDeviceFragment__submit_without_debug">Submit without debug log</string>
+    <string name="LinkDeviceFragment__submit_without_debug">Ná seol loga dífhabhtaithe isteach freisin</string>
     <!-- Button option to dismiss dialog -->
-    <string name="LinkDeviceFragment__cancel">Cancel</string>
+    <string name="LinkDeviceFragment__cancel">Cuir ar ceal</string>
     <!-- Email subject when contacting support on a linked device syncing issue -->
-    <string name="LinkDeviceFragment__link_sync_failure_support_email">Android Link&amp;Sync Export Failed</string>
+    <string name="LinkDeviceFragment__link_sync_failure_support_email">Theip ar Easpórtáil Android Link&amp;Sync</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__link_sync_failure_support_email_filter" translatable="false">Android Link&amp;Sync Export Failed</string> -->
     <!-- Title of a dialog letting the user know that syncing messages to their linked device failed -->
     <string name="LinkDeviceFragment__sync_failure_title">Theip ar shioncronú na dteachtaireachtaí</string>
@@ -1199,6 +1221,7 @@
 
     <!-- DocumentView -->
     <string name="DocumentView_unnamed_file">Comhad gan ainm</string>
+    <string name="DocumentView_document_file">Comhad doiciméid</string>
 
     <!-- DozeReminder -->
     <string name="DozeReminder_optimize_for_missing_play_services">Optamaigh le haghaidh Play Services atá ar iarraidh</string>
@@ -1801,7 +1824,6 @@
     </plurals>
     <string name="MediaOverviewActivity_Media_delete_progress_title">Ag scriosadh</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Ag scriosadh teachtaireachtaí…</string>
-    <string name="MediaOverviewActivity_collecting_attachments">Ag bailiú ceangaltáin…</string>
     <string name="MediaOverviewActivity_Sort_by">Sórtáil de réir</string>
     <string name="MediaOverviewActivity_Newest">Is nuaí</string>
     <string name="MediaOverviewActivity_Oldest">Is sine</string>
@@ -1845,6 +1867,8 @@
     <string name="MediaOverviewActivity_sent_by_you">Seolta agatsa</string>
     <string name="MediaOverviewActivity_sent_by_s_to_s">Seolta ag %1$s go %2$s</string>
     <string name="MediaOverviewActivity_sent_by_you_to_s">Seolta agat chuig %1$s</string>
+    <!-- Error message shown when the user is trying to open a media that is not sent yet. -->
+    <string name="MediaOverviewActivity_this_media_is_not_sent_yet">Níor seoladh an meán seo fós.</string>
 
     <!-- Megaphones -->
     <string name="Megaphones_remind_me_later">Meabhraigh Dom Níos Déanaí</string>
@@ -1914,6 +1938,10 @@
     <string name="MessageRecord_missed_voice_call">Guthghlao caillte</string>
     <!-- Update message shown when receiving an incoming 1:1 video call and not answered -->
     <string name="MessageRecord_missed_video_call">Físghlao caillte</string>
+    <!-- Update message shown when receiving an incoming 1:1 voice/audio call and not answered -->
+    <string name="MessageRecord_declined_voice_call">Diúltaíodh do ghuthghlao</string>
+    <!-- Update message shown when receiving an incoming 1:1 video call and not answered -->
+    <string name="MessageRecord_declined_video_call">Diúltaíodh d\'fhísghlao</string>
     <!-- Update message shown when receiving an incoming voice call and declined due to notification profile -->
     <string name="MessageRecord_missed_voice_call_notification_profile">Guthghlao caillte agus an phróifíl fógraí casta uirthi</string>
     <!-- Update message shown when receiving an incoming video call and declined due to notification profile -->
@@ -2118,7 +2146,7 @@
 
     <!-- GV2 group link deny -->
     <string name="MessageRecord_your_request_to_join_the_group_has_been_denied_by_an_admin">Dhiúltaigh riarthóir do d\'iarratas ar dhul isteach sa ghrúpa.</string>
-    <string name="MessageRecord_you_denied_a_request_to_join_the_group_from_s">You denied a request to join the group from %1$s.</string>
+    <string name="MessageRecord_you_denied_a_request_to_join_the_group_from_s">Dhiúltaigh tú iarratas ó %1$s ar dhul isteach sa ghrúpa.</string>
     <string name="MessageRecord_s_denied_a_request_to_join_the_group_from_s">%1$s denied a request to join the group from %2$s.</string>
     <string name="MessageRecord_a_request_to_join_the_group_from_s_has_been_denied">Diúltaíodh d\'iarratas ó %1$s ar dhul isteach sa ghrúpa.</string>
     <string name="MessageRecord_you_canceled_your_request_to_join_the_group">You canceled your request to join the group.</string>
@@ -2232,6 +2260,14 @@
     <string name="MessageRecord_reported_as_spam">Tuairiscithe mar thurscar</string>
     <!-- Update message shown in chat after accept a message request -->
     <string name="MessageRecord_you_accepted_the_message_request">Ghlac tú leis an iarratas teachtaireachta</string>
+    <!-- Update message shown in chat after you block a person -->
+    <string name="MessageRecord_you_blocked_this_person">Chuir tú bac ar an duine seo</string>
+    <!-- Update message shown in chat after you unblock a person -->
+    <string name="MessageRecord_you_unblocked_this_person">Bhain tú an bac den duine seo</string>
+    <!-- Update message shown in chat after you block a group -->
+    <string name="MessageRecord_you_blocked_this_group">Chuir tú bac ar an ngrúpa seo</string>
+    <!-- Update message shown in chat after you unblock a group -->
+    <string name="MessageRecord_you_unblocked_this_group">Bhain tú an bac den ghrúpa seo</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Glac leis</string>
@@ -2293,8 +2329,42 @@
         <item quantity="many">%1$d ngrúpa sa bhreis</item>
         <item quantity="other">%1$d grúpa sa bhreis</item>
     </plurals>
+    <!-- Describes the names of members in a group. MessageRequestProfileView_group_members_* is nested in the first parentheses. MessageRequestProfileView_invited is nested in the second -->
+    <string name="MessageRequestProfileView_member_names_and_invited">%1$s (%2$s)</string>
+    <!-- Text for an empty group or when you are the only member -->
+    <string name="MessageRequestProfileView_group_members_zero">Níl aon bhall eile sa ghrúpa fós</string>
+    <!-- Text for a group with one member (not you). %1$s is their name -->
+    <string name="MessageRequestProfileView_group_members_one">%1$s</string>
+    <!-- Text for a 2 member group you are in. %1$s is the name of the other member -->
+    <string name="MessageRequestProfileView_group_members_one_and_you">%1$s agus tusa</string>
+    <!-- Text for a 2 member group you are not in. %1$s and %2$s are the members\' names -->
+    <string name="MessageRequestProfileView_group_members_two">%1$s agus %2$s</string>
+    <!-- Text for a 3 member group you are in. %1$s and %2$s are the members\' names -->
+    <string name="MessageRequestProfileView_group_members_two_and_you">%1$s, %2$s agus tusa</string>
+    <!-- Text for a 3 member group you are not in. %1$s, %2$s, %3$s are the names of the other members. -->
+    <string name="MessageRequestProfileView_group_members_three">%1$s, %2$s agus %3$s</string>
+    <!-- Text for a 3+ member group. %1$s, %2$s, %3$s are member names. %4$s is the string key MessageRequestProfileView_other_members-->
+    <string name="MessageRequestProfileView_group_members_other">%1$s, %2$s, %3$s agus %4$s</string>
+    <!-- Nested in MessageRequestProfileView_group_members_other that shows how many members (besides three) are in the group -->
+    <plurals name="MessageRequestProfileView_other_members">
+        <item quantity="one">%1$d eile</item>
+        <item quantity="two">%1$d eile</item>
+        <item quantity="few">%1$d eile</item>
+        <item quantity="many">%1$d eile</item>
+        <item quantity="other">%1$d eile</item>
+    </plurals>
     <!-- Button label to report spam for a conversation when in a message request state -->
     <string name="MessageRequestBottomView_report">Tuairiscigh…</string>
+    <!-- Alert dialog title to accept a message request -->
+    <string name="MessageRequestBottomView_accept_request">Glac leis an iarratas?</string>
+    <!-- Alert dialog body to review the message request carefully -->
+    <string name="MessageRequestBottomView_review_requests_carefully">Déan athbhreithniú ar iarratais go cúramach. Roghnaíonn sealbhóir an chuntais ainm na próifíle agus níl an t-ainm fíoraithe.</string>
+    <!-- Alert dialog title to accept a message request to join a group -->
+    <string name="MessageRequestBottomView_join_group">Téigh isteach sa ghrúpa?</string>
+    <!-- Alert dialog body to review the message request for a group carefully -->
+    <string name="MessageRequestBottomView_review_requests_carefully_groups">Déan athbhreithniú ar iarratais go cúramach. Roghnaíonn baill den ghrúpa ainm an ghrúpa agus níl an t-ainm fíoraithe.</string>
+    <!-- Button text to join a group -->
+    <string name="MessageRequestBottomView_join">Téigh isteach ann</string>
 
     <!-- PassphraseChangeActivity -->
     <string name="PassphraseChangeActivity_passphrases_dont_match_exclamation">Ní hionann na nathanna faire!</string>
@@ -2319,7 +2389,7 @@
     <string name="DeviceProvisioningActivity_sorry_you_have_too_many_devices_linked_already">Faraor, tá a thuilleadh gléasanna nascaithe, cuir de le cúpla cinn.</string>
     <string name="DeviceActivity_sorry_this_is_not_a_valid_device_link_qr_code">Faraor, ní QR code nacs gléis bailí é seo.</string>
     <string name="DeviceProvisioningActivity_link_a_signal_device">Nasc gléas Signal?</string>
-    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">To link a desktop or iPad to this Signal account, go to Linked Devices and tap \"Link a New Device\"and scan the QR code again. Make sure you only scan QR codes that come directly from Signal.</string>
+    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">Le deasc nó iPad a nascadh leis an gcuntas Signal seo, téigh chuig Gléasanna Nasctha, tapáil \"Nasc Gléas Nua\" agus scan an cód QR athuair. Cinntigh nach scanfaidh tú ach cóid QR a thagann díreach ó Signal.</string>
 
     <string name="DeviceActivity_signal_needs_the_camera_permission_in_order_to_scan_a_qr_code">Tá gá ag Molly cead cheamara chun QR code a scanadh, ach ní ceadaítear é go deo. Lean ar aghaidh, le do thoil, go socruithe aipe, roghnaigh \"Ceadanna\", agus cumasaigh \"Ceamara\".</string>
     <string name="DeviceActivity_unable_to_scan_a_qr_code_without_the_camera_permission">Ní féidir QR code a scanadh gan cead Cheamara.</string>
@@ -2404,6 +2474,7 @@
 
     <!-- ReactionsBottomSheetDialogFragment -->
     <string name="ReactionsBottomSheetDialogFragment_all">Uile · %1$d</string>
+    <string name="ReactionsBottomSheetDialogFragment_tap_to_remove">Tapáil le baint</string>
 
     <!-- ReactionsConversationView -->
     <string name="ReactionsConversationView_plus">+%1$d</string>
@@ -2642,6 +2713,15 @@
     <!-- Content description for toggling group ring state -->
     <string name="WebRtcCallView__toggle_group_ringing">Scoránaigh fógraí grúpghlaonna</string>
 
+    <!-- Alert message indicating that the local user was remotely muted by some other user. Placeholder is the muters display name. -->
+    <string name="WebRtcCallView__s_remotely_muted_you">%1$s muted you.</string>
+    <!-- Alert message indicating that the local user remotely muted another user. Placeholder is the name of the person muted. -->
+    <string name="WebRtcCallView__you_remotely_muted_s">You muted %1$s.</string>
+    <!-- Alert message indicating that a remote user remotely muted another remote user. First placeholder is the muters display name, second is the display name of the person muted. -->
+    <string name="WebRtcCallView__s_remotely_muted_s">%1$s muted %2$s.</string>
+    <!-- Alert message indicating that the local user joined a call on a second device and muted this one from the other one. -->
+    <string name="WebRtcCallView__you_muted_yourself">You muted yourself from another device.</string>
+
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">Tharla earráid UI. Tuairiscigh an earráid seo do na forbróirí.</string>
     <!-- Error message when the user is trying to change audio outputs but none are present. -->
@@ -2669,6 +2749,8 @@
     <string name="CallOverflowPopupWindow__view">AMHARC</string>
 
 
+    <!-- A notification to the user that their hand is raised but they are currently speaking -->
+    <string name="CallRaiseHandSnackbar__lower_your_hand">Ísligh do lámh?</string>
     <!-- A notification to the user that they successfully raised their hand. The placeholder string is CallParticipant__you, or CallParticipant__you_on_another_device -->
     <string name="CallRaiseHandSnackbar__expanded_second_person_raised_a_hand_single">D\'ardaigh %1$s lámh</string>
     <!-- A notification to the user that they and at least one more participants in the call successfully raised their hand. The placeholder is a number quantifying how many other hands are also raised, besides the user. -->
@@ -2717,23 +2799,27 @@
     <string name="CallOverflowPopupWindow__expand_snackbar_accessibility_label">Fairsingigh amharc ar lámha ardaithe</string>
 
     <!-- Toolbar title of country picker selection page -->
-    <string name="CountryCodeFragment__your_country">Your country</string>
+    <string name="CountryCodeFragment__your_country">Do thír</string>
     <!-- Hint text in search bar to either enter in a country name or number -->
-    <string name="CountryCodeFragment__search_by">Cuardaigh de réir ainm nó uimhir</string>
+    <string name="CountryCodeFragment__search_by">Cuardaigh de réir ainm nó uimhreach</string>
     <!-- Text shown when displaying a list of countries that indicates an unknown country    -->
-    <string name="CountryCodeFragment__unknown_country">Tír Anaithnid</string>
+    <string name="CountryCodeFragment__unknown_country">Tír anaithnid</string>
 
     <!-- AboutSheet -->
     <!-- Displayed in a sheet row and allows user to open signal connection explanation on tap -->
     <string name="AboutSheet__signal_connection">Nasc Signal</string>
     <!-- Displayed in a sheet row describing that the user has marked this contact as \'verified\' from within the app -->
     <string name="AboutSheet__verified">Deimhnithe</string>
+    <!-- Displayed in a sheet row that tells users that profile names are not verified -->
+    <string name="AboutSheet__profile_names_are_not_verified">Níl ainmneacha próifíle fíoraithe</string>
+    <!-- Displayed in a sheet row describing that the user is in a message request state with the person -->
+    <string name="AboutSheet__pending_message_request">Iarratas ar theachtaireacht ar feitheamh</string>
     <!-- Displayed in bottom sheet describing that the user has no direct messages with this person. The placeholder is a person\'s name. -->
     <string name="AboutSheet__no_direct_message">Teachtaireacht dhíreach ar bith le %1$s</string>
     <!-- Explains that the given user (placeholder is short name) is in the users system contact -->
     <string name="AboutSheet__s_is_in_your_system_contacts">Tá %1$s i dteagmhálaithe do ghutháin</string>
     <!-- Notice in a row when user has no groups in common -->
-    <string name="AboutSheet__you_have_no_groups_in_common">Níl aon ghrúpaí i bpáirt agat</string>
+    <string name="AboutSheet__you_have_no_groups_in_common">Grúpa ar bith i bpáirt</string>
     <!-- Notice when a user is not a connection to review requests carefully -->
     <string name="AboutSheet__review_requests_carefully">Déan iarratais a athbhreithniú go cúramach</string>
     <!-- Text used when user has groups in common. Placeholder is the count -->
@@ -2750,6 +2836,15 @@
     <string name="AboutSheet__you">Tusa</string>
     <!-- Displays the name of a contact. The first placeholder is the name the user has assigned to that contact, the second name is the name the contact assigned to themselves -->
     <string name="AboutSheet__user_set_display_name_and_profile_name">%1$s (%2$s)</string>
+
+    <!-- Title of the screen showing which groups they have in common with another user. -->
+    <plurals name="GroupsInCommon__n_groups_in_common_title">
+        <item quantity="one">%1$s ghrúpa i bpáirt</item>
+        <item quantity="two">%1$s ghrúpa i bpáirt</item>
+        <item quantity="few">%1$s ghrúpa i bpáirt</item>
+        <item quantity="many">%1$s ngrúpa i bpáirt</item>
+        <item quantity="other">%1$s grúpa i bpáirt</item>
+    </plurals>
 
     <!-- CallParticipantsListDialog -->
     <plurals name="CallParticipantsListDialog_in_this_call">
@@ -2823,7 +2918,7 @@
     <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
     <string name="RegistrationActivity_you_will_receive_a_verification_code">Gheobhaidh tú cód deimhniúcháin. D\'fhéadfadh do sholáthraí seirbhíse táille a ghearradh ort.</string>
     <!-- Hint text to select a country -->
-    <string name="RegistrationActivity_select_a_country">Select a country</string>
+    <string name="RegistrationActivity_select_a_country">Roghnaigh tír</string>
     <!-- Hint text explaining that this is where the country code should go -->
     <string name="RegistrationActivity_default_country_code">0</string>
     <string name="RegistrationActivity_you_will_receive_a_call_to_verify_this_number">Cuirfear glao ort chun an uimhir seo a dheimhniú.</string>
@@ -2945,6 +3040,12 @@
     <string name="SignalPinReminders_well_remind_you_again_in_a_week">D\'éirigh le fíorú UAP. Meabhróimid duit arís i gceann seachtaine.</string>
     <string name="SignalPinReminders_well_remind_you_again_in_a_couple_weeks">D\'éirigh le fíorú UAP. Meabhróimid duit arís i gceann cúpla seachtain.</string>
     <string name="SignalPinReminders_well_remind_you_again_in_a_month">D\'éirigh le fíorú UAP. Meabhróimid duit arís é i gceann míosa.</string>
+    <string name="SignalPinReminders__well_remind_you_again_later">Meabhróimid duit arís é ar ball.</string>
+    <string name="SignalPinReminders__well_remind_you_again_tomorrow">Meabhróimid duit arís é amárach.</string>
+    <string name="SignalPinReminders__well_remind_you_again_in_a_few_days">Meabhróimid duit arís é i gceann cúpla lá.</string>
+    <string name="SignalPinReminders__well_remind_you_again_in_a_week">Meabhróimid duit arís é i gceann seachtaine.</string>
+    <string name="SignalPinReminders__well_remind_you_again_in_a_couple_weeks">Meabhróimid duit arís é i gceann cúpla seachtain.</string>
+    <string name="SignalPinReminders__well_remind_you_again_in_a_month">Meabhróimid duit arís é i gceann míosa.</string>
 
     <!-- Slide -->
     <string name="Slide_image">Íomhá</string>
@@ -2957,18 +3058,89 @@
     <string name="SmsMessageRecord_secure_session_reset_s">D\'athshocraigh %1$s an rith teachtaireachta slán.</string>
     <string name="SmsMessageRecord_duplicate_message">Teachtaireacht dúblach.</string>
 
-    <!-- StickerManagementActivity -->
-    <string name="StickerManagementActivity_stickers">Greamáin</string>
+    <!-- Sticker management screen default title. -->
+    <string name="StickerManagement_title_stickers">Greamáin</string>
+    <!-- Sticker management screen title displayed when multiple sticker packs are selected in order to perform an action. The placeholder is the number of selected items. -->
+    <plurals name="StickerManagement_title_n_selected">
+        <item quantity="one">%1$s roghnaithe</item>
+        <item quantity="two">%1$s roghnaithe</item>
+        <item quantity="few">%1$s roghnaithe</item>
+        <item quantity="many">%1$s roghnaithe</item>
+        <item quantity="other">%1$s roghnaithe</item>
+    </plurals>
+    <!-- Label for the sticker management screen tab which shows the stickers that are available to install. -->
+    <string name="StickerManagement_available_tab_label">Ar fáil</string>
+    <!-- Label for the sticker management screen tab which shows the stickers that are currently installed. -->
+    <string name="StickerManagement_installed_tab_label">Suiteáilte</string>
+    <!-- Shown when there are no sticker packs available for installation. -->
+    <string name="StickerManagement_available_tab_empty_text">Níl aon bheart greamán ar fáil</string>
+    <!-- Shown when there are no sticker packs currently installed. -->
+    <string name="StickerManagement_installed_tab_empty_text">Níl aon bheart greamán suiteáilte</string>
+    <!-- Message shown when the author of the sticker pack is unknown. -->
+    <string name="StickerManagement_author_unknown">Anaithnid</string>
+    <!-- Sticker pack list section header for packs that are already installed. -->
+    <string name="StickerManagement_installed_stickers_header">Greamáin shuiteáilte</string>
+    <!-- Sticker pack list section header for packs that have been received from incoming messages. -->
+    <string name="StickerManagement_stickers_you_received_header">Greamáin a bhfuair tú</string>
+    <!-- Sticker pack list section header for highlighted/"blessed" packs. -->
+    <string name="StickerManagement_signal_artist_series_header">Sraith ealaíontóirí Signal</string>
+    <!-- Title shown when sharing a sticker pack with another user. -->
+    <string name="StickerManagement_share_sheet_title">Forward To</string>
+    <!-- Bottom action bar option to select all sticker packs in the list. -->
+    <string name="StickerManagement_action_select_all">Roghnaigh uile</string>
+    <!-- Bottom action bar option to deselect all sticker packs in the list. -->
+    <string name="StickerManagement_action_deselect_all">Deselect all</string>
+    <!-- Bottom action bar option to uninstall all selected sticker packs. -->
+    <string name="StickerManagement_action_delete_selected">Scrios</string>
+    <!-- Confirmation message shown before uninstalling sticker packs. The placeholder is the number of items to delete. -->
+    <plurals name="StickerManagement_delete_n_packs_confirmation">
+        <item quantity="one">Remove %1$s sticker pack</item>
+        <item quantity="two">Remove %1$s sticker packs</item>
+        <item quantity="few">Remove %1$s sticker packs</item>
+        <item quantity="many">Remove %1$s sticker packs</item>
+        <item quantity="other">Remove %1$s sticker packs</item>
+    </plurals>
+    <!-- Message shown after installing a sticker pack. The placeholder is the name of the sticker pack that was installed. -->
+    <string name="StickerManagement_installed_pack_s">Installed %1$s.</string>
+    <!-- Message shown after uninstalling a sticker pack. The placeholder is the name of the sticker pack that was deleted. -->
+    <string name="StickerManagement_deleted_pack_s">Removed %1$s.</string>
+    <!-- Message shown after uninstalling sticker packs. The placeholder is the number of items that were deleted. -->
+    <plurals name="StickerManagement_deleted_n_packs">
+        <item quantity="one">%1$s sticker pack removed.</item>
+        <item quantity="two">%1$s sticker packs removed.</item>
+        <item quantity="few">%1$s sticker packs removed.</item>
+        <item quantity="many">%1$s sticker packs removed.</item>
+        <item quantity="other">%1$s sticker packs removed.</item>
+    </plurals>
+
+    <!-- Sticker pack list dropdown menu label for the button to forward a sticker pack to another user. -->
+    <string name="StickerManagement_menu_forward_pack">Cuir ar aghaidh</string>
+    <!-- Sticker pack list dropdown menu label for the button to mark a sticker pack as selected in order to perform additional actions. -->
+    <string name="StickerManagement_menu_select_pack">Roghnaigh</string>
+    <!-- Sticker pack list dropdown menu label for the button to install a sticker pack. -->
+    <string name="StickerManagement_menu_install_pack">Suiteáil</string>
+    <!-- Sticker pack list dropdown menu label for the button to uninstall a sticker pack. -->
+    <string name="StickerManagement_menu_remove_pack">Bain</string>
+    <!-- Sticker management screen dropdown menu label for the button to enter multi-select mode. -->
+    <string name="StickerManagement_menu_select_packs">Select sticker packs</string>
+
+    <!-- Accessibility label for the button to download a sticker pack. The placeholder is the sticker pack name. -->
+    <string name="StickerManagement_accessibility_download_pack">Íoslódáil beart greamán %1$s</string>
+    <!-- Accessibility label for the icon that is displayed after a sticker pack has been downloaded. The placeholder is the sticker pack name. -->
+    <string name="StickerManagement_accessibility_downloaded_checkmark">Íoslódáil ticmharc</string>
+    <!-- Accessibility label for the sticker pack drag and drop handle used to reorder the list. -->
+    <string name="StickerManagement_accessibility_drag_handle">Hanla tarraingthe agus scaoilte</string>
+    <!-- Accessibility label for the button to download a sticker pack. -->
+    <string name="StickerManagement_accessibility_download">Íoslódáil</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="StickerManagement_accessibility_open_top_bar_menu">Open menu</string>
+    <!-- Accessibility label for opening the context menu for a sticker pack row item. -->
+    <string name="StickerManagement_accessibility_open_context_menu">Oscail an roghchlár comhthéacs</string>
+    <!-- Accessibility label for opening the context menu for a sticker pack row item. -->
+    <string name="StickerManagement_accessibility_exit_multi_select_mode">Exit selection mode and clear selections</string>
 
     <!-- StickerManagementAdapter -->
-    <string name="StickerManagementAdapter_installed_stickers">Greamáin Shuiteáilte</string>
-    <string name="StickerManagementAdapter_stickers_you_received">Greamáin a bhFuair Tú</string>
-    <string name="StickerManagementAdapter_signal_artist_series">Sraith Ealaíontóirí Signal</string>
-    <string name="StickerManagementAdapter_no_stickers_installed">Níl aon ghreamáin suiteáilte</string>
-    <string name="StickerManagementAdapter_stickers_from_incoming_messages_will_appear_here">Taispeánfar greamáin ó theachtaireachtaí isteach anseo</string>
     <string name="StickerManagementAdapter_untitled">Gan teideal</string>
-    <!-- Message shown when the author of the sticker pack is unknown -->
-    <string name="StickerManagementAdapter_unknown">Anaithnid</string>
 
     <!-- StickerPackPreviewActivity -->
     <string name="StickerPackPreviewActivity_untitled">Gan teideal</string>
@@ -2995,6 +3167,8 @@
     <string name="SubmitDebugLogActivity_copy_this_url_and_add_it_to_your_issue">Cóipeáil an URL seo agus cuir le do thuairisc ar fhadhb nó ríomhphost tacaíochta é: \n\n<b>%1$s</b></string>
     <string name="SubmitDebugLogActivity_share">Comhroinn</string>
     <string name="SubmitDebugLogActivity_this_log_will_be_posted_publicly_online_for_contributors">Postálfar an loga seo go poiblí ar líne le go mbeidh rannpháirtithe in ann amharc air. Is féidir leat é a scrúdú roimh uaslódáil.</string>
+    <!-- Banner message shown while submitting debug log -->
+    <string name="SubmitDebugLogActivity_your_log_will_be_posted_online">Nuair a chliceálann tú Cuir Isteach, postálfar do loga ar líne go ceann 30 lá ag URL uathúil neamhfhoilsithe. Is féidir leat é a shábháil go logánta ar dtús.</string>
 
     <!-- SupportEmailUtil -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_support_email" translatable="false">support@signal.org</string> -->
@@ -3063,6 +3237,10 @@
     <string name="ThreadRecord_message_history_has_been_merged">Cumascadh do stair teachtaireachtaí</string>
     <!--  Displayed in the conversation list when identities have been merged. The first placeholder is a phone number, and the second is a person\'s name -->
     <string name="ThreadRecord_s_belongs_to_s">Is le %2$s %1$s</string>
+    <!-- Displayed in the conversation list when a person has been blocked -->
+    <string name="ThreadRecord_blocked">Bac curtha</string>
+    <!-- Displayed in the conversation list when a group has been blocked -->
+    <string name="ThreadRecord_blocked_group">Bac curtha</string>
 
     <!-- ApkUpdateNotifications -->
     <string name="ApkUpdateNotifications_prompt_install_title">Nuashonrú Molly</string>
@@ -3165,10 +3343,6 @@
     <!-- MessageDisplayHelper -->
     <string name="MessageDisplayHelper_message_encrypted_for_non_existing_session">Teachtaireacht criptiú le haghaidh rith teachtaireachta neamheiseach</string>
 
-    <!-- MmsMessageRecord -->
-    <string name="MmsMessageRecord_bad_encrypted_mms_message">Teachtaireacht MMS droch-chriptithe</string>
-    <string name="MmsMessageRecord_mms_message_encrypted_for_non_existing_session">Teachtaireacht MMS criptiú le haghaidh rith teachtaireachta neamheiseach</string>
-
     <!-- MuteDialog -->
     <string name="MuteDialog_mute_notifications">Balbhaigh fógraí</string>
 
@@ -3181,8 +3355,6 @@
     <string name="MediaPreviewActivity_you">Tusa</string>
     <string name="MediaPreviewActivity_unssuported_media_type">Cineál meán nach dtugtar tacaíocht dó</string>
     <string name="MediaPreviewActivity_draft">Dréacht</string>
-    <string name="MediaPreviewActivity_signal_needs_the_storage_permission_in_order_to_write_to_external_storage_but_it_has_been_permanently_denied">Tá Cead stórála ag teastáil ó Molly chun sábháil chuig stóras seachtrach, ach diúltaíodh go buan dó. Lean ar aghaidh chuig socruithe na haipe, roghnaigh \"Ceadanna\" agus cumasaigh \"Stóras\".</string>
-    <string name="MediaPreviewActivity_unable_to_write_to_external_storage_without_permission">Ní féidir sábháil chuig stóras seachtrach gan ceadanna</string>
     <string name="MediaPreviewActivity_media_delete_confirmation_title">Scrios an teachtaireacht?</string>
     <string name="MediaPreviewActivity_media_delete_confirmation_message">Scriosfar an teachtaireacht seo go buan leis sin.</string>
     <string name="MediaPreviewActivity_s_to_s">%1$s chuig %2$s</string>
@@ -3295,14 +3467,58 @@
     <!-- Notification channel name for notifications sent when a device has been linked -->
     <string name="NotificationChannel_new_linked_device">Gléas nua nasctha</string>
 
-    <!-- ProfileEditNameFragment -->
-
     <!-- QuickResponseService -->
     <string name="QuickResponseService_quick_response_unavailable_when_Signal_is_locked">Níl freagairt tapa le fáil agus Molly faoi ghlas.</string>
     <string name="QuickResponseService_problem_sending_message">Tharla fadhb ag seoladh na teachtaireachta!</string>
 
-    <!-- A small toast notification to let the user know their image/video/audio was downloaded and saved to their device, accessible in other apps. -->
-    <string name="SaveAttachmentTask_saved">Meáin sábháilte</string>
+    <!-- A toast notification that is shown when the app does not have sufficient permissions to save media files to the device storage. -->
+    <string name="SaveAttachment_unable_to_write_to_sd_card_exclamation">Ní féidir scríobh chun stóras.</string>
+
+    <!-- A toast notification that is shown after image/video/audio media was successfully downloaded and saved to the device storage, accessible in other apps. -->
+    <plurals name="SaveAttachment_saved_success">
+        <item quantity="one">Meán sábháilte</item>
+        <item quantity="two">Meáin sábháilte</item>
+        <item quantity="few">Meáin sábháilte</item>
+        <item quantity="many">Meáin sábháilte</item>
+        <item quantity="other">Meáin sábháilte</item>
+    </plurals>
+
+    <!-- A toast notification that is shown after some image/video/audio media was successfully downloaded and saved to the device storage, but some failed to save
+         %1$s is the number of items that failed to save and %2$s is the total number of items that the user requested to save. -->
+    <plurals name="SaveAttachment_saved_success_n_failures">
+        <item quantity="one">Meáin sábháilte (theip ar %1$s amháin as %2$s)</item>
+        <item quantity="two">Meáin sábháilte (theip ar %1$s cheann as %2$s)</item>
+        <item quantity="few">Meáin sábháilte (theip ar %1$s cinn as %2$s)</item>
+        <item quantity="many">Meáin sábháilte (theip ar %1$s gcinn as %2$s)</item>
+        <item quantity="other">Meáin sábháilte (theip ar %1$s ceann as %2$s)</item>
+    </plurals>
+
+    <!-- A toast notification that is shown after all of the requested image/video/audio media failed to save to the device storage. -->
+    <plurals name="SaveAttachment_error_while_saving_attachments_to_sd_card">
+        <item quantity="one">Tharla earráid agus an ceangaltán á shábháil chuig stóras.</item>
+        <item quantity="two">Tharla earráid agus na ceangaltáin á sábháil chuig stóras.</item>
+        <item quantity="few">Tharla earráid agus na ceangaltáin á sábháil chuig stóras.</item>
+        <item quantity="many">Tharla earráid agus na ceangaltáin á sábháil chuig stóras.</item>
+        <item quantity="other">Tharla earráid agus na ceangaltáin á sábháil chuig stóras.</item>
+    </plurals>
+
+    <!-- Dialog title asking to save media to your phone\'s storage -->
+    <string name="AttachmentSaver__save_to_phone">Sábháil chuig an nguthán?</string>
+
+    <!-- Dialog message explaining that media will be saved to your phone and can potentially be accessed by other phones. -->
+    <plurals name="AttachmentSaver__this_media_will_be_saved">
+        <item quantity="one">Sábhálfar an meán seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann é a rochtain ag brath ar cheadanna do ghutháin.</item>
+        <item quantity="two">Sábhálfar na meáin seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann iad a rochtain ag brath ar cheadanna do ghutháin.</item>
+        <item quantity="few">Sábhálfar na meáin seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann iad a rochtain ag brath ar cheadanna do ghutháin.</item>
+        <item quantity="many">Sábhálfar na meáin seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann iad a rochtain ag brath ar cheadanna do ghutháin.</item>
+        <item quantity="other">Sábhálfar na meáin seo ar stóras do ghutháin. Is féidir go mbeidh aipeanna eile in ann iad a rochtain ag brath ar cheadanna do ghutháin.</item>
+    </plurals>
+
+    <!-- Message shown when the app requests permission to save media to the device storage, but that permission has been permanently denied by the user. -->
+    <string name="AttachmentSaver__signal_needs_the_storage_permission_in_order_to_write_to_external_storage_but_it_has_been_permanently_denied">Tá Cead stórála ag teastáil ó Molly chun sábháil chuig stóras seachtrach, ach diúltaíodh go buan dó. Lean ar aghaidh chuig socruithe na haipe, roghnaigh \"Ceadanna\" agus cumasaigh \"Stóras\".</string>
+
+    <!-- Message explaining that it is not possible to save media to the device storage after the user denied the system save to storage permission. -->
+    <string name="AttachmentSaver__unable_to_write_to_external_storage_without_permission">Ní féidir sábháil chuig stóras seachtrach gan ceadanna</string>
 
     <!-- SearchToolbar -->
     <string name="SearchToolbar_search">Cuardaigh</string>
@@ -3551,7 +3767,8 @@
     <string name="ConversationUpdateItem_update_contact">Nuashonraigh an teagmhálaí</string>
     <!-- Update item button text to show to block a recipient from requesting to join via group link -->
     <string name="ConversationUpdateItem_block_request">Cuir bac ar an iarratas</string>
-    <string name="ConversationUpdateItem_no_groups_in_common_review_requests_carefully">Níl aon ghrúpaí i bpáirt ann. Athbhreithnigh iarratais go cúramach.</string>
+    <!-- Text shown in conversation header that the account messaging the user does not have any groups in common with them -->
+    <string name="ConversationUpdateItem_no_groups_in_common_review_requests_carefully">Grúpa ar bith i bpáirt</string>
     <string name="ConversationUpdateItem_no_contacts_in_this_group_review_requests_carefully">Níl aon teagmhálaithe sa ghrúpa seo. Athbhreithnigh iarratais go cúramach.</string>
     <string name="ConversationUpdateItem_view">Amharc</string>
     <string name="ConversationUpdateItem_the_disappearing_message_time_will_be_set_to_s_when_you_message_them">The disappearing message time will be set to %1$s when you message them.</string>
@@ -3571,6 +3788,11 @@
     <!-- audio_view -->
     <string name="audio_view__play_pause_accessibility_description">Seinn … Cuir ar sos</string>
     <string name="audio_view__download_accessibility_description">Íosluchtaigh é</string>
+
+    <!-- document_view -->
+    <string name="document_view__download_accessibility_description">Íoslódáil</string>
+    <string name="document_view__upload_accessibility_description">Uaslódáil</string>
+    <string name="document_view__cancel_accessibility_description">Cuir ar ceal</string>
 
     <!-- QuoteView -->
     <string name="QuoteView_audio">Fuaim</string>
@@ -3901,6 +4123,7 @@
     <string name="DebugLogsPromptDialogFragment__no_thanks">Ní raibh maith agaibh</string>
 
     <!-- ReactWithAnyEmojiBottomSheetDialogFragment -->
+    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recents">Úsáidte le déanaí</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__this_message">An Teachtaireacht Seo</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recently_used">Úsáidte le Déanaí</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__smileys_and_people">Straoiseoga ⁊ Daoine</string>
@@ -3913,6 +4136,17 @@
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__flags">Bratacha</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__emoticons">Straoiseoga</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__no_results_found">Gan toradh</string>
+
+    <!-- GifQuickSearchOption -->
+    <string name="GifQuickSearchOption__recents">Úsáidte le déanaí</string>
+    <string name="GifQuickSearchOption__trending">Treochtáil</string>
+    <string name="GifQuickSearchOption__celebrate">Ceiliúradh</string>
+    <string name="GifQuickSearchOption__love">Grá</string>
+    <string name="GifQuickSearchOption__thumbs_up">Ordóga Suas</string>
+    <string name="GifQuickSearchOption__surprised">Iontas</string>
+    <string name="GifQuickSearchOption__excited">Ar Bís</string>
+    <string name="GifQuickSearchOption__sad">Brónach</string>
+    <string name="GifQuickSearchOption__angry">Feargach</string>
 
     <!-- arrays.xml -->
     <string name="arrays__use_default">Bain feidhm as an réamhshocrú</string>
@@ -4067,6 +4301,8 @@
     <string name="preferences__language">Teanga</string>
     <string name="preferences__signal_messages_and_calls">Teachtaireachtaí agus glaonna Signal</string>
     <string name="preferences__advanced_pin_settings">Ardroghanna UAP</string>
+    <!-- Title of toolbar for the advanced pin settings screen -->
+    <string name="preferences__advanced_pin_settings_title">Ardroghanna UAP</string>
     <string name="preferences__free_private_messages_and_calls">Teachtaireachtaí agus glaonna príobháideacha don lucht Signal</string>
     <string name="preferences__submit_debug_log">Seol an Logchomhad Dífhabhtaithe</string>
     <string name="preferences__delete_account">Scrios cuntas</string>
@@ -4177,6 +4413,7 @@
     <string name="preferences_connection_failed">Theip ar an nascadh</string>
     <string name="preferences_couldnt_connect_to_the_proxy">Níorbh fhéidir nascadh leis an seachfhreastalaí. Seiceáil seoladh an tseachfhreastalaí agus triail arís.</string>
     <string name="preferences_you_are_connected_to_the_proxy">Tá tú nasctha leis an seachfhreastalaí. Is féidir leat an seachfhreastalaí a chasadh as am ar bith ó na Socruithe.</string>
+    <!-- Title of alert dialog after a successful connection to the proxy -->
     <string name="preferences_success">D\'éirigh leis</string>
     <string name="preferences_failed_to_connect">Theip air nascadh leis</string>
     <string name="preferences_enter_proxy_address">Iontráil Seoladh Seachfhreastalaí</string>
@@ -4517,6 +4754,8 @@
     <string name="conversation_list_fragment__fab_content_description">Comhrá nua</string>
     <string name="conversation_list_fragment__open_camera_description">Oscail an Grianghrafadán</string>
     <string name="conversation_list_fragment__no_chats_yet_get_started_by_messaging_a_friend">No chats yet.\nGet started by messaging a friend.</string>
+    <!-- Message shown when there are no archived chats to display -->
+    <string name="conversation_list_fragment__archived_chats_will_appear_here">Taispeánfar anseo comhráite a cuireadh sa chartlann.</string>
     <!-- Message shown when there are no chats in the chat folder to display -->
     <string name="conversation_list_fragment__no_chats_to_display">Níl aon chomhrá le taispeáint</string>
     <!-- Button text that will open up chat folder settings -->
@@ -4745,6 +4984,13 @@
     <string name="KbsMegaphone__pins_keep_information_thats_stored_with_signal_encrytped">Coinnítear faisnéis a stóráiltear le Signal criptithe le UAP.</string>
     <string name="KbsMegaphone__create_pin">Cruthaigh UAP</string>
 
+    <!-- Title for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__update_signal_pin">Nuashonraigh UAP Signal</string>
+    <!-- Message for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__message">Nuashonraigh do UAP Signal chun clárú an chuntais a chur i gcrích.</string>
+    <!-- Button text for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__update_pin">Nuashonraigh UAP</string>
+
     <!-- CallNotificationBuilder -->
     <!-- Displayed in a notification when a Signal voice call is ringing -->
     <string name="CallNotificationBuilder__incoming_signal_voice_call">Guthghlao Molly isteach</string>
@@ -4807,6 +5053,7 @@
     <string name="BackupDialog_copied_to_clipboard">Macasamhlaithe chuig an ngearrthaisce</string>
     <string name="BackupDialog_no_file_picker_available">Níl roghnóir comhaid le fáil.</string>
     <string name="BackupDialog_enter_backup_passphrase_to_verify">Cuir isteach do phasfhrása cúltaca lena fhíorú</string>
+    <!-- Confirmation button text on an alert dialog to verify whether the entered backup phrase was correct -->
     <string name="BackupDialog_verify">Deimhnigh</string>
     <string name="BackupDialog_you_successfully_entered_your_backup_passphrase">D\'éirigh leat do phasfhrása cúltaca a chur isteach</string>
     <string name="BackupDialog_passphrase_was_not_correct">Ní raibh an pasfhrása ceart</string>
@@ -4831,6 +5078,7 @@
     <string name="RegistrationActivity_code_support_subject">Clárúchán Molly — Cód Deimhniúcháin ar Android</string>
     <string name="RegistrationActivity_incorrect_code">Cód mícheart</string>
     <string name="BackupUtil_never">Choíche</string>
+    <!-- Subtext below last backup time when we do not know when the last backup was -->
     <string name="BackupUtil_unknown">Anaithnid</string>
     <!-- Phone number heading displayed as a screen title -->
     <string name="preferences_app_protection__phone_number">Uimhir ghutháin</string>
@@ -4885,6 +5133,14 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">Rinne tú an iomarca iarrachtaí. Bain triail eile as ar ball.</string>
     <string name="RegistrationActivity_error_connecting_to_service">Earráid agus ceangal á bhunú leis an tseirbhís</string>
     <string name="preferences_chats__backups">Cúltacaithe</string>
+
+    <!-- Button label to indicate that a feature is in beta mode -->
+    <string name="Beta__beta_title">Béite</string>
+    <!-- Content description for info icon -->
+    <string name="Beta__info">Faisnéis</string>
+    <!-- Text in header describing that the feature is a beta feature and prone to frequent changes -->
+    <string name="Beta__this_is_beta">This is a beta feature that we will be adding functionality to on an ongoing basis.</string>
+
     <!-- Title text shown when Signal is locked and needs to be unlocked -->
     <string name="prompt_passphrase_activity__unlock_signal">Díghlasáil Molly</string>
     <!-- Description text explaining how to unlock Signal -->
@@ -5015,6 +5271,7 @@
     <string name="DeviceTransferSetup__try_turning_wifi_off_and_on_on_both_devices">Triail Wi-Fi a chasadh as agus air ar an dá ghléas.</string>
     <string name="DeviceTransferSetup__make_sure_both_devices_are_in_transfer_mode">Cinntigh go bhfuil mód traschurtha air ar an dá ghléas.</string>
     <string name="DeviceTransferSetup__go_to_support_page">Téigh chuig an leathanach tacaíochta</string>
+    <!-- Button text when a device transfer could not occur and to try again -->
     <string name="DeviceTransferSetup__try_again">Féach arís é</string>
     <string name="DeviceTransferSetup__waiting_for_other_device">Ag feitheamh leis an ngléas eile</string>
     <string name="DeviceTransferSetup__tap_continue_on_your_other_device_to_start_the_transfer">Cnag Lean Ar Aghaidh ar do ghléas eile chun tús a chur leis an aistriú.</string>
@@ -5160,11 +5417,11 @@
     <string name="ReviewCardDialogFragment__no_other_groups_in_common">No other groups in common.</string>
     <string name="ReviewCardDialogFragment__no_groups_in_common">Níl aon ghrúpaí i bpáirt.</string>
     <plurals name="ReviewCardDialogFragment__d_other_groups_in_common">
-        <item quantity="one">%1$d ghrúpa i bpáirt</item>
-        <item quantity="two">%1$d ghrúpa i bpáirt</item>
-        <item quantity="few">%1$d ghrúpa i bpáirt</item>
-        <item quantity="many">%1$d ngrúpa i bpáirt</item>
-        <item quantity="other">%1$d grúpa i bpáirt</item>
+        <item quantity="one">%1$d ghrúpa amháin eile i bpáirt</item>
+        <item quantity="two">%1$d ghrúpa eile i bpáirt</item>
+        <item quantity="few">%1$d ghrúpa eile i bpáirt</item>
+        <item quantity="many">%1$d ngrúpa eile i bpáirt</item>
+        <item quantity="other">%1$d grúpa eile i bpáirt</item>
     </plurals>
     <plurals name="ReviewCardDialogFragment__d_groups_in_common">
         <item quantity="one">%1$d ghrúpa i bpáirt</item>
@@ -5544,6 +5801,7 @@
 
     <!-- ChangeNumberVerifyFragment -->
     <string name="ChangeNumberVerifyFragment__change_number">Athraigh Uimhir</string>
+    <!-- Text shown when verifying a new phone number where %1$s is the number being changed -->
     <string name="ChangeNumberVerifyFragment__verifying_s">Verifying %1$s</string>
     <string name="ChangeNumberVerifyFragment__captcha_required">Captcha de dhíth</string>
 
@@ -5940,6 +6198,7 @@
     <string name="ConversationSettingsFragment__permissions">Ceadanna</string>
     <string name="ConversationSettingsFragment__requests_and_invites">Requests &amp; Invites</string>
     <string name="ConversationSettingsFragment__group_link">Group Link</string>
+    <!-- Option in conversation settings to add a user as a contact -->
     <string name="ConversationSettingsFragment__add_as_a_contact">Cuir leis mar theagmhálaí</string>
     <string name="ConversationSettingsFragment__unmute">Díbhalbhaigh</string>
     <!-- The subtitle for a settings item that describes how long the user\'s chat is muted. If a chat is muted, you will not receive notifications unless @mentioned. The placeholder represents a time (e.g. 10pm, March 4, etc). -->
@@ -5948,6 +6207,8 @@
     <string name="ConversationSettingsFragment__copied_phone_number_to_clipboard">Uimhir ghutháin cóipeáilte chuig an ngearrthaisce.</string>
     <string name="ConversationSettingsFragment__phone_number">Uimhir ghutháin</string>
     <string name="ConversationSettingsFragment__get_badges">Faigh suaitheantais do do phróifíl trí thacú le Signal. Tapáil ar shuaitheantas chun tuilleadh a fhail amach.</string>
+    <!-- Error message shown when the user is trying to open a media that is not sent yet. -->
+    <string name="ConversationSettingsFragment__this_media_is_not_sent_yet">Níor seoladh an meán seo fós.</string>
 
     <!-- PermissionsSettingsFragment -->
     <string name="PermissionsSettingsFragment__add_members">Cuir baill leis</string>
@@ -6000,6 +6261,8 @@
     <string name="NewConversationActivity__s_has_been_removed">Baineadh %1$s</string>
     <!-- Snackbar message after blocking a contact -->
     <string name="NewConversationActivity__s_has_been_blocked">Bac curtha ar %1$s</string>
+    <!-- Snackbar message when blocking a contact has failed -->
+    <string name="NewConversationActivity__block_failed">Block failed</string>
     <!-- Dialog title when remove target contact is in system contacts -->
     <string name="NewConversationActivity__unable_to_remove_s">Ní féidir %1$s a bhaint</string>
     <!-- Dialog message when remove target contact is in system contacts -->
@@ -6056,6 +6319,7 @@
     <string name="ShareInterstitialActivity__share">Comhroinn</string>
 
     <!-- DSLSettingsToolbar -->
+    <!-- Content description describing the back arrow on toolbars -->
     <string name="DSLSettingsToolbar__navigate_up">Téigh suas</string>
     <string name="MultiselectForwardFragment__forward_to">Forward To</string>
     <!-- Displayed when sharing content to people via the fragment -->
@@ -6066,6 +6330,7 @@
     <string name="MultiselectForwardFragment__videos_will_be_trimmed">Gearrfar físeáin chuig gearrthóga 30s agus seolfar mar Scéalta iolracha iad.</string>
     <!-- Displayed when user selects a video that cannot be sent as a story -->
     <string name="MultiselectForwardFragment__videos_sent_to_stories_cant">Ní féidir físeáin a sheoltar chuig Scéalta a bheith níos faide ná 30s.</string>
+    <!-- Body in alert dialog telling users that messages are now sent immediately -->
     <string name="MultiselectForwardFragment__forwarded_messages_are_now">Forwarded messages are now sent immediately.</string>
     <plurals name="MultiselectForwardFragment_send_d_messages">
         <item quantity="one">Seol %1$d teachtaireacht</item>
@@ -6125,6 +6390,24 @@
     <string name="MediaReviewFragment__photo_set_to_high_quality">Grianghraf socraithe ag ardchaighdeán</string>
     <!-- Small notification presented to the user when they set their still image to be sent in standard (lower than high) visual quality. -->
     <string name="MediaReviewFragment__photo_set_to_standard_quality">Grianghraf socraithe ag gnáthchaighdeán</string>
+    <!-- Accessibility label describing the add media button on the Media review screen -->
+    <string name="MediaReviewFragment__add_media_accessibility_label">Cuir Meán leis</string>
+    <!-- Accessibility label describing the brush and pen button on the Media review screen -->
+    <string name="MediaReviewFragment__brush_pen_accessibility_label">Scuab agus Peann</string>
+    <!-- Accessibility label describing the crop and rotate button on the Media review screen -->
+    <string name="MediaReviewFragment__crop_rotate_accessibility_label">Bearr agus Rothlaigh</string>
+    <!-- Accessibility label describing the change media quality button on the Media review screen -->
+    <string name="MediaReviewFragment__change_media_quality_accessibility_label">Athraigh Cáilíocht an Mheáin</string>
+    <!-- Accessibility label describing the save media button on the Media review screen -->
+    <string name="MediaReviewFragment__save_media_accessibility_label">Sábháil Meán</string>
+    <!-- Accessibility label describing the toggle emoji keyboard button on the Media review screen -->
+    <string name="MediaReviewFragment__emoji_toggle_accessibility_label">Scoránaigh an méarchlár emoji</string>
+    <!-- Accessibility label describing the toggle view once button on the Media review screen -->
+    <string name="MediaReviewFragment__view_once_toggle_accessibility_label">Scoránaigh Amharc Aonuaire</string>
+    <!-- Accessibility label describing the send media button on the Media review screen -->
+    <string name="MediaReviewFragment__send_media_accessibility_label">Seol Meán</string>
+    <!-- Accessibility label describing the finish adding a message button on the Media review screen dialog -->
+    <string name="MediaReviewFragment__finish_adding_a_message_accessibility_label">Críochnaigh le Teachtaireacht a chur leis</string>
     <!-- Small notification presented to the user when they set multiple media items to be sent in high visual quality. -->
     <plurals name="MediaReviewFragment__items_set_to_high_quality">
         <item quantity="one">%1$d mhír socraithe ag ardchaighdeán</item>
@@ -6175,7 +6458,7 @@
     <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
     <string name="MediaCaptureFragment_device_link_dialog_title">Nasc gléas?</string>
     <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">It looks like you\'re trying to link a Signal device. Tap continue and then tap \"Link a New Device\" and scan the QR code again.</string>
+    <string name="MediaCaptureFragment_it_looks_like_youre_trying">Is cosúil go bhfuil tú ag iarraidh gléas Signal a nascadh. Tapáil \"Ar aghaidh\" agus ansin tapáil \"Nasc Gléas Nua\" agus scan an cód QR athuair.</string>
     <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
     <string name="MediaCaptureFragment_device_link_dialog_continue">Ar aghaidh</string>
 
@@ -6270,6 +6553,7 @@
 
     <string name="MySupportPreference__s_per_month">%1$s/month</string>
     <string name="MySupportPreference__renews_s">Athnuachan %1$s</string>
+    <!-- Subtitle shown when processing a donation transaction -->
     <string name="MySupportPreference__processing_transaction">Idirbheart á phróiseáil…</string>
     <!-- Displayed on "My Support" screen when user badge failed to be added to their account -->
     <string name="MySupportPreference__couldnt_add_badge_s">Níorbh fhéidir suaitheantas a chur leis. %1$s</string>
@@ -6380,7 +6664,7 @@
     <string name="DonationsErrors__your_payment_is_still">Tá do thabhartas á phróiseáil fós. D\'fheadfaí go mbeadh cúpla nóiméad i gceist leis sin ag brath ar do nasc.</string>
     <string name="DonationsErrors__failed_to_cancel_subscription">Theip ar chur an tsíntiúis ar ceal</string>
     <string name="DonationsErrors__subscription_cancellation_requires_an_internet_connection">Teastaíonn nasc Idirlín chun an síntiús a chur ar ceal.</string>
-    <string name="ViewBadgeBottomSheetDialogFragment__your_device_doesn_t_support_google_pay_so_you_can_t_subscribe_to_earn_a_badge_you_can_still_support_signal_by_making_a_donation_on_our_website">Ní thacaíonn do ghléas le Google Pay, mar sin ní féidir leat síntiús a ghlacadh chun suaitheantas a thuilleamh. Is féidir leat tacú le Signal fós trí airgead a thabhairt ar ár suíomh gréasáin.</string>
+    <string name="ViewBadgeBottomSheetDialogFragment__your_device_doesn_t_support">Ní thacaíonn do ghléas le tabhartais ionaipe, mar sin ní féidir leat clárú chun suaitheantas a thuilleamh. Is féidir leat tacú le Signal fós trí airgead a thabhairt ar ár suíomh gréasáin.</string>
     <string name="NetworkFailure__network_error_check_your_connection_and_try_again">Network error. Check your connection and try again.</string>
     <string name="NetworkFailure__retry">Bain triail eile as</string>
     <!-- Displayed as a dialog title when the selected recipient for a gift doesn\'t support gifting -->
@@ -6620,6 +6904,16 @@
 
     <!-- Description shown for the Signal Release Notes channel -->
     <string name="ReleaseNotes__signal_release_notes_and_news">Nótaí Eisiúna agus Nuacht Signal</string>
+    <!-- Text description shown for the Signal Release Notes channel explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__this_is_official_chat_period">Seo é an t-aon chomhrá oifigiúil de chuid Signal.</string>
+    <!-- Text description shown for the Signal Release Notes channel explaining what the channel is for -->
+    <string name="ReleaseNotes__keep_up_to_date_period">Coinnigh suas chun dáta le nuacht agus le nótaí eisiúna.</string>
+    <!-- Text description in Signal Release channel details explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__this_is_official_chat">Seo é an t-aon chomhrá oifigiúil de chuid Signal</string>
+    <!-- Text description in Signal Release channel details explaining what the channel is for -->
+    <string name="ReleaseNotes__keep_up_to_date">Coinnigh suas chun dáta le nuacht agus le nótaí eisiúna</string>
+    <!-- Subtitle for the Signal Release channel explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__official_only_chat">An t-aon chomhrá oifigiúil de chuid Signal</string>
 
     <!-- Donation receipts activity title -->
     <string name="DonationReceiptListFragment__all_activity">Gach gníomhaíocht</string>
@@ -6682,7 +6976,7 @@
     <string name="StoriesLandingItem__info">Eolas</string>
     <!-- Label when a story is pending sending -->
     <string name="StoriesLandingItem__sending">Seoladh…</string>
-    <!-- Label when multiple stories are pending sending -->
+    <!-- Label when multiple stories are pending sending where %1$d is the number of stories being sent -->
     <string name="StoriesLandingItem__sending_d">%1$d a sheoladh…</string>
     <!-- Label when a story fails to send due to networking -->
     <string name="StoriesLandingItem__send_failed">Theip ar an seoladh</string>
@@ -6754,6 +7048,8 @@
     <string name="StoryViewerPageFragment__send_failed">Theip ar an seoladh. Tapáil chun atriail</string>
     <!-- Label for the reply button in story viewer, which will launch the group story replies bottom sheet. -->
     <string name="StoryViewerPageFragment__reply_to_group">Freagair an Grúpa</string>
+    <!-- Content description for the any reaction button in reply to story composer, which will launch the emojis bottom sheet. -->
+    <string name="StoryViewerPageFragment_any_reaction_content_description">Tuilleadh freagairtí</string>
     <!-- Displayed when a story has no views -->
     <string name="StoryViewsFragment__no_views_yet">Níl aon amharc ann fós</string>
     <!-- Displayed when user has disabled receipts -->
@@ -7354,34 +7650,6 @@
     <string name="ExternalNavigationHelper__leave_signal_to_confirm_payment">Imigh as Signal leis an tabhartas a dheimhniú?</string>
     <string name="ExternalNavigationHelper__once_this_payment_is_confirmed">Agus é deimhnithe fill ar Signal chun próiseáil do thabhartais a chur i gcrích.</string>
 
-    <!-- IdealBank -->
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__abn_amro">ABN AMRO</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__asn_bank">ASN Bank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__bunq">bunq</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__ing">ING</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__knab">Knab</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__n26">N26</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__rabobank">Rabobank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__regiobank">RegioBank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__revolut">Revolut</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__sns_bank">SNS Bank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__triodos_bank">Triodos Bank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__van_lanschot">Van Lanschot Kempen</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__yoursafe">Yoursafe</string>
-
     <!-- BankTransferMandateFragment -->
     <!-- Title of screen displaying the bank transfer mandate -->
     <string name="BankTransferMandateFragment__bank_transfer">Aistriú Bainc</string>
@@ -7442,7 +7710,7 @@
     <!-- Default label for bank selection -->
     <string name="IdealTransferDetailsFragment__choose_your_bank">Roghnaigh do bhanc</string>
     <!-- Dialog title shown when using iDEAL payment for setting up a monthly donation -->
-    <string name="IdealTransferDetailsFragment__confirm_your_donation_with_s">Deimhnigh do Thabhartas le %1$s</string>
+    <string name="IdealTransferDetailsFragment__confirm_your_donation_with_ideal">Confirm your donation with iDEAL</string>
     <!-- Dialog warning shown when using iDEAL payment for setting up a monthly donation. Placeholder is donation amount.Z -->
     <string name="IdealTransferDetailsFragment__to_setup_your_recurring_donation">Chun do thabhartas athfhillteach a shocrú, tapáil Lean leis le táille €0.01 le do bhanc a dheimhniú. Aisíocfar é sin go huathoibríoch agus tabharfaidh sé cead do thabhartas %1$s/sa mhí a ghearradh ar do chuntas.</string>
     <!-- Dialog button shown when using iDEAL payment for setting up a monthly donation to continue with the donation -->
@@ -7723,6 +7991,8 @@
     <string name="CameraControls_capture_button_accessibility_label">Cnaipe Gabhála</string>
     <!-- Accessibility label describing the continue button on the camera screen -->
     <string name="CameraControls_continue_button_accessibility_label">Cnaipe Ar Aghaidh</string>
+    <!-- Accessibility label describing the flash Mode toggle button on the camera screen -->
+    <string name="CameraControls_toggle_flash_mode_accessibility_label">Scoránaigh Mód Splaince</string>
 
     <!-- CallPreference -->
     <!-- Generic group call in call info -->
@@ -8141,11 +8411,13 @@
     <!-- Status title for banner when user is actively restoring media from a backup -->
     <string name="BackupStatus__restoring_media">Meáin á n-aischur</string>
     <!-- Status title for banner when user has paused restore media from a backup -->
-    <string name="BackupStatus__restore_paused">Aischur curtha ar sos</string>
+    <string name="BackupStatus__restore_paused">Media restore paused</string>
     <!-- Status title for banner when user has completed restoring restore media from a backup -->
     <string name="BackupStatus__restore_complete">Tá an t-aischur críochnaithe</string>
     <!-- Status action label for seeing more details about storage space -->
     <string name="BackupStatus__details">Mionsonraí</string>
+    <!-- Status action label for resume restore from a paused state -->
+    <string name="BackupStatus__resume">Resume</string>
 
     <!-- Status subtitle for banner when restoring media pauses for Wi-Fi -->
     <string name="BackupStatus__status_waiting_for_wifi">Ag fanacht le Wi-Fi…</string>
@@ -8177,6 +8449,11 @@
     <string name="BackupStatusRow__your_last_backup_latest_version">Níorbh fhéidir do chúltaca deiridh a chur i gcrích. Cinntigh go bhfuil an leagan Signal is déanaí agat agus triail arís.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">Tuilleadh faisnéise</string>
+
+    <!-- Dialog title to prompt resuming media restore over cellular -->
+    <string name="ResumeRestoreCellular_resume_using_cellular_title">Resume using cellular data?</string>
+    <!-- Dialog message to prompt resuming media restore over cellular -->
+    <string name="ResumeRestoreCellular_resume_using_cellular_message">Restoring your media using cellular data may result in data charges. You can connect to a Wi-Fi network to automatically resume.</string>
 
     <!-- BackupsTypeSettingsFragment -->
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -8280,8 +8557,8 @@
     <string name="RemoteBackupsSettingsFragment__payment_history">Stair íocaíochtaí</string>
     <!-- Section header for backup information -->
     <string name="RemoteBackupsSettingsFragment__backup_details">Sonraí an chúltaca</string>
-    <!-- Toggle row label to allow the restoration of a backup to occur while on cellular connection -->
-    <string name="RemoteBackupsSettingsFragment__restore_using_cellular">Aischuir le nasc móibíleach</string>
+    <!-- Row label to allow the restoration of a backup to occur while on cellular connection -->
+    <string name="RemoteBackupsSettingsFragment__resume_download">Resume download</string>
     <!-- Row label for backup size -->
     <string name="RemoteBackupsSettingsFragment__backup_size">Méid an chúltaca</string>
     <!-- Row label for backup frequency -->
@@ -8395,12 +8672,12 @@
     <!-- Linear progress dialog text shown when preparing a backup -->
     <string name="RemoteBackupsSettingsFragment__preparing_backup">Cúltaca á ullmhú…</string>
     <!-- Linear progress dialog text shown when processing messages for backup. First placeholder is completed count, second is approximate total count, third is percent completed. -->
-    <plurals name="RemoteBackupsSettingsFragment__processing_d_of_d_d_messages">
-        <item quantity="one">%1$d teachtaireacht as %2$d á próiseáil (%3$d%%)</item>
-        <item quantity="two">%1$d theachtaireacht as %2$d á bpróiseáil (%3$d%%)</item>
-        <item quantity="few">%1$d theachtaireacht as %2$d á bpróiseáil (%3$d%%)</item>
-        <item quantity="many">%1$d dteachtaireacht as %2$d á bpróiseáil (%3$d%%)</item>
-        <item quantity="other">%1$d teachtaireacht as %2$d á bpróiseáil (%3$d%%)</item>
+    <plurals name="RemoteBackupsSettingsFragment__processing_messages_progress_text">
+        <item quantity="one">%1$s as %2$s teachtaireacht (%3$d%%) á phróiseáil</item>
+        <item quantity="two">%1$s as ~%2$s theachtaireacht (%3$d%%) á bpróiseáil</item>
+        <item quantity="few">%1$s as ~%2$s theachtaireacht (%3$d%%) á bpróiseáil</item>
+        <item quantity="many">%1$s as ~%2$s dteachtaireacht (%3$d%%) á bpróiseáil</item>
+        <item quantity="other">%1$s as ~%2$s teachtaireacht (%3$d%%) á bpróiseáil</item>
     </plurals>
     <!-- Displayed in row when backup is available for download and users subscription has expired. First placeholder is data size e.g. 12MB, second is days before expiration -->
     <plurals name="RemoteBackupsSettingsFragment__you_have_s_of_backup_data">
@@ -8410,6 +8687,8 @@
         <item quantity="many">Tá %1$s de shonraí cúltaca agat nach bhfuil ar an ngléas seo. Scriosfar do chúltaca nuair a thiocfaidh deireadh le do shíntiús i gceann %2$d lá.</item>
         <item quantity="other">Tá %1$s de shonraí cúltaca agat nach bhfuil ar an ngléas seo. Scriosfar do chúltaca nuair a thiocfaidh deireadh le do shíntiús i gceann %2$d lá.</item>
     </plurals>
+    <!-- Display in a row when backup is available for download but the user has canceled the restore. Place holder is data size e.g. 12MB -->
+    <string name="RemoteBackupsSettingsFragment__you_have_s_of_backup_data_not_on_device">You have %1$s of backup data that’s not on this device. </string>
     <!-- Displayed in row when backup is available for download to let user start download -->
     <string name="RemoteBackupsSettingsFragment__download">Íoslódáil</string>
     <!-- Dialog title for skipping download of backed up media -->
@@ -8422,6 +8701,10 @@
         <item quantity="many">Má scipeálann tú íoslódáil scriosfar na meáin agus ceangaltáin atá fágtha i do chúltaca i gceann %1$d lá.</item>
         <item quantity="other">Má scipeálann tú íoslódáil scriosfar na meáin agus ceangaltáin atá fágtha i do chúltaca i gceann %1$d lá.</item>
     </plurals>
+    <!-- Dialog title for skipping download of in progress initial restore of backed up media -->
+    <string name="RemoteBackupsSettingsFragment__skip_restore_question">Scipeáil aischur?</string>
+    <!-- Dialog message for skipping download of in progress initial restore of backed up media -->
+    <string name="RemoteBackupsSettingsFragment__skip_restore_message">If you skip restore the remaining media and attachments in your backup can be downloaded at a later time.</string>
     <!-- Positive dialog action to skip download -->
     <string name="RemoteBackupsSettingsFragment__skip">Léim thar seo</string>
     <!-- Dialog title for network error while trying to disable backups -->
@@ -8452,6 +8735,10 @@
     <string name="SubscriptionNotFoundBottomSheet__got_it">Tuigim</string>
     <!-- Action button label to contact support -->
     <string name="SubscriptionNotFoundBottomSheet__contact_support">Déan teagmháil leis an bhfoireann tacaíochta</string>
+
+    <!-- MessageBackupsFlowFragment -->
+    <!-- Body for network failure dialog in message backups checkout flow -->
+    <string name="MessageBackupsFlowFragment__a_network_failure_occurred">Tharla cliseadh líonra. Triail arís níos déanaí.</string>
 
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
@@ -8496,6 +8783,19 @@
     <string name="MessageBackupsKeyRecordScreen__continue">Ar aghaidh</string>
     <!-- Sheet secondary action button label -->
     <string name="MessageBackupsKeyRecordScreen__see_key_again">Féach ar an eochair arís</string>
+
+    <!-- Confirm key title -->
+    <string name="MessageBackupsKeyVerifyScreen__confirm_your_backup_key">Deimhnigh d\'eochair chúltaca</string>
+    <!-- Confirm your key subtitle -->
+    <string name="MessageBackupsKeyVerifyScreen__enter_the_backup_key_that_you_just_recorded">Cuir isteach an eochair chúltaca atá taifeadta agat díreach anois</string>
+    <!-- Confirm your key text entry hint text -->
+    <string name="MessageBackupsKeyVerifyScreen__backup_key">Eochair chúltaca</string>
+    <!-- Confirm your key text entry error text -->
+    <string name="MessageBackupsKeyVerifyScreen__incorrect_backup_key">Eochair chúltaca mhícheart</string>
+    <!-- Confirm your key button text to return to record key screen. -->
+    <string name="MessageBackupsKeyVerifyScreen__see_key_again">Féach ar an eochair arís</string>
+    <!-- Confirm your key button text to move onto next screen in flow -->
+    <string name="MessageBackupsKeyVerifyScreen__next">Ar aghaidh</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -8623,11 +8923,30 @@
     <!-- Text field error when the backup key is invalid -->
     <string name="EnterBackupKey_invalid_backup_key_error">Eochair chúltaca neamhbhailí</string>
     <!-- Dialog title shown during registration and trying to restore a remote backup -->
-    <string name="EnterBackupKey_backup_not_found">Backup not found</string>
+    <string name="EnterBackupKey_backup_not_found">Níor aimsíodh cúltaca</string>
     <!-- Dialog message shown during registration and trying to restore a remote backup -->
-    <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">The backup key you entered is correct, but there is no backup associated with it. If you still have your old phone, make sure backups are enabled and that a backup has been completed and try again.</string>
+    <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">Tá an eochair chúltaca a chuir tú isteach ceart, ach ní bhaineann aon chúltaca léi. Má tá do sheanghuthán agat fós, cinntigh go bhfuil cúltacaí cumasaithe agus go bhfuil cúltaca curtha i gcrích, agus triail arís.</string>
     <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
     <string name="EnterBackupKey_skip_restore">Scipeáil aischur</string>
+    <!-- Dialog title text when encountering backup restore network error -->
+    <string name="EnterBackupKey_cant_restore_backup">Ní féidir an cúltaca a aischur</string>
+    <!-- Dialog body text when encountering backup restore network error -->
+    <string name="EnterBackupKey_your_backup_cant_be_restored_right_now">Ní féidir do chúltaca a aischur díreach anois. Seiceáil do nasc Idirlín agus triail arís. </string>
+    <!-- Dialog button text to contact support on network error -->
+    <string name="EnterBackupKey_contact_support">Déan teagmháil leis an bhfoireann tacaíochta</string>
+
+    <!-- Email subject when contacting support on a restore backup network issue -->
+    <string name="EnterBackupKey_network_failure_support_email">Earráid líonra le haischur Chúltaca Signal Android</string>
+  <!-- Removed by excludeNonTranslatables <string name="EnterBackupKey_network_failure_support_email_filter" translatable="false">Signal Android Backup restore network error</string> -->
+
+    <!-- Title of dialog asking to submit debuglogs -->
+    <string name="ContactSupportDialog_submit_debug_log">Cuir isteach loga dífhabhtaithe?</string>
+    <!-- Body of dialog explaining what debug logs are and that they are optional to submit -->
+    <string name="ContactSupportDialog_your_debug_logs">Cabhróidh na logaí dífhabhtaithe linn d\'fhadhb a réiteach níos sciobtha. É sin ráite, níl siad riachtanach.</string>
+    <!-- Button option to submit debug log when contacting support -->
+    <string name="ContactSupportDialog_submit_with_debug">Seol loga dífhabhtaithe isteach freisin</string>
+    <!-- Button option to not submit debug log when contacting support -->
+    <string name="ContactSupportDialog_submit_without_debug">Ná seol loga dífhabhtaithe isteach freisin</string>
 
     <!-- Title for restore via qr screen -->
     <string name="RestoreViaQr_title">Scan an cód seo le do sheanghuthán</string>
@@ -8686,6 +9005,27 @@
     <string name="NoBackupToRestore_step3">Cumasaigh cúltacaí agus fan go dtí go bhfuil do chúltacú curtha i gcrích</string>
     <!-- No backup to Restore tonal cta to skip restore -->
     <string name="NoBackupToRestore_skip_restore">Scipeáil aischur</string>
+
+    <!-- Accessibility label for close search button in MainToolbar -->
+    <string name="MainToolbar__close_search_content_description">Dún an cuardach</string>
+    <!-- Accessibility label for clear search query in MainToolbar -->
+    <string name="MainToolbar__clear_search_content_description">Glan an cuardach</string>
+    <!-- Accessibility label for more options button in MainToolbar -->
+    <string name="MainToolbar__more_options_content_description">Tuilleadh roghanna</string>
+    <!-- Accessibility label for more options button in MainToolbar -->
+    <string name="MainToolbar__notification_profile_content_description">Próifíl Fógraí</string>
+    <!-- Accessibility label for more options button in MainToolbar -->
+    <string name="MainToolbar__proxy_content_description">Seachfhreastalaí</string>
+
+    <!-- Accessibility label for a button displayed in the toolbar to return to the previous screen. -->
+    <string name="DefaultTopAppBar__navigate_up_content_description">Téigh suas</string>
+
+    <!-- Accessibility label describing the action that occurs when clicking a checkbox. -->
+    <string name="SignalCheckbox_accessibility_on_click_label">Scoránaigh</string>
+    <!-- Accessibility label describing a checked checkbox. -->
+    <string name="SignalCheckbox_accessibility_checked_description">Ticked</string>
+    <!-- Accessibility label describing an unchecked checkbox. -->
+    <string name="SignalCheckbox_accessibility_unchecked_description">Unticked</string>
 
     <!-- EOF -->
 </resources>

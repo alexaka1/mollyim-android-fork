@@ -89,10 +89,10 @@
         android:background="?selectableItemBackground"
         android:gravity="center"
         android:textAppearance="@style/Signal.Text.Body"
-        android:textColor="@color/signal_colorOnSurface"
+        android:textColor="?attr/colorOnSurface"
         app:iconGravity="textStart"
         app:iconSize="20dp"
-        app:iconTint="@color/signal_colorOnSurface"
+        app:iconTint="?attr/colorOnSurface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -105,7 +105,7 @@
         android:id="@+id/sending_bar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/signal_colorSurface"
+        android:background="?attr/colorSurfaceContainer"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/views_and_replies_bar"
         app:layout_constraintTop_toTopOf="@id/views_and_replies_bar">
@@ -118,7 +118,7 @@
             android:drawablePadding="10dp"
             android:text="@string/StoriesLandingItem__sending"
             android:textAppearance="@style/Signal.Text.Body"
-            app:drawableTint="@color/signal_colorOnSurface" />
+            app:drawableTint="?attr/colorOnSurface" />
 
     </FrameLayout>
 
@@ -138,26 +138,22 @@
 
     <FrameLayout
         android:id="@+id/story_caption_container"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="95sp"
         android:layout_marginBottom="12dp"
-        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/story_from_barrier"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1">
+        app:layout_constraintStart_toStartOf="parent">
 
         <org.thoughtcrime.securesms.components.emoji.EmojiTextView
             android:id="@+id/story_caption"
-            android:layout_width="match_parent"
-            android:layout_height="95sp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
             android:gravity="bottom"
+            android:layout_gravity="bottom"
             android:textAppearance="@style/Signal.Text.BodyLarge"
             android:textColor="@color/core_white"
+            app:emoji_renderSpoilers="true"
             tools:text="Ugh." />
     </FrameLayout>
 
@@ -224,7 +220,7 @@
             android:text="@string/StoryViewerPageFragment__add"
             android:textAllCaps="false"
             android:textAppearance="@style/Signal.Text.BodyMedium"
-            android:textColor="@color/signal_dark_colorOnSurface"
+            android:textColor="?attr/colorOnSurface"
             android:visibility="gone"
             app:backgroundTint="@color/signal_colorSurfaceVariant_64"
             app:backgroundTintMode="src_in"
@@ -233,7 +229,7 @@
             app:iconGravity="textStart"
             app:iconPadding="8dp"
             app:iconSize="16dp"
-            app:iconTint="@color/signal_dark_colorOnSurface"
+            app:iconTint="?attr/colorOnSurface"
             tools:visibility="visible" />
     </FrameLayout>
 

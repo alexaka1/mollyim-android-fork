@@ -165,4 +165,10 @@
     <string name="MollySocketLink_scan_the_qr_code">Scan an cód QR atá ar taispeáint ar leathanach baile do fhreastalaí MollySocket nó sa chonsól.</string>
     <string name="MollySocketLink_try_scanning_another_image_containing_a_mollysocket_qr_code">Bain triail as íomhá eile a scanadh ina bhfuil cód MollySocket QR.</string>
     <string name="UnifiedPushSettingsFragment__mollysocket_server">MollySocket freastalaí</string>
+    <string name="app_icon_label_zen">Zen</string>
+    <string name="app_icon_label_moon">Gealach</string>
+    <string name="app_icon_label_music">Ceol</string>
+    <string name="preferences__follow_system">Córas leantach</string>
+    <string name="preferences_appearance__dynamic_colors">Dathanna Dinimiciúla</string>
+    <string name="preferences_appearance__use_system_colors_for_the_app_theme">Úsáid dathanna an chórais do théama an aip</string>
 </resources>

@@ -66,6 +66,7 @@ public final class LocalBackupJobApi29 extends BaseJob {
     return KEY;
   }
 
+  @SuppressLint("NewApi")
   @Override
   public void onRun() throws IOException {
     Log.i(TAG, "Executing backup job...");
@@ -88,7 +89,7 @@ public final class LocalBackupJobApi29 extends BaseJob {
       notification = GenericForegroundService.startForegroundTask(context,
                                                                   context.getString(R.string.LocalBackupJob_creating_signal_backup),
                                                                   NotificationChannels.getInstance().BACKUPS,
-                                                                  R.drawable.ic_molly_backup);
+                                                                  R.drawable.ic_notification_backup);
     } catch (UnableToStartException e) {
       Log.w(TAG, "Unable to start foreground backup service, continuing without service");
     }

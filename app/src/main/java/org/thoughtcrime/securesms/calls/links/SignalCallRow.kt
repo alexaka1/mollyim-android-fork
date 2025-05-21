@@ -35,9 +35,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import org.signal.core.ui.Buttons
-import org.signal.core.ui.Previews
-import org.signal.core.ui.SignalPreview
+import org.signal.core.ui.compose.Buttons
+import org.signal.core.ui.compose.Previews
+import org.signal.core.ui.compose.SignalPreview
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.conversation.colors.AvatarColorPair
 import org.thoughtcrime.securesms.database.CallLinkTable
@@ -150,10 +150,6 @@ fun SignalCallRow(
 
       Buttons.Small(
         onClick = onJoinClicked,
-        colors = ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.primaryContainer,
-          contentColor = MaterialTheme.colorScheme.onSurface
-        ),
         modifier = Modifier.align(CenterVertically)
       ) {
         val textId = if (callLinkPeekInfo?.isJoined == true) {

@@ -36,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -45,9 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import kotlinx.coroutines.launch
-import org.signal.core.ui.BottomSheets
-import org.signal.core.ui.Buttons
-import org.signal.core.ui.theme.SignalTheme
+import org.signal.core.ui.compose.BottomSheets
+import org.signal.core.ui.compose.Buttons
+import org.signal.core.ui.compose.theme.SignalTheme
+import org.signal.core.ui.compose.theme.colorAttribute
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.compose.ComposeBottomSheetDialogFragment
 
@@ -88,6 +88,7 @@ data class SafetyTipData(
 )
 
 private val tips = listOf(
+  SafetyTipData(heroImage = R.drawable.safety_tip0, titleText = R.string.SafetyTips_tip0_title, messageText = R.string.SafetyTips_tip0_message),
   SafetyTipData(heroImage = R.drawable.safety_tip1, titleText = R.string.SafetyTips_tip1_title, messageText = R.string.SafetyTips_tip1_message),
   SafetyTipData(heroImage = R.drawable.safety_tip2, titleText = R.string.SafetyTips_tip2_title, messageText = R.string.SafetyTips_tip2_message),
   SafetyTipData(heroImage = R.drawable.safety_tip3, titleText = R.string.SafetyTips_tip3_title, messageText = R.string.SafetyTips_tip3_message),
@@ -233,7 +234,7 @@ private fun SafetyTipPreview() {
 private fun SafetyTip(safetyTip: SafetyTipData) {
   Surface(
     shape = RoundedCornerShape(18.dp),
-    color = colorResource(id = R.color.safety_tip_background),
+    color = colorAttribute(id = R.attr.safety_tip_background),
     contentColor = MaterialTheme.colorScheme.onSurface,
     modifier = Modifier
       .fillMaxWidth()
@@ -246,7 +247,7 @@ private fun SafetyTip(safetyTip: SafetyTipData) {
     ) {
       Surface(
         shape = RoundedCornerShape(12.dp),
-        color = colorResource(id = R.color.safety_tip_image_background),
+        color = colorAttribute(id = R.attr.safety_tip_image_background),
         modifier = Modifier
           .padding(12.dp)
           .fillMaxWidth()

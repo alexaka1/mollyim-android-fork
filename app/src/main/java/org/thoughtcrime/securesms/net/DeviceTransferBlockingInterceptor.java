@@ -2,6 +2,7 @@ package org.thoughtcrime.securesms.net;
 
 import androidx.annotation.NonNull;
 
+import org.signal.core.util.concurrent.SignalExecutors;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
@@ -48,13 +49,17 @@ public final class DeviceTransferBlockingInterceptor implements Interceptor {
                                  .build();
   }
 
+  public boolean isBlockingNetwork() {
+    return blockNetworking;
+  }
+
   public void blockNetwork() {
     blockNetworking = true;
-    AppDependencies.resetNetwork(false);
+    SignalExecutors.UNBOUNDED.execute(() -> AppDependencies.resetNetwork(false));
   }
 
   public void unblockNetwork() {
     blockNetworking = false;
-    AppDependencies.resetNetwork(true);
+    SignalExecutors.UNBOUNDED.execute(() -> AppDependencies.resetNetwork(true));
   }
 }

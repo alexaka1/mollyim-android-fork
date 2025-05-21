@@ -1,8 +1,6 @@
 package org.thoughtcrime.securesms.jobmanager;
 
 import android.app.Application;
-import android.content.Intent;
-import android.os.Build;
 
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
@@ -74,8 +72,7 @@ public class JobManager implements ConstraintObserver.Notifier {
                                            configuration.getJobInstantiator(),
                                            configuration.getConstraintFactories(),
                                            configuration.getJobTracker(),
-                                           Build.VERSION.SDK_INT < 26 ? new AlarmManagerScheduler(application)
-                                                                      : new CompositeScheduler(new InAppScheduler(this), new JobSchedulerScheduler(application)),
+                                           new CompositeScheduler(new InAppScheduler(this), new JobSchedulerScheduler(application)),
                                            new Debouncer(500),
                                            this::onEmptyQueue);
 
@@ -92,10 +89,6 @@ public class JobManager implements ConstraintObserver.Notifier {
 
         for (ConstraintObserver constraintObserver : configuration.getConstraintObservers()) {
           constraintObserver.register(this);
-        }
-
-        if (Build.VERSION.SDK_INT < 26) {
-          application.startService(new Intent(application, KeepAliveService.class));
         }
 
         initialized = true;
@@ -135,10 +128,6 @@ public class JobManager implements ConstraintObserver.Notifier {
       }
     } catch (InterruptedException ie) {
       Log.w(TAG, ie);
-    }
-
-    if (Build.VERSION.SDK_INT < 26) {
-      application.stopService(new Intent(application, KeepAliveService.class));
     }
   }
 
@@ -297,6 +286,7 @@ public class JobManager implements ConstraintObserver.Notifier {
    * Search through the list of pending jobs and find all that match a given predicate. Note that there will always be races here, and the result you get back
    * may not be valid anymore by the time you get it. Use with caution.
    */
+  @WorkerThread
   public @NonNull List<JobSpec> find(@NonNull Predicate<JobSpec> predicate) {
     waitUntilInitialized();
     return jobController.findJobs(predicate);
@@ -554,18 +544,6 @@ public class JobManager implements ConstraintObserver.Notifier {
       if (!jobs.isEmpty()) {
         this.jobs.add(new ArrayList<>(jobs));
       }
-      return this;
-    }
-
-    public Chain after(@NonNull Job job) {
-      return after(Collections.singletonList(job));
-    }
-
-    public Chain after(@NonNull List<? extends Job> jobs) {
-      if (!jobs.isEmpty()) {
-        this.jobs.add(0, new ArrayList<>(jobs));
-      }
-
       return this;
     }
 

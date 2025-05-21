@@ -30,6 +30,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0"
+        android:overScrollMode="never"
+        android:nestedScrollingEnabled="true"
         tools:itemCount="0" />
 
     <androidx.fragment.app.FragmentContainerView
@@ -59,7 +61,7 @@
             android:minHeight="48dp"
             android:text="@string/StoryGroupReplyFragment__you_cant_reply"
             android:textAppearance="@style/Signal.Text.BodyMedium"
-            android:textColor="@color/signal_colorOnSurfaceVariant"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:visibility="gone" />
 
         <org.thoughtcrime.securesms.stories.viewer.reply.composer.StoryReplyComposer

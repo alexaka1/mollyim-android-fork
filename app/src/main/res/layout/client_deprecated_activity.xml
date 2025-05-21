@@ -24,14 +24,14 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_molly_logo" />
+        app:srcCompat="@drawable/logo_round_filled" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="27dp"
         android:text="@string/ClientDeprecatedActivity_update_signal"
-        android:textColor="@color/signal_colorOnBackground"
+        android:textColor="?attr/colorOnBackground"
         style="@style/Signal.Text.Headline"
         android:textStyle="bold"
         android:gravity="center" />
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/ClientDeprecatedActivity_this_version_of_the_app_is_no_longer_supported"
-        android:textColor="@color/signal_colorOnBackground"
+        android:textColor="?attr/colorOnBackground"
         style="@style/Signal.Text.Body"
         android:gravity="center" />
 

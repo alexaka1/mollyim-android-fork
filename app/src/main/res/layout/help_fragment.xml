@@ -25,6 +25,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:navigationIcon="@drawable/symbol_arrow_start_24"
+                app:title="@string/preferences__help" />
+
             <TextView
                 android:id="@+id/help_fragment_contact"
                 android:layout_width="match_parent"
@@ -34,10 +44,10 @@
                 android:layout_marginEnd="16dp"
                 android:text="@string/HelpFragment__contact_us"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textColor="@color/signal_text_secondary"
+                android:textColor="?attr/signal_text_secondary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
             <EditText
                 android:id="@+id/help_fragment_problem"
@@ -66,7 +76,7 @@
                 android:layout_marginEnd="16dp"
                 android:text="@string/HelpFragment__tell_us_why_youre_reaching_out"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textColor="@color/signal_text_secondary"
+                android:textColor="?attr/signal_text_secondary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/help_fragment_problem" />
@@ -90,7 +100,7 @@
                 android:layout_marginEnd="16dp"
                 android:text="@string/HelpFragment__how_do_you_feel"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textColor="@color/signal_text_secondary"
+                android:textColor="?attr/signal_text_secondary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/help_fragment_category" />
@@ -180,7 +190,7 @@
                 android:layout_marginStart="16dp"
                 android:checked="true"
                 android:text="@string/HelpFragment__include_debug_log"
-                android:textColor="@color/signal_text_secondary"
+                android:textColor="?attr/signal_text_secondary"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="@id/help_fragment_debug_info"
                 app:layout_constraintStart_toStartOf="parent"
@@ -217,6 +227,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingVertical="8dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/HelpFragment__have_you_read_our_faq_yet"
         android:textAllCaps="false"
         android:textAppearance="@style/Signal.Text.Body"

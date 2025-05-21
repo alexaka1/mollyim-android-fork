@@ -13,13 +13,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.messagerequests.MessageRequestState
 import org.thoughtcrime.securesms.messagerequests.MessageRequestsBottomView
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.util.SpanUtil
+import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.visible
 
 /**
@@ -82,7 +83,25 @@ class DisabledInputView @JvmOverloads constructor(
         setMessageRequestData(recipient, messageRequestState)
         setWallpaperEnabled(recipient.hasWallpaper)
 
-        setAcceptOnClickListener { listener?.onAcceptMessageRequestClicked() }
+        setAcceptOnClickListener {
+          if (messageRequestState.isFewConnectionsIndividual) {
+            MaterialAlertDialogBuilder(context)
+              .setTitle(R.string.MessageRequestBottomView_accept_request)
+              .setMessage(R.string.MessageRequestBottomView_review_requests_carefully)
+              .setPositiveButton(R.string.MessageRequestBottomView_accept) { _, _ -> listener?.onAcceptMessageRequestClicked() }
+              .setNegativeButton(android.R.string.cancel, null)
+              .show()
+          } else if (messageRequestState.isGroupV2Add) {
+            MaterialAlertDialogBuilder(context)
+              .setTitle(R.string.MessageRequestBottomView_join_group)
+              .setMessage(R.string.MessageRequestBottomView_review_requests_carefully_groups)
+              .setPositiveButton(R.string.MessageRequestBottomView_join) { _, _ -> listener?.onAcceptMessageRequestClicked() }
+              .setNegativeButton(android.R.string.cancel, null)
+              .show()
+          } else {
+            listener?.onAcceptMessageRequestClicked()
+          }
+        }
         setDeleteOnClickListener { listener?.onDeleteClicked() }
         setBlockOnClickListener { listener?.onBlockClicked() }
         setUnblockOnClickListener { listener?.onUnblockClicked() }
@@ -163,7 +182,7 @@ class DisabledInputView @JvmOverloads constructor(
   }
 
   fun setWallpaperEnabled(wallpaperEnabled: Boolean) {
-    color = ContextCompat.getColor(context, if (wallpaperEnabled) R.color.wallpaper_bubble_color else R.color.signal_colorBackground)
+    color = ThemeUtil.getThemedColor(context, if (wallpaperEnabled) R.color.wallpaper_bubble_color else com.google.android.material.R.attr.colorSurface)
     setBackgroundColor(color)
   }
 

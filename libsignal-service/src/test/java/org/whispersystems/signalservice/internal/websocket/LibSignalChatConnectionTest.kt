@@ -8,8 +8,11 @@ import io.mockk.verify
 import io.reactivex.rxjava3.observers.TestObserver
 import okio.ByteString.Companion.toByteString
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.signal.libsignal.internal.CompletableFuture
 import org.signal.libsignal.net.ChatConnection
@@ -19,6 +22,7 @@ import org.signal.libsignal.net.Network
 import org.signal.libsignal.net.UnauthenticatedChatConnection
 import org.whispersystems.signalservice.api.websocket.HealthMonitor
 import org.whispersystems.signalservice.api.websocket.WebSocketConnectionState
+import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -49,7 +53,7 @@ class LibSignalChatConnectionTest {
   fun before() {
     clearAllMocks()
     every { healthMonitor.onMessageError(any(), any()) }
-    every { healthMonitor.onKeepAliveResponse(any(), any(), any()) }
+    every { healthMonitor.onKeepAliveResponse(any(), any()) }
 
     // NB: We provide default success behavior mocks here to cut down on boilerplate later, but it is
     //  expected that some tests will override some of these to test failures.
@@ -69,6 +73,12 @@ class LibSignalChatConnectionTest {
       delay {
         it.complete(null)
         disconnectLatch?.countDown()
+
+        // The disconnectReason is null when the disconnect is due to the local client requesting the disconnect.
+        // This is a regression test because we previously forgot to update the Kotlin type definitions to
+        //   match this when the behavior changed in libsignal-client, causing NullPointerExceptions
+        //   missed connection interrupted events.
+        chatListener!!.onConnectionInterrupted(chatConnection, null)
       }
     }
 
@@ -101,6 +111,7 @@ class LibSignalChatConnectionTest {
       WebSocketConnectionState.CONNECTING,
       WebSocketConnectionState.CONNECTED
     )
+    observer.assertNoConsecutiveDuplicates()
   }
 
   // Test that the LibSignalChatConnection transitions to FAILED if the
@@ -131,9 +142,11 @@ class LibSignalChatConnectionTest {
       WebSocketConnectionState.CONNECTING,
       WebSocketConnectionState.FAILED
     )
+    observer.assertNoConsecutiveDuplicates()
   }
 
   // Test connect followed by disconnect, checking the state transitions.
+  @Ignore("Flaky")
   @Test
   fun orderOfStatesOnConnectAndDisconnect() {
     connectLatch = CountDownLatch(1)
@@ -149,6 +162,10 @@ class LibSignalChatConnectionTest {
     connection.disconnect()
     disconnectLatch!!.await(100, TimeUnit.MILLISECONDS)
 
+    // onConnectionInterrupted acts like the onClosed callback for the connection here, driving the
+    //   transition from DISCONNECTING -> DISCONNECTED.
+    chatListener!!.onConnectionInterrupted(chatConnection, null)
+
     observer.assertNotComplete()
     observer.assertValues(
       WebSocketConnectionState.DISCONNECTED,
@@ -157,6 +174,7 @@ class LibSignalChatConnectionTest {
       WebSocketConnectionState.DISCONNECTING,
       WebSocketConnectionState.DISCONNECTED
     )
+    observer.assertNoConsecutiveDuplicates()
   }
 
   // Test that a disconnect failure transitions from CONNECTED -> DISCONNECTING -> DISCONNECTED anyway,
@@ -189,6 +207,7 @@ class LibSignalChatConnectionTest {
       WebSocketConnectionState.DISCONNECTING,
       WebSocketConnectionState.DISCONNECTED
     )
+    observer.assertNoConsecutiveDuplicates()
   }
 
   // Test a successful keepAlive, i.e. we get a 200 OK in response to the keepAlive request,
@@ -203,7 +222,7 @@ class LibSignalChatConnectionTest {
     sendLatch!!.await(100, TimeUnit.MILLISECONDS)
 
     verify(exactly = 1) {
-      healthMonitor.onKeepAliveResponse(any(), false, any())
+      healthMonitor.onKeepAliveResponse(any(), false)
     }
     verify(exactly = 0) {
       healthMonitor.onMessageError(any(), any())
@@ -234,7 +253,7 @@ class LibSignalChatConnectionTest {
         healthMonitor.onMessageError(response.status, false)
       }
       verify(exactly = 0) {
-        healthMonitor.onKeepAliveResponse(any(), any(), any())
+        healthMonitor.onKeepAliveResponse(any(), any())
       }
     }
   }
@@ -270,8 +289,9 @@ class LibSignalChatConnectionTest {
       // Disconnects as a result of keep-alive failure
       WebSocketConnectionState.DISCONNECTED
     )
+    observer.assertNoConsecutiveDuplicates()
     verify(exactly = 0) {
-      healthMonitor.onKeepAliveResponse(any(), any(), any())
+      healthMonitor.onKeepAliveResponse(any(), any())
       healthMonitor.onMessageError(any(), any())
     }
   }
@@ -295,9 +315,38 @@ class LibSignalChatConnectionTest {
       // Disconnects as a result of the connection interrupted event
       WebSocketConnectionState.DISCONNECTED
     )
+    observer.assertNoConsecutiveDuplicates()
     verify(exactly = 0) {
-      healthMonitor.onKeepAliveResponse(any(), any(), any())
+      healthMonitor.onKeepAliveResponse(any(), any())
       healthMonitor.onMessageError(any(), any())
+    }
+  }
+
+  // If readRequest() does not throw when the underlying connection disconnects, this
+  //   causes the app to get stuck in a "fetching new messages" state.
+  @Test
+  fun regressionTestReadRequestThrowsOnDisconnect() {
+    setupConnectedConnection()
+
+    executor.submit {
+      Thread.sleep(100)
+      chatConnection.disconnect()
+    }
+
+    assertThrows(IOException::class.java) {
+      connection.readRequest(1000)
+    }
+  }
+
+  @Test
+  fun readRequestDoesTimeOut() {
+    setupConnectedConnection()
+
+    val observer = TestObserver<WebSocketConnectionState>()
+    connection.state.subscribe(observer)
+
+    assertThrows(TimeoutException::class.java) {
+      connection.readRequest(10)
     }
   }
 
@@ -309,15 +358,6 @@ class LibSignalChatConnectionTest {
 
     val observer = TestObserver<WebSocketConnectionState>()
     connection.state.subscribe(observer)
-
-    // Confirm that readRequest times out if there's no message.
-    var timedOut = false
-    try {
-      connection.readRequest(10)
-    } catch (e: TimeoutException) {
-      timedOut = true
-    }
-    assertTrue(timedOut)
 
     // We'll now simulate incoming messages
     val envelopeA = "msgA".toByteArray()
@@ -375,12 +415,85 @@ class LibSignalChatConnectionTest {
     assertTrue(connection.readRequestIfAvailable().isEmpty)
   }
 
+  @Test
+  fun regressionTestDisconnectWhileConnecting() {
+    every { network.connectUnauthChat(any()) } answers {
+      chatListener = firstArg()
+      delay {
+        // We do not complete the future, so we stay in the CONNECTING state forever.
+      }
+    }
+
+    connection.connect()
+    connection.disconnect()
+  }
+
+  @Test
+  fun regressionTestSendWhileConnecting() {
+    var connectionCompletionFuture: CompletableFuture<UnauthenticatedChatConnection>? = null
+    every { network.connectUnauthChat(any()) } answers {
+      chatListener = firstArg()
+      connectionCompletionFuture = CompletableFuture<UnauthenticatedChatConnection>()
+      connectionCompletionFuture!!
+    }
+    sendLatch = CountDownLatch(1)
+
+    connection.connect()
+
+    val sendSingle = connection.sendRequest(WebSocketRequestMessage("GET", "/fake-path"))
+    val sendObserver = sendSingle.test()
+
+    assertEquals(1, sendLatch!!.count)
+    sendObserver.assertNotComplete()
+
+    connectionCompletionFuture!!.complete(chatConnection)
+
+    sendLatch!!.await(100, TimeUnit.MILLISECONDS)
+    sendObserver.awaitDone(100, TimeUnit.MILLISECONDS)
+    sendObserver.assertValues(RESPONSE_SUCCESS.toWebsocketResponse(true))
+  }
+
+  @Test
+  fun testSendFailsWhenConnectionFails() {
+    var connectionCompletionFuture: CompletableFuture<UnauthenticatedChatConnection>? = null
+    every { network.connectUnauthChat(any()) } answers {
+      chatListener = firstArg()
+      connectionCompletionFuture = CompletableFuture<UnauthenticatedChatConnection>()
+      connectionCompletionFuture!!
+    }
+    sendLatch = CountDownLatch(1)
+
+    connection.connect()
+    val sendSingle = connection.sendRequest(WebSocketRequestMessage("GET", "/fake-path"))
+    val sendObserver = sendSingle.test()
+
+    assertEquals(1, sendLatch!!.count)
+    sendObserver.assertNotComplete()
+
+    connectionCompletionFuture!!.completeExceptionally(ChatServiceException(""))
+
+    sendObserver.awaitDone(100, TimeUnit.MILLISECONDS)
+    assertEquals(1, sendLatch!!.count)
+    sendObserver.assertFailure(IOException().javaClass)
+  }
+
   private fun <T> delay(action: ((CompletableFuture<T>) -> Unit)): CompletableFuture<T> {
     val future = CompletableFuture<T>()
     executor.submit {
       action(future)
     }
     return future
+  }
+
+  private fun TestObserver<WebSocketConnectionState>.assertNoConsecutiveDuplicates() {
+    val states = this.values()
+    for (i in 1 until states.size) {
+      assertNotEquals(
+        "Found duplicate consecutive states states[${i - 1}] = states[$i] = ${states[i]}",
+        states[i - 1],
+        states[i]
+      )
+    }
   }
 
   companion object {

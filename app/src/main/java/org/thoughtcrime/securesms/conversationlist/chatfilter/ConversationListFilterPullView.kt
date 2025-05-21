@@ -11,15 +11,17 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.StringRes
 import androidx.core.animation.doOnEnd
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnNextLayout
+import com.google.android.material.R as MaterialR
 import com.google.android.material.animation.ArgbEvaluatorCompat
 import org.signal.core.util.getParcelableCompat
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.animation.AnimationCompleteListener
 import org.thoughtcrime.securesms.databinding.ConversationListFilterPullViewBinding
+import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.VibrateUtil
+import org.thoughtcrime.securesms.util.doAfterNextLayout
 import org.thoughtcrime.securesms.util.doOnEachLayout
 import kotlin.math.max
 import kotlin.math.min
@@ -77,8 +79,8 @@ class ConversationListFilterPullView @JvmOverloads constructor(
   private var animateHelpText = 0
   private var helpTextStartFraction = 0.35f
 
-  private val pillDefaultBackgroundTint = ContextCompat.getColor(context, R.color.signal_colorSecondaryContainer)
-  private val pillWillCloseBackgroundTint = ContextCompat.getColor(context, R.color.signal_colorSurface1)
+  private val pillDefaultBackgroundTint = ThemeUtil.getThemedColor(context, MaterialR.attr.colorSecondaryContainer)
+  private val pillWillCloseBackgroundTint = ThemeUtil.getThemedColor(context, MaterialR.attr.colorSurfaceContainerLow)
 
   fun setPillText(@StringRes textId: Int) {
     binding.filterText.setText(textId)
@@ -104,7 +106,7 @@ class ConversationListFilterPullView @JvmOverloads constructor(
 
     doOnNextLayout {
       when (restoredState.toLatestSettledState()) {
-        FilterPullState.OPEN -> toggle(restoredSource)
+        FilterPullState.OPEN -> open(restoredSource)
         FilterPullState.CLOSED -> Unit
         else -> throw IllegalStateException("Unexpected settled state.")
       }
@@ -195,6 +197,7 @@ class ConversationListFilterPullView @JvmOverloads constructor(
   }
 
   fun openImmediate() {
+    println("openImmediate from $state")
     if (state == FilterPullState.CLOSED) {
       setState(FilterPullState.OPEN_APEX, source)
       setState(FilterPullState.OPENING, source)
@@ -203,6 +206,12 @@ class ConversationListFilterPullView @JvmOverloads constructor(
         animationStartDelay = 0.milliseconds,
         animationDuration = 0.milliseconds
       )
+    }
+  }
+
+  fun openAfterNextLayout() {
+    doAfterNextLayout {
+      openImmediate()
     }
   }
 

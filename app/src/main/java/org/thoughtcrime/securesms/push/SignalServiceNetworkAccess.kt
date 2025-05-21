@@ -1,6 +1,9 @@
 package org.thoughtcrime.securesms.push
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import okhttp3.CipherSuite
 import okhttp3.ConnectionSpec
@@ -16,7 +19,9 @@ import org.thoughtcrime.securesms.net.DeviceTransferBlockingInterceptor
 import org.thoughtcrime.securesms.net.Networking
 import org.thoughtcrime.securesms.net.RemoteDeprecationDetectorInterceptor
 import org.thoughtcrime.securesms.net.StandardUserAgentInterceptor
+import org.thoughtcrime.securesms.net.StorageServiceSizeLoggingInterceptor
 import org.whispersystems.signalservice.api.push.TrustStore
+import org.whispersystems.signalservice.internal.configuration.HttpProxy
 import org.whispersystems.signalservice.internal.configuration.SignalCdnUrl
 import org.whispersystems.signalservice.internal.configuration.SignalCdsiUrl
 import org.whispersystems.signalservice.internal.configuration.SignalServiceConfiguration
@@ -24,6 +29,8 @@ import org.whispersystems.signalservice.internal.configuration.SignalServiceUrl
 import org.whispersystems.signalservice.internal.configuration.SignalStorageUrl
 import org.whispersystems.signalservice.internal.configuration.SignalSvr2Url
 import java.io.IOException
+import java.util.Optional
+import android.net.Proxy as AndroidProxy
 
 /**
  * Provides a [SignalServiceConfiguration] to be used with our service layer.
@@ -64,7 +71,7 @@ class SignalServiceNetworkAccess(context: Context) {
     private const val HTTPS_ANDROID_CLIENTS_GOOGLE_COM = "https://android.clients.google.com"
     private const val HTTPS_CLIENTS_3_GOOGLE_COM = "https://clients3.google.com"
     private const val HTTPS_CLIENTS_4_GOOGLE_COM = "https://clients4.google.com"
-    private const val HTTPS_INBOX_GOOGLE_COM = "https://inbox.google.com"
+    private const val HTTPS_GOOGLEMAIL_COM = "https://googlemail.com"
     private const val HTTPS_GITHUB_GITHUBASSETS_COM = "https://github.githubassets.com"
     private const val HTTPS_PINTEREST_COM = "https://pinterest.com"
     private const val HTTPS_WWW_REDDITSTATIC_COM = "https://www.redditstatic.com"
@@ -103,7 +110,7 @@ class SignalServiceNetworkAccess(context: Context) {
       HTTPS_ANDROID_CLIENTS_GOOGLE_COM.stripProtocol(),
       HTTPS_CLIENTS_3_GOOGLE_COM.stripProtocol(),
       HTTPS_CLIENTS_4_GOOGLE_COM.stripProtocol(),
-      HTTPS_INBOX_GOOGLE_COM.stripProtocol(),
+      HTTPS_GOOGLEMAIL_COM.stripProtocol(),
       HTTPS_GITHUB_GITHUBASSETS_COM.stripProtocol(),
       HTTPS_PINTEREST_COM.stripProtocol(),
       HTTPS_WWW_REDDITSTATIC_COM.stripProtocol(),
@@ -170,6 +177,28 @@ class SignalServiceNetworkAccess(context: Context) {
       .build()
 
     private val APP_CONNECTION_SPEC = ConnectionSpec.MODERN_TLS
+
+    @Suppress("DEPRECATION")
+    private fun getSystemHttpProxy(context: Context): HttpProxy? {
+      return if (Build.VERSION.SDK_INT >= 23) {
+        val connectivityManager = ContextCompat.getSystemService(context, ConnectivityManager::class.java) ?: return null
+
+        connectivityManager
+          .activeNetwork
+          ?.let { connectivityManager.getLinkProperties(it)?.httpProxy }
+          ?.takeIf { !it.exclusionList.contains(BuildConfig.SIGNAL_URL.stripProtocol()) }
+          ?.let { proxy -> HttpProxy(proxy.host, proxy.port) }
+      } else {
+        val host: String? = AndroidProxy.getHost(context)
+        val port: Int = AndroidProxy.getPort(context)
+
+        if (host != null) {
+          HttpProxy(host, port)
+        } else {
+          null
+        }
+      }
+    }
   }
 
   private val serviceTrustStore: TrustStore = SignalServiceTrustStore(context)
@@ -178,7 +207,8 @@ class SignalServiceNetworkAccess(context: Context) {
 
   private val interceptors: List<Interceptor> = listOf(
     StandardUserAgentInterceptor(),
-    RemoteDeprecationDetectorInterceptor(),
+    StorageServiceSizeLoggingInterceptor(),
+    RemoteDeprecationDetectorInterceptor(this::getConfiguration),
     DeprecatedClientPreventionInterceptor(),
     DeviceTransferBlockingInterceptor.getInstance()
   )
@@ -206,7 +236,7 @@ class SignalServiceNetworkAccess(context: Context) {
     HostConfig(HTTPS_ANDROID_CLIENTS_GOOGLE_COM, G_HOST, PLAY_CONNECTION_SPEC),
     HostConfig(HTTPS_CLIENTS_3_GOOGLE_COM, G_HOST, GMAPS_CONNECTION_SPEC),
     HostConfig(HTTPS_CLIENTS_4_GOOGLE_COM, G_HOST, GMAPS_CONNECTION_SPEC),
-    HostConfig(HTTPS_INBOX_GOOGLE_COM, G_HOST, GMAIL_CONNECTION_SPEC)
+    HostConfig(HTTPS_GOOGLEMAIL_COM, G_HOST, GMAIL_CONNECTION_SPEC)
   )
 
   private val fUrls = arrayOf(HTTPS_GITHUB_GITHUBASSETS_COM, HTTPS_PINTEREST_COM, HTTPS_WWW_REDDITSTATIC_COM)
@@ -225,6 +255,7 @@ class SignalServiceNetworkAccess(context: Context) {
     socketFactory = Networking.socketFactory,
     proxySelector = Networking.proxySelectorForSocks,
     dns = Networking.dns,
+    systemHttpProxy = Optional.empty(),
     zkGroupServerPublicParams = zkGroupServerPublicParams,
     genericServerPublicParams = genericServerPublicParams,
     backupServerPublicParams = backupServerPublicParams,
@@ -285,6 +316,7 @@ class SignalServiceNetworkAccess(context: Context) {
     socketFactory = Networking.socketFactory,
     proxySelector = Networking.proxySelectorForSocks,
     dns = Networking.dns,
+    systemHttpProxy = Optional.ofNullable(getSystemHttpProxy(context)),
     zkGroupServerPublicParams = zkGroupServerPublicParams,
     genericServerPublicParams = genericServerPublicParams,
     backupServerPublicParams = backupServerPublicParams,
@@ -356,6 +388,7 @@ class SignalServiceNetworkAccess(context: Context) {
       socketFactory = Networking.socketFactory,
       proxySelector = Networking.proxySelectorForSocks,
       dns = Networking.dns,
+      systemHttpProxy = Optional.empty(),
       zkGroupServerPublicParams = zkGroupServerPublicParams,
       genericServerPublicParams = genericServerPublicParams,
       backupServerPublicParams = backupServerPublicParams,

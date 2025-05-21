@@ -230,7 +230,6 @@ public abstract class WebRtcActionProcessor {
                                                       messageAgeSec,
                                                       WebRtcUtil.getCallMediaTypeFromOfferType(offerMetadata.getOfferType()),
                                                       SignalStore.account().getDeviceId(),
-                                                      SignalStore.account().isPrimaryDevice(),
                                                       remoteIdentityKey,
                                                       localIdentityKey);
     } catch (CallException | InvalidKeyException e) {
@@ -619,6 +618,10 @@ public abstract class WebRtcActionProcessor {
       callParticipant.getVideoSink().setDeviceOrientationDegrees(sinkRotationDegrees);
     }
 
+    AppDependencies.getSignalCallManager()
+                   .getLockManager()
+                   .updateOrientation(Orientation.fromDegrees(orientationDegrees));
+
     return currentState.builder()
                        .changeLocalDeviceState()
                        .setOrientation(Orientation.fromDegrees(stateRotationDegrees))
@@ -780,6 +783,21 @@ public abstract class WebRtcActionProcessor {
 
   protected @NonNull WebRtcServiceState handleGroupCallEnded(@NonNull WebRtcServiceState currentState, int groupCallHash, @NonNull GroupCall.GroupCallEndReason groupCallEndReason) {
     Log.i(tag, "handleGroupCallEnded not processed");
+    return currentState;
+  }
+
+  protected @NonNull WebRtcServiceState handleRemoteMuteRequest(@NonNull WebRtcServiceState currentState, long sourceDemuxId) {
+    Log.i(tag, "handleRemoteMuteRequest not processed");
+    return currentState;
+  }
+
+  protected @NonNull WebRtcServiceState handleObservedRemoteMute(@NonNull WebRtcServiceState currentState, long sourceDemuxId, long targetDemuxId) {
+    Log.i(tag, "handleObservedRemoteMute not processed");
+    return currentState;
+  }
+
+  protected @NonNull WebRtcServiceState handleGroupCallSpeechEvent(@NonNull WebRtcServiceState currentState, @NonNull GroupCall.SpeechEvent speechEvent) {
+    Log.i(tag, "handleGroupCallSpeechEvent not processed");
     return currentState;
   }
 

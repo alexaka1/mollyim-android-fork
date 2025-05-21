@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ import org.signal.core.util.bytes
 import org.signal.core.util.logging.Log
 import org.signal.core.util.money.FiatMoney
 import org.signal.donations.InAppPaymentType
+import org.thoughtcrime.securesms.backup.ArchiveUploadProgress
 import org.thoughtcrime.securesms.backup.v2.BackupFrequency
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
 import org.thoughtcrime.securesms.backup.v2.MessageBackupTier
@@ -41,6 +43,7 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobs.BackupMessagesJob
 import org.thoughtcrime.securesms.jobs.RestoreOptimizedMediaJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
+import org.thoughtcrime.securesms.keyvalue.protos.ArchiveUploadProgressState
 import org.thoughtcrime.securesms.service.MessageBackupListener
 import java.util.Currency
 import kotlin.time.Duration.Companion.seconds
@@ -52,14 +55,14 @@ import kotlin.time.Duration.Companion.seconds
 class RemoteBackupsSettingsViewModel : ViewModel() {
 
   companion object {
-    private val TAG = Log.tag(RemoteBackupsSettingsFragment::class)
+    private val TAG = Log.tag(RemoteBackupsSettingsViewModel::class)
   }
 
   private val _state = MutableStateFlow(
     RemoteBackupsSettingsState(
       backupsEnabled = SignalStore.backup.areBackupsEnabled,
       lastBackupTimestamp = SignalStore.backup.lastBackupTime,
-      backupSize = SignalStore.backup.totalBackupSize,
+      backupMediaSize = SignalStore.backup.totalBackupSize,
       backupsFrequency = SignalStore.backup.backupFrequency,
       canBackUpUsingCellular = SignalStore.backup.backupWithCellular,
       canRestoreUsingCellular = SignalStore.backup.restoreWithCellular
@@ -81,15 +84,25 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
         }
     }
 
-    viewModelScope.launch(Dispatchers.Default) {
+    viewModelScope.launch(Dispatchers.IO) {
       val restoreProgress = MediaRestoreProgressBanner()
 
+      var optimizedRemainingBytes = 0L
       while (isActive) {
         if (restoreProgress.enabled) {
           Log.d(TAG, "Backup is being restored. Collecting updates.")
-          restoreProgress.dataFlow.collectLatest { latest ->
-            _restoreState.update { BackupRestoreState.FromBackupStatusData(latest) }
-          }
+          restoreProgress
+            .dataFlow
+            .takeWhile { it !is BackupStatusData.RestoringMedia || it.restoreStatus != BackupStatusData.RestoreStatus.FINISHED }
+            .collectLatest { latest ->
+              _restoreState.update { BackupRestoreState.FromBackupStatusData(latest) }
+            }
+        } else if (
+          !SignalStore.backup.optimizeStorage &&
+          SignalStore.backup.userManuallySkippedMediaRestore &&
+          SignalDatabase.attachments.getOptimizedMediaAttachmentSize().also { optimizedRemainingBytes = it } > 0
+        ) {
+          _restoreState.update { BackupRestoreState.Ready(optimizedRemainingBytes.bytes.toUnitString()) }
         } else if (SignalStore.backup.totalRestorableAttachmentSize > 0L) {
           _restoreState.update { BackupRestoreState.Ready(SignalStore.backup.totalRestorableAttachmentSize.bytes.toUnitString()) }
         } else if (BackupRepository.shouldDisplayBackupFailedSettingsRow()) {
@@ -103,6 +116,20 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
         delay(1.seconds)
       }
     }
+
+    viewModelScope.launch {
+      var previous: ArchiveUploadProgressState.State? = null
+      ArchiveUploadProgress.progress
+        .collect { current ->
+          if (previous != null && current.state == ArchiveUploadProgressState.State.None) {
+            _state.update {
+              it.copy(lastBackupTimestamp = SignalStore.backup.lastBackupTime)
+            }
+            refreshState(null)
+          }
+          previous = current.state
+        }
+    }
   }
 
   fun setCanBackUpUsingCellular(canBackUpUsingCellular: Boolean) {
@@ -110,9 +137,9 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
     _state.update { it.copy(canBackUpUsingCellular = canBackUpUsingCellular) }
   }
 
-  fun setCanRestoreUsingCellular(canRestoreUsingCellular: Boolean) {
-    SignalStore.backup.restoreWithCellular = canRestoreUsingCellular
-    _state.update { it.copy(canRestoreUsingCellular = canRestoreUsingCellular) }
+  fun setCanRestoreUsingCellular() {
+    SignalStore.backup.restoreWithCellular = true
+    _state.update { it.copy(canRestoreUsingCellular = true) }
   }
 
   fun setBackupsFrequency(backupsFrequency: BackupFrequency) {
@@ -123,15 +150,11 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
   }
 
   fun beginMediaRestore() {
-    // TODO - [backups] Begin media restore.
+    BackupRepository.resumeMediaRestore()
   }
 
   fun skipMediaRestore() {
     BackupRepository.skipMediaRestore()
-  }
-
-  fun cancelMediaRestore() {
-    // TODO - [backups] Cancel in-progress media restoration
   }
 
   fun requestDialog(dialog: RemoteBackupsSettingsState.Dialog) {
@@ -154,7 +177,52 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
     }
   }
 
+  fun turnOffAndDeleteBackups() {
+    viewModelScope.launch {
+      Log.d(TAG, "Beginning to turn off and delete backup.")
+      requestDialog(RemoteBackupsSettingsState.Dialog.PROGRESS_SPINNER)
+
+      val hasMediaBackupUploaded = SignalStore.backup.backsUpMedia && SignalStore.backup.hasBackupBeenUploaded
+
+      val succeeded = withContext(Dispatchers.IO) {
+        BackupRepository.turnOffAndDisableBackups()
+      }
+
+      if (isActive) {
+        if (succeeded) {
+          if (hasMediaBackupUploaded && SignalStore.backup.optimizeStorage) {
+            Log.d(TAG, "User has optimized storage, downloading.")
+            requestDialog(RemoteBackupsSettingsState.Dialog.DOWNLOADING_YOUR_BACKUP)
+
+            SignalStore.backup.optimizeStorage = false
+            RestoreOptimizedMediaJob.enqueue()
+          } else {
+            Log.d(TAG, "User does not have optimized storage, finished.")
+            requestDialog(RemoteBackupsSettingsState.Dialog.NONE)
+          }
+          refresh()
+        } else {
+          Log.d(TAG, "Failed to disable backups.")
+          requestDialog(RemoteBackupsSettingsState.Dialog.TURN_OFF_FAILED)
+        }
+      }
+    }
+  }
+
+  fun onBackupNowClick() {
+    BackupMessagesJob.enqueue()
+  }
+
   private suspend fun refreshState(lastPurchase: InAppPaymentTable.InAppPayment?) {
+    try {
+      performStateRefresh(lastPurchase)
+    } catch (e: Exception) {
+      Log.w(TAG, "State refresh failed", e)
+      throw e
+    }
+  }
+
+  private suspend fun performStateRefresh(lastPurchase: InAppPaymentTable.InAppPayment?) {
     val tier = SignalStore.backup.latestBackupTier
 
     _state.update {
@@ -162,7 +230,7 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
         backupsEnabled = SignalStore.backup.areBackupsEnabled,
         backupState = RemoteBackupsSettingsState.BackupState.Loading,
         lastBackupTimestamp = SignalStore.backup.lastBackupTime,
-        backupSize = SignalStore.backup.totalBackupSize,
+        backupMediaSize = SignalStore.backup.totalBackupSize,
         backupsFrequency = SignalStore.backup.backupFrequency,
         canBackUpUsingCellular = SignalStore.backup.backupWithCellular,
         canRestoreUsingCellular = SignalStore.backup.restoreWithCellular
@@ -188,7 +256,7 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
       val hasActiveGooglePlayBillingSubscription = when (val purchaseResult = AppDependencies.billingApi.queryPurchases()) {
         is BillingPurchaseResult.Success -> purchaseResult.isAcknowledged && purchaseResult.isWithinTheLastMonth()
         else -> false
-      }
+      } || SignalStore.backup.backupTierInternalOverride == MessageBackupTier.PAID
 
       Log.d(TAG, "[subscriptionStateMismatchDetected] hasActiveGooglePlayBillingSubscription: $hasActiveGooglePlayBillingSubscription")
 
@@ -204,18 +272,35 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
         BackupRepository.getBackupsType(MessageBackupTier.PAID) as MessageBackupsType.Paid
       }
 
-      if (hasActiveSignalSubscription && !hasActiveGooglePlayBillingSubscription) {
-        _state.update {
-          it.copy(
-            backupState = RemoteBackupsSettingsState.BackupState.SubscriptionMismatchMissingGooglePlay(
-              messageBackupsType = type,
-              renewalTime = activeSubscription!!.activeSubscription.endOfCurrentPeriod.seconds
+      when {
+        hasActiveSignalSubscription && !hasActiveGooglePlayBillingSubscription -> {
+          _state.update {
+            it.copy(
+              backupState = RemoteBackupsSettingsState.BackupState.SubscriptionMismatchMissingGooglePlay(
+                messageBackupsType = type,
+                renewalTime = activeSubscription.activeSubscription.endOfCurrentPeriod.seconds
+              )
             )
-          )
+          }
+
+          return
+        }
+
+        hasActiveSignalSubscription && hasActiveGooglePlayBillingSubscription -> {
+          Log.d(TAG, "Found active signal subscription and active google play subscription. Clearing mismatch.")
+          SignalStore.backup.subscriptionStateMismatchDetected = false
+        }
+
+        !hasActiveSignalSubscription && !hasActiveGooglePlayBillingSubscription -> {
+          Log.d(TAG, "Found inactive signal subscription and inactive google play subscription. Clearing mismatch.")
+          SignalStore.backup.subscriptionStateMismatchDetected = false
+        }
+
+        else -> {
+          Log.w(TAG, "Hit unexpected subscription mismatch state: signal:false, google:true")
+          return
         }
       }
-
-      return
     }
 
     when (tier) {
@@ -226,6 +311,7 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
           BackupRepository.getBackupsType(tier) as MessageBackupsType.Paid
         }
 
+        Log.d(TAG, "Attempting to retrieve current subscription...")
         val activeSubscription = withContext(Dispatchers.IO) {
           RecurringInAppPaymentRepository.getActiveSubscriptionSync(InAppPaymentSubscriberRecord.Type.BACKUP)
         }
@@ -298,39 +384,6 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
     }
   }
 
-  fun turnOffAndDeleteBackups() {
-    viewModelScope.launch {
-      Log.d(TAG, "Beginning to turn off and delete backup.")
-      requestDialog(RemoteBackupsSettingsState.Dialog.PROGRESS_SPINNER)
-
-      val hasMediaBackupUploaded = SignalStore.backup.backsUpMedia && SignalStore.backup.hasBackupBeenUploaded
-
-      val succeeded = withContext(Dispatchers.IO) {
-        BackupRepository.turnOffAndDisableBackups()
-      }
-
-      if (isActive) {
-        if (succeeded) {
-          if (hasMediaBackupUploaded && SignalStore.backup.optimizeStorage) {
-            Log.d(TAG, "User has optimized storage, downloading.")
-            requestDialog(RemoteBackupsSettingsState.Dialog.DOWNLOADING_YOUR_BACKUP)
-
-            SignalStore.backup.optimizeStorage = false
-            RestoreOptimizedMediaJob.enqueue()
-          } else {
-            Log.d(TAG, "User does not have optimized storage, finished.")
-            requestDialog(RemoteBackupsSettingsState.Dialog.NONE)
-          }
-          refresh()
-        } else {
-          Log.d(TAG, "Failed to disable backups.")
-          requestDialog(RemoteBackupsSettingsState.Dialog.TURN_OFF_FAILED)
-        }
-      }
-    }
-  }
-
-  fun onBackupNowClick() {
-    BackupMessagesJob.enqueue()
+  private fun refreshLocalState() {
   }
 }

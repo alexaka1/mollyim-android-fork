@@ -5,15 +5,18 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.getParcelableCompat
 import org.signal.donations.InAppPaymentType
@@ -21,7 +24,6 @@ import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.components.TemporaryScreenshotSecurity
 import org.thoughtcrime.securesms.components.ViewBinderDelegate
 import org.thoughtcrime.securesms.components.settings.app.subscription.DonationSerializationHelper.toFiatMoney
-import org.thoughtcrime.securesms.components.settings.app.subscription.InAppPaymentComponent
 import org.thoughtcrime.securesms.components.settings.app.subscription.donate.InAppPaymentCheckoutDelegate
 import org.thoughtcrime.securesms.components.settings.app.subscription.donate.InAppPaymentProcessorAction
 import org.thoughtcrime.securesms.components.settings.app.subscription.donate.InAppPaymentProcessorActionResult
@@ -29,26 +31,27 @@ import org.thoughtcrime.securesms.components.settings.app.subscription.donate.st
 import org.thoughtcrime.securesms.components.settings.app.subscription.donate.stripe.StripePaymentInProgressViewModel
 import org.thoughtcrime.securesms.databinding.CreditCardFragmentBinding
 import org.thoughtcrime.securesms.payments.FiatMoneyUtil
+import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.ViewUtil
-import org.thoughtcrime.securesms.util.fragments.requireListener
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
+import org.thoughtcrime.securesms.util.viewModel
 
 class CreditCardFragment : Fragment(R.layout.credit_card_fragment) {
 
   private val binding by ViewBinderDelegate(CreditCardFragmentBinding::bind)
   private val args: CreditCardFragmentArgs by navArgs()
-  private val viewModel: CreditCardViewModel by viewModels()
+  private val viewModel: CreditCardViewModel by viewModel {
+    CreditCardViewModel(args.inAppPaymentId)
+  }
+
   private val lifecycleDisposable = LifecycleDisposable()
   private val stripePaymentViewModel: StripePaymentInProgressViewModel by navGraphViewModels(
-    R.id.checkout_flow,
-    factoryProducer = {
-      StripePaymentInProgressViewModel.Factory(requireListener<InAppPaymentComponent>().stripeRepository)
-    }
+    R.id.checkout_flow
   )
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     TemporaryScreenshotSecurity.bindToViewLifecycleOwner(this)
-    InAppPaymentCheckoutDelegate.ErrorHandler().attach(this, null, args.inAppPayment.id)
+    InAppPaymentCheckoutDelegate.ErrorHandler().attach(this, null, args.inAppPaymentId)
 
     setFragmentResultListener(StripePaymentInProgressFragment.REQUEST_KEY) { _, bundle ->
       val result: InAppPaymentProcessorActionResult = bundle.getParcelableCompat(StripePaymentInProgressFragment.REQUEST_KEY, InAppPaymentProcessorActionResult::class.java)!!
@@ -58,25 +61,31 @@ class CreditCardFragment : Fragment(R.layout.credit_card_fragment) {
       }
     }
 
-    binding.continueButton.text = when (args.inAppPayment.type) {
-      InAppPaymentType.RECURRING_DONATION -> {
-        getString(
-          R.string.CreditCardFragment__donate_s_month,
-          FiatMoneyUtil.format(resources, args.inAppPayment.data.amount!!.toFiatMoney(), FiatMoneyUtil.formatOptions().trimZerosAfterDecimal())
-        )
-      }
-      InAppPaymentType.RECURRING_BACKUP -> {
-        getString(
-          R.string.CreditCardFragment__pay_s_month,
-          FiatMoneyUtil.format(resources, args.inAppPayment.data.amount!!.toFiatMoney(), FiatMoneyUtil.formatOptions().trimZerosAfterDecimal())
-        )
-      }
-      else -> {
-        getString(R.string.CreditCardFragment__donate_s, FiatMoneyUtil.format(resources, args.inAppPayment.data.amount!!.toFiatMoney()))
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        viewModel.inAppPayment.collectLatest { inAppPayment ->
+          binding.continueButton.text = when (inAppPayment.type) {
+            InAppPaymentType.RECURRING_DONATION -> {
+              getString(
+                R.string.CreditCardFragment__donate_s_month,
+                FiatMoneyUtil.format(resources, inAppPayment.data.amount!!.toFiatMoney(), FiatMoneyUtil.formatOptions().trimZerosAfterDecimal())
+              )
+            }
+            InAppPaymentType.RECURRING_BACKUP -> {
+              getString(
+                R.string.CreditCardFragment__pay_s_month,
+                FiatMoneyUtil.format(resources, inAppPayment.data.amount!!.toFiatMoney(), FiatMoneyUtil.formatOptions().trimZerosAfterDecimal())
+              )
+            }
+            else -> {
+              getString(R.string.CreditCardFragment__donate_s, FiatMoneyUtil.format(resources, inAppPayment.data.amount!!.toFiatMoney()))
+            }
+          }
+        }
       }
     }
 
-    binding.description.setLinkColor(ContextCompat.getColor(requireContext(), R.color.signal_colorPrimary))
+    binding.description.setLinkColor(ThemeUtil.getThemedColor(requireContext(), com.google.android.material.R.attr.colorPrimary))
     binding.description.setLearnMoreVisible(true)
     binding.description.setOnLinkClickListener {
       findNavController().safeNavigate(CreditCardFragmentDirections.actionCreditCardFragmentToYourInformationIsPrivateBottomSheet())
@@ -124,8 +133,7 @@ class CreditCardFragment : Fragment(R.layout.credit_card_fragment) {
       findNavController().safeNavigate(
         CreditCardFragmentDirections.actionCreditCardFragmentToStripePaymentInProgressFragment(
           InAppPaymentProcessorAction.PROCESS_NEW_IN_APP_PAYMENT,
-          args.inAppPayment,
-          args.inAppPayment.type
+          args.inAppPaymentId
         )
       )
     }

@@ -26,10 +26,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
+import com.google.android.material.R as MaterialR
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetBehaviorHack
@@ -53,9 +54,11 @@ import org.thoughtcrime.securesms.components.InsetAwareConstraintLayout
 import org.thoughtcrime.securesms.components.webrtc.CallOverflowPopupWindow
 import org.thoughtcrime.securesms.components.webrtc.WebRtcCallView
 import org.thoughtcrime.securesms.components.webrtc.WebRtcControls
+import org.thoughtcrime.securesms.components.webrtc.v2.CallControlsVisibilityListener
 import org.thoughtcrime.securesms.components.webrtc.v2.CallInfoCallbacks
 import org.thoughtcrime.securesms.components.webrtc.v2.WebRtcCallViewModel
 import org.thoughtcrime.securesms.service.webrtc.links.UpdateCallLinkResult
+import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.padding
 import org.thoughtcrime.securesms.util.visible
 import kotlin.math.max
@@ -107,6 +110,7 @@ class ControlsAndInfoController private constructor(
   private val raiseHandComposeView: ComposeView = webRtcCallView.findViewById(R.id.call_screen_raise_hand_view)
   private val aboveControlsGuideline: Guideline = webRtcCallView.findViewById(R.id.call_screen_above_controls_guideline)
   private val toggleCameraDirectionView: View = webRtcCallView.findViewById(R.id.call_screen_camera_direction_toggle)
+  private val startCallControls: View = webRtcCallView.findViewById(R.id.call_screen_start_call_controls)
   private val callControls: ConstraintLayout = webRtcCallView.findViewById(R.id.call_controls_constraint_layout)
   private val isLandscape = activity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
   private val waitingToBeLetInProgressDrawable = IndeterminateDrawable.createCircularDrawable(
@@ -116,7 +120,7 @@ class ControlsAndInfoController private constructor(
       indicatorInset = 0.dp
       trackThickness = 2.dp
       trackCornerRadius = 1.dp
-      indicatorColors = intArrayOf(ContextCompat.getColor(activity, R.color.signal_colorOnBackground))
+      indicatorColors = intArrayOf(ThemeUtil.getThemedColor(activity, MaterialR.attr.colorOnBackground))
       trackColor = Color.TRANSPARENT
     }
   )
@@ -125,7 +129,7 @@ class ControlsAndInfoController private constructor(
   }
 
   private val scheduleHideControlsRunnable: Runnable = Runnable { onScheduledHide() }
-  private val bottomSheetVisibilityListeners = mutableSetOf<BottomSheetVisibilityListener>()
+  private val callControlsVisibilityListeners = mutableSetOf<CallControlsVisibilityListener>()
 
   private val handler: Handler?
     get() = webRtcCallView.handler
@@ -159,7 +163,11 @@ class ControlsAndInfoController private constructor(
         previousCallControlHeightData = HeightData(callControls.height, coordinator.height)
 
         val controlPeakHeight = callControls.height + callControls.y.toInt() + 16.dp
-        behavior.peekHeight = controlPeakHeight
+        if (startCallControls.isVisible) {
+          behavior.peekHeight = max(behavior.peekHeight, controlPeakHeight)
+        } else {
+          behavior.peekHeight = controlPeakHeight
+        }
         frame.minimumHeight = coordinator.height / minFrameHeightDenominator
         behavior.maxHeight = (coordinator.height.toFloat() * maxBehaviorHeightPercentage).toInt()
 
@@ -193,12 +201,11 @@ class ControlsAndInfoController private constructor(
         .setTopRightCorner(CornerFamily.ROUNDED, 18.dp.toFloat())
         .build()
     ).apply {
-      fillColor = ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.signal_colorSurface))
+      fillColor = ColorStateList.valueOf(ThemeUtil.getThemedColor(activity, MaterialR.attr.colorSurface))
     }
 
     behavior.isHideable = true
     behavior.peekHeight = 0
-    behavior.state = BottomSheetBehavior.STATE_HIDDEN
     BottomSheetBehaviorHack.setNestedScrollingChild(behavior, callInfoComposeView)
 
     behavior.addBottomSheetCallback(object : BottomSheetCallback() {
@@ -246,8 +253,8 @@ class ControlsAndInfoController private constructor(
     callInfoComposeView.translationY = INFO_TRANSLATION_DISTANCE
   }
 
-  fun addVisibilityListener(listener: BottomSheetVisibilityListener): Boolean {
-    return bottomSheetVisibilityListeners.add(listener)
+  fun addVisibilityListener(listener: CallControlsVisibilityListener): Boolean {
+    return callControlsVisibilityListeners.add(listener)
   }
 
   fun onStateRestored() {
@@ -279,7 +286,7 @@ class ControlsAndInfoController private constructor(
     behavior.isHideable = false
     behavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-    bottomSheetVisibilityListeners.forEach { it.onShown() }
+    callControlsVisibilityListeners.forEach { it.onShown() }
   }
 
   private fun hide(delay: Long = 0L) {
@@ -288,7 +295,7 @@ class ControlsAndInfoController private constructor(
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
 
-        bottomSheetVisibilityListeners.forEach { it.onHidden() }
+        callControlsVisibilityListeners.forEach { it.onHidden() }
       }
     } else {
       cancelScheduledHide()
@@ -321,6 +328,7 @@ class ControlsAndInfoController private constructor(
 
     if (controlState == WebRtcControls.PIP) {
       waitingToBeLetIn.visible = false
+      toggleCameraDirectionView.visible = false
     }
 
     if (controlState != WebRtcControls.PIP && controlState.controlVisibilitiesChanged(previousState)) {
@@ -489,10 +497,5 @@ class ControlsAndInfoController private constructor(
     fun hasChanged(controlHeight: Int, coordinatorHeight: Int): Boolean {
       return controlHeight != this.controlHeight || coordinatorHeight != this.coordinatorHeight
     }
-  }
-
-  interface BottomSheetVisibilityListener {
-    fun onShown()
-    fun onHidden()
   }
 }

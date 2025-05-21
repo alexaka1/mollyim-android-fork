@@ -126,7 +126,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:background="@color/signal_colorSurface"
+        android:background="?attr/colorSurfaceContainer"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <ImageView
@@ -148,8 +148,7 @@
             android:id="@+id/call_controls_constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="38dp"
-            android:paddingBottom="48dp">
+            android:layout_marginTop="38dp">
 
             <org.thoughtcrime.securesms.components.webrtc.WebRtcAudioOutputToggleButton
                 android:id="@+id/call_screen_speaker_toggle"
@@ -251,7 +250,7 @@
                     android:text="@string/WebRtcCallView__start_call"
                     android:textAllCaps="false"
                     android:textColor="@color/core_green_text_button"
-                    app:backgroundTint="@color/signal_light_colorPrimary"
+                    app:backgroundTint="?attr/colorPrimaryInverse"
                     app:cornerRadius="28dp" />
 
             </LinearLayout>

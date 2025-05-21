@@ -148,6 +148,7 @@
     <!-- BlockedUsersActivity -->
     <string name="BlockedUsersActivity__blocked_users">Užblokuoti naudotojai</string>
     <string name="BlockedUsersActivity__add_blocked_user">Pridėti užblokuotą naudotoją</string>
+    <string name="BlockedUsersActivity__cannot_block_yourself">Negalite užblokuoti savęs</string>
     <string name="BlockedUsersActivity__blocked_users_will">Užblokuoti naudotojai negalės tau skambinti ar siųsti žinučių.</string>
     <string name="BlockedUsersActivity__no_blocked_users">Nėra užblokuotų naudotojų</string>
     <string name="BlockedUsersActivity__block_user">Užblokuoti naudotoją?</string>
@@ -551,6 +552,8 @@
     <string name="ConversationActivity__invite_to_signal">Pakviesti į Molly</string>
     <!-- Snackbar message shown after dismissing the full screen sms export megaphone indicating we\'ll do it again soon -->
     <string name="ConversationActivity__you_will_be_reminded_again_soon">Netrukus gausi dar vieną priminimą.</string>
+    <!-- Toast message shown when trying to record a voice message during an ongoing call -->
+    <string name="ConversationFragment_cannot_record_voice_message_during_call">Cannot record voice message during call.</string>
 
     <!-- Title for dialog shown when first sending formatted text -->
     <string name="SendingFormattingTextDialog_title">Suformatuoto teksto siuntimas</string>
@@ -585,13 +588,6 @@
         <item quantity="many">Šių visų %1$d medijų įrašymas į atmintį leis bet kuriai programėlei jūsų įrenginyje prieigą prie jų.\n\nTęsti?</item>
         <item quantity="other">Šių visų %1$d medijų įrašymas į atmintį leis bet kuriai programėlei jūsų įrenginyje prieigą prie jų.\n\nTęsti?</item>
     </plurals>
-    <plurals name="ConversationFragment_error_while_saving_attachments_to_sd_card">
-        <item quantity="one">Klaida, įrašant priedą į atmintį!</item>
-        <item quantity="few">Klaida, įrašant priedus į atmintį!</item>
-        <item quantity="many">Klaida, įrašant priedus į atmintį!</item>
-        <item quantity="other">Klaida, įrašant priedus į atmintį!</item>
-    </plurals>
-    <string name="ConversationFragment_unable_to_write_to_sd_card_exclamation">Nepavyksta įrašyti į atmintį!</string>
     <plurals name="ConversationFragment_saving_n_attachments">
         <item quantity="one">Įrašomas %1$d priedas</item>
         <item quantity="few">Įrašomi %1$d priedai</item>
@@ -603,15 +599,6 @@
         <item quantity="few">%1$d priedai įrašomi į atmintį…</item>
         <item quantity="many">%1$d priedo įrašoma į atmintį…</item>
         <item quantity="other">%1$d priedų įrašoma į atmintį…</item>
-    </plurals>
-    <!-- Dialog title asking to save media to your phone\'s storage -->
-    <string name="ConversationFragment__save_to_phone">Išsaugoti telefone?</string>
-    <!-- Dialog message explaining that media will be saved to your phone and can potentially be accessed by other phones. -->
-    <plurals name="ConversationFragment__this_media_will_be_saved">
-        <item quantity="one">Šis įrašas bus išsaugotas jūsų telefono saugykloje. Priklausomai nuo jūsų telefono leidimų, jį galės pasiekti kitos programos.</item>
-        <item quantity="few">Šis įrašas bus išsaugotas jūsų telefono saugykloje. Priklausomai nuo jūsų telefono leidimų, jį galės pasiekti kitos programos.</item>
-        <item quantity="many">Šis įrašas bus išsaugotas jūsų telefono saugykloje. Priklausomai nuo jūsų telefono leidimų, jį galės pasiekti kitos programos.</item>
-        <item quantity="other">Šis įrašas bus išsaugotas jūsų telefono saugykloje. Priklausomai nuo jūsų telefono leidimų, jį galės pasiekti kitos programos.</item>
     </plurals>
     <!-- Checkbox shown in dialog to not show the dialog again in future cases -->
     <string name="ConversationFragment_dont_show_again">Daugiau neberodyti</string>
@@ -690,6 +677,18 @@
     <string name="ConversationFragment_reported_as_spam_and_blocked">Pranešta apie šlamštą ir užblokuota</string>
     <!-- Dialog message shown after accepting a message request and tapping on options from the conversation event -->
     <string name="ConversationFragment_you_accepted_a_message_request_from_s">Priėmei žinutės užklausą iš %1$s. Jei suklydai, toliau gali pasirinkti veiksmą.</string>
+    <!-- Text shown in conversation header when in a message request state and to carefully review the user -->
+    <string name="ConversationFragment_review_carefully">Atidžiai peržiūrėkite</string>
+    <!-- Text shown in conversation header when in a message request state that profile names are not verified. Placeholder will be \'Profile names\' -->
+    <string name="ConversationFragment_profile_names_not_verified">%1$s nėra patvirtinti</string>
+    <!-- Text shown in conversation header when in a message request state that group names are not verified. Placeholder will be \'Group names\' -->
+    <string name="ConversationFragment_group_names_not_verified">%1$s nėra patvirtinti</string>
+    <!-- Placeholder text shown in conversation header that when clicked will open a dialog about profile names -->
+    <string name="ConversationFragment_profile_names">Profilių vardai</string>
+    <!-- Placeholder text shown in conversation header that when clicked will open a dialog about group names -->
+    <string name="ConversationFragment_group_names">Grupės pavadinimai</string>
+    <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
+    <string name="ConversationFragment_photo_failed">Nepavyko atsisiųsti nuotraukos. Bandykite dar kartą.</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Saugos patarimai</string>
@@ -701,6 +700,10 @@
     <string name="SafetyTips_previous_tip">Ankstesnis patarimas</string>
     <!-- Button text to move to the next tip -->
     <string name="SafetyTips_next_tip">Kitas patarimas</string>
+    <!-- Title of tip 0 -->
+    <string name="SafetyTips_tip0_title">Netikri vardai ir paskyros</string>
+    <!-- Message of tip 0 -->
+    <string name="SafetyTips_tip0_message">„Molly“ niekada neprašys jūsų pateikti registracijos kodą ar PIN. Būkite atidūs – naudotojai gali apsimesti kitais žmonėmis. Profilio vardus pasirenka paskyros turėtojai, jie nėra patvirtinti.</string>
     <!-- Title of tip 1 -->
     <string name="SafetyTips_tip1_title">Kriptovaliutų ar pinigų sukčiai</string>
     <!-- Message of tip 1 -->
@@ -717,6 +720,21 @@
     <string name="SafetyTips_tip4_title">Netikros įmonės ir institucijos</string>
     <!-- Message of tip 4 -->
     <string name="SafetyTips_tip4_message">Atsargiai vertinkite su jumis susisiekti bandančias įmones ar vyriausybines institucijas. Žinutės nuo mokesčių inspekcijos, kurjerių ir pan. gali būti šlamštas.</string>
+
+    <!-- Bottom sheet text explaining that profile names are chosen by the account holder. Placeholder will be \'Profile names\' -->
+    <string name="ProfileNameBottomSheet__profile_names_on_signal">%1$s programoje „Signal“ yra pasirenkami paskyros savininkų.</string>
+    <!-- Bottom sheet text explaining that profile names are not verified. -->
+    <string name="ProfileNameBottomSheet__profile_names_arent_verified">Profilių vardai nėra patvirtinti</string>
+    <!-- Bottom sheet text explaining that accounts can impersonate other people and to be cautious -->
+    <string name="ProfileNameBottomSheet__be_cautious_of_accounts">Būkite atidūs – naudotojai gali apsimesti kitais žmonėmis</string>
+    <!-- Bottom sheet text explaining that personal information should not be shared with strangers -->
+    <string name="ProfileNameBottomSheet__dont_share_personal">Nesidalinkite asmenine informacija su nepažįstamais žmonėmis</string>
+    <!-- Bottom sheet text explaining that group names are chosen by the group members. Placeholder will be \'Group names\' -->
+    <string name="ProfileNameBottomSheet__group_names_on_signal">%1$s yra pasirenkami grupės narių.</string>
+    <!-- Bottom sheet text explaining that groups can impersonate organizations and to be cautious -->
+    <string name="ProfileNameBottomSheet__be_cautious_of_groups">Būkite atidūs – grupės gali apsimesti organizacijomis ir įmonėmis</string>
+    <!-- Bottom sheet text explaining that profile names of group members are not verified -->
+    <string name="ProfileNameBottomSheet__profile_names_in_groups">Grupės narių profilių vardai nėra patvirtinti</string>
 
     <!-- Label for a button displayed in conversation list to clear the chat filter -->
     <string name="ConversationListFragment__clear_filter">Išvalyti filtrą</string>
@@ -798,8 +816,13 @@
     <string name="AddToFolderBottomSheet_choose_a_folder">Pasirinkti aplanką</string>
     <!-- Toast shown when a chat has been added to a folder, where %s is the name of the folder -->
     <string name="AddToFolderBottomSheet_added_to_s">Pridėta į „%1$s“</string>
-    <!-- Toast shown when a user tries to add a chat to a folder, but the folder already has that chat. %s is the name of the folder -->
-    <string name="AddToFolderBottomSheet_this_chat_is_already">Šis pokalbis jau yra aplanke „%1$s“</string>
+    <!-- Toast shown when a user tries to add chats to a folder, but the folder already has those chats. %s is the name of the folder -->
+    <plurals name="AddToFolderBottomSheet_these_chat_are_already_in_s">
+        <item quantity="one">Šis pokalbis jau yra aplanke „%1$s“</item>
+        <item quantity="few">Šie pokalbiai jau yra aplanke „%1$s“</item>
+        <item quantity="many">Šie pokalbiai jau yra aplanke „%1$s“</item>
+        <item quantity="other">Šie pokalbiai jau yra aplanke „%1$s“</item>
+    </plurals>
 
     <!-- Show in conversation list overflow menu to open selection bottom sheet -->
     <string name="ConversationListFragment__notification_profile">Pranešimų profilis</string>
@@ -1028,7 +1051,7 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Use this Signal account on desktop or iPad.</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Šią „Signal“ paskyrą naudokite kompiuteryje arba „iPad“.</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">Susieti naują įrenginį</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
@@ -1069,19 +1092,19 @@
     <!-- Button that dismisses the bottom sheet -->
     <string name="LinkDeviceFragment__continue">Tęsti</string>
     <!-- Option on button to contact support -->
-    <string name="LinkDeviceFragment__contact_support">Contact support</string>
+    <string name="LinkDeviceFragment__contact_support">Susisiekti su aptarnavimo komanda</string>
     <!-- Title of dialog asking users if they want to submit debug logs when contacting support -->
-    <string name="LinkDeviceFragment__submit_debug_log">Submit debug log?</string>
+    <string name="LinkDeviceFragment__submit_debug_log">Pateikti derinimo žurnalą?</string>
     <!-- Body of dialog explaining what debug logs are and that they are optional to submit -->
-    <string name="LinkDeviceFragment__your_debug_logs">Your debug logs will help us troubleshoot your issue faster. Submitting your logs is optional.</string>
+    <string name="LinkDeviceFragment__your_debug_logs">Turėdami derinimo žurnalus greičiau išspręsime jūsų problemą. Žurnalų pateikti neprivaloma.</string>
     <!-- Button option to submit debug log when contacting support -->
-    <string name="LinkDeviceFragment__submit_with_debug">Submit with debug log</string>
+    <string name="LinkDeviceFragment__submit_with_debug">Pateikti su derinimo žurnalu</string>
     <!-- Button option to not submit debug log when contacting support -->
-    <string name="LinkDeviceFragment__submit_without_debug">Submit without debug log</string>
+    <string name="LinkDeviceFragment__submit_without_debug">Pateikti be derinimo žurnalo</string>
     <!-- Button option to dismiss dialog -->
-    <string name="LinkDeviceFragment__cancel">Cancel</string>
+    <string name="LinkDeviceFragment__cancel">Atšaukti</string>
     <!-- Email subject when contacting support on a linked device syncing issue -->
-    <string name="LinkDeviceFragment__link_sync_failure_support_email">Android Link&amp;Sync Export Failed</string>
+    <string name="LinkDeviceFragment__link_sync_failure_support_email">„Android“ eksportavimas („Link&amp;Sync“) nepavyko</string>
   <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__link_sync_failure_support_email_filter" translatable="false">Android Link&amp;Sync Export Failed</string> -->
     <!-- Title of a dialog letting the user know that syncing messages to their linked device failed -->
     <string name="LinkDeviceFragment__sync_failure_title">Nepavyko sinchronizuoti žinučių</string>
@@ -1176,6 +1199,7 @@
 
     <!-- DocumentView -->
     <string name="DocumentView_unnamed_file">Bevardis failas</string>
+    <string name="DocumentView_document_file">Dokumento failas</string>
 
     <!-- DozeReminder -->
     <string name="DozeReminder_optimize_for_missing_play_services">Optimizuoti trūkstamoms „Play“ paslaugoms</string>
@@ -1753,7 +1777,6 @@
     </plurals>
     <string name="MediaOverviewActivity_Media_delete_progress_title">Ištrinama</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Ištrinamos žinutės…</string>
-    <string name="MediaOverviewActivity_collecting_attachments">Renkami priedai…</string>
     <string name="MediaOverviewActivity_Sort_by">Rikiuoti pagal</string>
     <string name="MediaOverviewActivity_Newest">Naujausi</string>
     <string name="MediaOverviewActivity_Oldest">Seniausi</string>
@@ -1794,6 +1817,8 @@
     <string name="MediaOverviewActivity_sent_by_you">Išsiuntėte jūs</string>
     <string name="MediaOverviewActivity_sent_by_s_to_s">%1$s išsiuntė naudotojui ar grupei %2$s</string>
     <string name="MediaOverviewActivity_sent_by_you_to_s">Jūs išsiuntėte naudotojui %1$s</string>
+    <!-- Error message shown when the user is trying to open a media that is not sent yet. -->
+    <string name="MediaOverviewActivity_this_media_is_not_sent_yet">Šis įrašas dar neišsiųstas.</string>
 
     <!-- Megaphones -->
     <string name="Megaphones_remind_me_later">Priminti vėliau</string>
@@ -1863,6 +1888,10 @@
     <string name="MessageRecord_missed_voice_call">Praleistas balso skambutis</string>
     <!-- Update message shown when receiving an incoming 1:1 video call and not answered -->
     <string name="MessageRecord_missed_video_call">Praleistas vaizdo skambutis</string>
+    <!-- Update message shown when receiving an incoming 1:1 voice/audio call and not answered -->
+    <string name="MessageRecord_declined_voice_call">Atmestas balso skambutis</string>
+    <!-- Update message shown when receiving an incoming 1:1 video call and not answered -->
+    <string name="MessageRecord_declined_video_call">Atmestas vaizdo skambutis</string>
     <!-- Update message shown when receiving an incoming voice call and declined due to notification profile -->
     <string name="MessageRecord_missed_voice_call_notification_profile">Praleistas balso skambutis įjungus pranešimų profilį</string>
     <!-- Update message shown when receiving an incoming video call and declined due to notification profile -->
@@ -2171,6 +2200,14 @@
     <string name="MessageRecord_reported_as_spam">Pranešta apie šlamštą</string>
     <!-- Update message shown in chat after accept a message request -->
     <string name="MessageRecord_you_accepted_the_message_request">Priėmei žinutės užklausą</string>
+    <!-- Update message shown in chat after you block a person -->
+    <string name="MessageRecord_you_blocked_this_person">Užblokavote šį asmenį</string>
+    <!-- Update message shown in chat after you unblock a person -->
+    <string name="MessageRecord_you_unblocked_this_person">Atblokavote šį asmenį</string>
+    <!-- Update message shown in chat after you block a group -->
+    <string name="MessageRecord_you_blocked_this_group">Užblokavote šią grupę</string>
+    <!-- Update message shown in chat after you unblock a group -->
+    <string name="MessageRecord_you_unblocked_this_group">Atblokavote šią grupę</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Priimti</string>
@@ -2228,8 +2265,41 @@
         <item quantity="many">%1$d papildomų grupių</item>
         <item quantity="other">%1$d papildoma grupė</item>
     </plurals>
+    <!-- Describes the names of members in a group. MessageRequestProfileView_group_members_* is nested in the first parentheses. MessageRequestProfileView_invited is nested in the second -->
+    <string name="MessageRequestProfileView_member_names_and_invited">%1$s (%2$s)</string>
+    <!-- Text for an empty group or when you are the only member -->
+    <string name="MessageRequestProfileView_group_members_zero">Kitų grupės narių dar nėra</string>
+    <!-- Text for a group with one member (not you). %1$s is their name -->
+    <string name="MessageRequestProfileView_group_members_one">%1$s</string>
+    <!-- Text for a 2 member group you are in. %1$s is the name of the other member -->
+    <string name="MessageRequestProfileView_group_members_one_and_you">%1$s ir jūs</string>
+    <!-- Text for a 2 member group you are not in. %1$s and %2$s are the members\' names -->
+    <string name="MessageRequestProfileView_group_members_two">%1$s ir %2$s</string>
+    <!-- Text for a 3 member group you are in. %1$s and %2$s are the members\' names -->
+    <string name="MessageRequestProfileView_group_members_two_and_you">%1$s, %2$s ir jūs</string>
+    <!-- Text for a 3 member group you are not in. %1$s, %2$s, %3$s are the names of the other members. -->
+    <string name="MessageRequestProfileView_group_members_three">%1$s, %2$s ir %3$s</string>
+    <!-- Text for a 3+ member group. %1$s, %2$s, %3$s are member names. %4$s is the string key MessageRequestProfileView_other_members-->
+    <string name="MessageRequestProfileView_group_members_other">%1$s, %2$s, %3$s ir %4$s</string>
+    <!-- Nested in MessageRequestProfileView_group_members_other that shows how many members (besides three) are in the group -->
+    <plurals name="MessageRequestProfileView_other_members">
+        <item quantity="one">dar %1$d</item>
+        <item quantity="few">dar %1$d</item>
+        <item quantity="many">dar %1$d</item>
+        <item quantity="other">dar %1$d</item>
+    </plurals>
     <!-- Button label to report spam for a conversation when in a message request state -->
     <string name="MessageRequestBottomView_report">Pranešti…</string>
+    <!-- Alert dialog title to accept a message request -->
+    <string name="MessageRequestBottomView_accept_request">Priimti užklausą?</string>
+    <!-- Alert dialog body to review the message request carefully -->
+    <string name="MessageRequestBottomView_review_requests_carefully">Atidžiai peržiūrėkite užklausas. Profilio vardus pasirenka paskyros savininkai, jie nėra patvirtinti.</string>
+    <!-- Alert dialog title to accept a message request to join a group -->
+    <string name="MessageRequestBottomView_join_group">Prisijungti prie grupės?</string>
+    <!-- Alert dialog body to review the message request for a group carefully -->
+    <string name="MessageRequestBottomView_review_requests_carefully_groups">Atidžiai peržiūrėkite užklausas. Grupės pavadinimus pasirenka grupės nariai, jie nėra patvirtinti.</string>
+    <!-- Button text to join a group -->
+    <string name="MessageRequestBottomView_join">Prisijungti</string>
 
     <!-- PassphraseChangeActivity -->
     <string name="PassphraseChangeActivity_passphrases_dont_match_exclamation">Slaptafrazės nesutampa!</string>
@@ -2254,7 +2324,7 @@
     <string name="DeviceProvisioningActivity_sorry_you_have_too_many_devices_linked_already">Atleiskite, jūs jau turite per daug susietų įrenginių, pabandykite kai kuriuos pašalinti</string>
     <string name="DeviceActivity_sorry_this_is_not_a_valid_device_link_qr_code">Atleiskite, tai nėra teisingas įrenginio nuorodos QR kodas.</string>
     <string name="DeviceProvisioningActivity_link_a_signal_device">Susieti Signal įrenginį?</string>
-    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">To link a desktop or iPad to this Signal account, go to Linked Devices and tap \"Link a New Device\"and scan the QR code again. Make sure you only scan QR codes that come directly from Signal.</string>
+    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">Norėdami susieti kompiuterį arba „iPad“ su šia „Signal“ paskyra, eikite į „Susieti įrenginiai“, bakstelėkite „Susieti naują įrenginį“ ir dar kartą nuskaitykite QR kodą. Įsitikinkite, kad nuskaitote tik tiesiogiai iš „Signal“ gautus QR kodus.</string>
 
     <string name="DeviceActivity_signal_needs_the_camera_permission_in_order_to_scan_a_qr_code">Norint skenuoti QR kodą, Molly reikia kameros leidimo, tačiau jis buvo visam laikui uždraustas. Pereikite į programėlės nustatymų meniu, pasirinkite „Leidimai“ ir įjunkite „Kamerą“.</string>
     <string name="DeviceActivity_unable_to_scan_a_qr_code_without_the_camera_permission">Nepavyksta nuskenuoti QR kodo be kameros leidimo</string>
@@ -2337,6 +2407,7 @@
 
     <!-- ReactionsBottomSheetDialogFragment -->
     <string name="ReactionsBottomSheetDialogFragment_all">Visi · %1$d</string>
+    <string name="ReactionsBottomSheetDialogFragment_tap_to_remove">Bakstelėk, kad pašalintum</string>
 
     <!-- ReactionsConversationView -->
     <string name="ReactionsConversationView_plus">+%1$d</string>
@@ -2564,6 +2635,15 @@
     <!-- Content description for toggling group ring state -->
     <string name="WebRtcCallView__toggle_group_ringing">Perjungti grupės skambėjimą</string>
 
+    <!-- Alert message indicating that the local user was remotely muted by some other user. Placeholder is the muters display name. -->
+    <string name="WebRtcCallView__s_remotely_muted_you">%1$s muted you.</string>
+    <!-- Alert message indicating that the local user remotely muted another user. Placeholder is the name of the person muted. -->
+    <string name="WebRtcCallView__you_remotely_muted_s">You muted %1$s.</string>
+    <!-- Alert message indicating that a remote user remotely muted another remote user. First placeholder is the muters display name, second is the display name of the person muted. -->
+    <string name="WebRtcCallView__s_remotely_muted_s">%1$s muted %2$s.</string>
+    <!-- Alert message indicating that the local user joined a call on a second device and muted this one from the other one. -->
+    <string name="WebRtcCallView__you_muted_yourself">You muted yourself from another device.</string>
+
     <!-- Error message when the developer added a button in the wrong place. -->
     <string name="WebRtcAudioOutputToggleButton_fragment_activity_error">Įvyko vartotojo sąsajos klaida. Prašome pranešti apie šią klaidą kūrėjams.</string>
     <!-- Error message when the user is trying to change audio outputs but none are present. -->
@@ -2591,6 +2671,8 @@
     <string name="CallOverflowPopupWindow__view">Rodyti</string>
 
 
+    <!-- A notification to the user that their hand is raised but they are currently speaking -->
+    <string name="CallRaiseHandSnackbar__lower_your_hand">Nuleisti ranką?</string>
     <!-- A notification to the user that they successfully raised their hand. The placeholder string is CallParticipant__you, or CallParticipant__you_on_another_device -->
     <string name="CallRaiseHandSnackbar__expanded_second_person_raised_a_hand_single">%1$s pakėlėte ranką</string>
     <!-- A notification to the user that they and at least one more participants in the call successfully raised their hand. The placeholder is a number quantifying how many other hands are also raised, besides the user. -->
@@ -2635,23 +2717,27 @@
     <string name="CallOverflowPopupWindow__expand_snackbar_accessibility_label">Išplėsti pakeltos rankos rodinį</string>
 
     <!-- Toolbar title of country picker selection page -->
-    <string name="CountryCodeFragment__your_country">Your country</string>
+    <string name="CountryCodeFragment__your_country">Jūsų šalis</string>
     <!-- Hint text in search bar to either enter in a country name or number -->
-    <string name="CountryCodeFragment__search_by">Search by name or number</string>
+    <string name="CountryCodeFragment__search_by">Ieškoti pagal vardą ar šalies kodą</string>
     <!-- Text shown when displaying a list of countries that indicates an unknown country    -->
-    <string name="CountryCodeFragment__unknown_country">Unknown country</string>
+    <string name="CountryCodeFragment__unknown_country">Nežinoma šalis</string>
 
     <!-- AboutSheet -->
     <!-- Displayed in a sheet row and allows user to open signal connection explanation on tap -->
     <string name="AboutSheet__signal_connection">„Signal“ kontaktas</string>
     <!-- Displayed in a sheet row describing that the user has marked this contact as \'verified\' from within the app -->
     <string name="AboutSheet__verified">Patvirtinta(s)</string>
+    <!-- Displayed in a sheet row that tells users that profile names are not verified -->
+    <string name="AboutSheet__profile_names_are_not_verified">Profilių vardai nėra patvirtinti</string>
+    <!-- Displayed in a sheet row describing that the user is in a message request state with the person -->
+    <string name="AboutSheet__pending_message_request">Laukianti žinutės užklausa</string>
     <!-- Displayed in bottom sheet describing that the user has no direct messages with this person. The placeholder is a person\'s name. -->
     <string name="AboutSheet__no_direct_message">Neturite tiesioginių žinučių su %1$s</string>
     <!-- Explains that the given user (placeholder is short name) is in the users system contact -->
     <string name="AboutSheet__s_is_in_your_system_contacts">%1$s yra jūsų telefono kontaktuose</string>
     <!-- Notice in a row when user has no groups in common -->
-    <string name="AboutSheet__you_have_no_groups_in_common">Neturi bendrų grupių</string>
+    <string name="AboutSheet__you_have_no_groups_in_common">Nėra bendrų grupių</string>
     <!-- Notice when a user is not a connection to review requests carefully -->
     <string name="AboutSheet__review_requests_carefully">Atidžiai peržiūrėkite prašymus</string>
     <!-- Text used when user has groups in common. Placeholder is the count -->
@@ -2667,6 +2753,14 @@
     <string name="AboutSheet__you">Jūs</string>
     <!-- Displays the name of a contact. The first placeholder is the name the user has assigned to that contact, the second name is the name the contact assigned to themselves -->
     <string name="AboutSheet__user_set_display_name_and_profile_name">%1$s (%2$s)</string>
+
+    <!-- Title of the screen showing which groups they have in common with another user. -->
+    <plurals name="GroupsInCommon__n_groups_in_common_title">
+        <item quantity="one">%1$s bendra grupė</item>
+        <item quantity="few">%1$s bendros grupės</item>
+        <item quantity="many">%1$s bendrų grupių</item>
+        <item quantity="other">%1$s bendra grupė</item>
+    </plurals>
 
     <!-- CallParticipantsListDialog -->
     <plurals name="CallParticipantsListDialog_in_this_call">
@@ -2736,7 +2830,7 @@
     <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
     <string name="RegistrationActivity_you_will_receive_a_verification_code">Gausite patvirtinimo kodą. Gali būti taikomi mobiliojo ryšio tinklo operatoriaus mokesčiai.</string>
     <!-- Hint text to select a country -->
-    <string name="RegistrationActivity_select_a_country">Select a country</string>
+    <string name="RegistrationActivity_select_a_country">Pasirinkite šalį</string>
     <!-- Hint text explaining that this is where the country code should go -->
     <string name="RegistrationActivity_default_country_code">0</string>
     <string name="RegistrationActivity_you_will_receive_a_call_to_verify_this_number">Sulauksite skambučio, kad patvirtintumėte šį numerį.</string>
@@ -2857,6 +2951,12 @@
     <string name="SignalPinReminders_well_remind_you_again_in_a_week">PIN kodas sėkmingai patvirtintas. Po savaitės priminsime jums dar kartą.</string>
     <string name="SignalPinReminders_well_remind_you_again_in_a_couple_weeks">PIN kodas sėkmingai patvirtintas. Po kelių savaičių priminsime jums dar kartą.</string>
     <string name="SignalPinReminders_well_remind_you_again_in_a_month">PIN kodas sėkmingai patvirtintas. Po mėnesio priminsime jums dar kartą.</string>
+    <string name="SignalPinReminders__well_remind_you_again_later">Vėliau dar kartą priminsime.</string>
+    <string name="SignalPinReminders__well_remind_you_again_tomorrow">Rytoj priminsime dar kartą.</string>
+    <string name="SignalPinReminders__well_remind_you_again_in_a_few_days">Po kelių dienų vėl priminsime.</string>
+    <string name="SignalPinReminders__well_remind_you_again_in_a_week">Priminsime dar kartą po savaitės.</string>
+    <string name="SignalPinReminders__well_remind_you_again_in_a_couple_weeks">Priminsime dar kartą po poros savaičių.</string>
+    <string name="SignalPinReminders__well_remind_you_again_in_a_month">Po mėnesio dar kartą priminsime.</string>
 
     <!-- Slide -->
     <string name="Slide_image">Paveikslas</string>
@@ -2869,18 +2969,86 @@
     <string name="SmsMessageRecord_secure_session_reset_s">%1$s atstatė saugųjį seansą.</string>
     <string name="SmsMessageRecord_duplicate_message">Dviguba žinutė.</string>
 
-    <!-- StickerManagementActivity -->
-    <string name="StickerManagementActivity_stickers">Lipdukai</string>
+    <!-- Sticker management screen default title. -->
+    <string name="StickerManagement_title_stickers">Lipdukai</string>
+    <!-- Sticker management screen title displayed when multiple sticker packs are selected in order to perform an action. The placeholder is the number of selected items. -->
+    <plurals name="StickerManagement_title_n_selected">
+        <item quantity="one">Pažymėta: %1$s</item>
+        <item quantity="few">Pažymėta: %1$s</item>
+        <item quantity="many">Pažymėta: %1$s</item>
+        <item quantity="other">Pažymėta: %1$s</item>
+    </plurals>
+    <!-- Label for the sticker management screen tab which shows the stickers that are available to install. -->
+    <string name="StickerManagement_available_tab_label">Galimas</string>
+    <!-- Label for the sticker management screen tab which shows the stickers that are currently installed. -->
+    <string name="StickerManagement_installed_tab_label">Įdiegtas</string>
+    <!-- Shown when there are no sticker packs available for installation. -->
+    <string name="StickerManagement_available_tab_empty_text">Jokių lipdukų paketų nėra</string>
+    <!-- Shown when there are no sticker packs currently installed. -->
+    <string name="StickerManagement_installed_tab_empty_text">Jokių lipdukų paketų neįdiegta</string>
+    <!-- Message shown when the author of the sticker pack is unknown. -->
+    <string name="StickerManagement_author_unknown">Nežinoma</string>
+    <!-- Sticker pack list section header for packs that are already installed. -->
+    <string name="StickerManagement_installed_stickers_header">Įdiegti lipdukai</string>
+    <!-- Sticker pack list section header for packs that have been received from incoming messages. -->
+    <string name="StickerManagement_stickers_you_received_header">Jūsų gauti lipdukai</string>
+    <!-- Sticker pack list section header for highlighted/"blessed" packs. -->
+    <string name="StickerManagement_signal_artist_series_header">Signal menininkų serija</string>
+    <!-- Title shown when sharing a sticker pack with another user. -->
+    <string name="StickerManagement_share_sheet_title">Kam persiųsti</string>
+    <!-- Bottom action bar option to select all sticker packs in the list. -->
+    <string name="StickerManagement_action_select_all">Žymėti viską</string>
+    <!-- Bottom action bar option to deselect all sticker packs in the list. -->
+    <string name="StickerManagement_action_deselect_all">Deselect all</string>
+    <!-- Bottom action bar option to uninstall all selected sticker packs. -->
+    <string name="StickerManagement_action_delete_selected">Ištrinti</string>
+    <!-- Confirmation message shown before uninstalling sticker packs. The placeholder is the number of items to delete. -->
+    <plurals name="StickerManagement_delete_n_packs_confirmation">
+        <item quantity="one">Remove %1$s sticker pack</item>
+        <item quantity="few">Remove %1$s sticker packs</item>
+        <item quantity="many">Remove %1$s sticker packs</item>
+        <item quantity="other">Remove %1$s sticker packs</item>
+    </plurals>
+    <!-- Message shown after installing a sticker pack. The placeholder is the name of the sticker pack that was installed. -->
+    <string name="StickerManagement_installed_pack_s">Installed %1$s.</string>
+    <!-- Message shown after uninstalling a sticker pack. The placeholder is the name of the sticker pack that was deleted. -->
+    <string name="StickerManagement_deleted_pack_s">Removed %1$s.</string>
+    <!-- Message shown after uninstalling sticker packs. The placeholder is the number of items that were deleted. -->
+    <plurals name="StickerManagement_deleted_n_packs">
+        <item quantity="one">%1$s sticker pack removed.</item>
+        <item quantity="few">%1$s sticker packs removed.</item>
+        <item quantity="many">%1$s sticker packs removed.</item>
+        <item quantity="other">%1$s sticker packs removed.</item>
+    </plurals>
+
+    <!-- Sticker pack list dropdown menu label for the button to forward a sticker pack to another user. -->
+    <string name="StickerManagement_menu_forward_pack">Persiųsti</string>
+    <!-- Sticker pack list dropdown menu label for the button to mark a sticker pack as selected in order to perform additional actions. -->
+    <string name="StickerManagement_menu_select_pack">Pasirinkti</string>
+    <!-- Sticker pack list dropdown menu label for the button to install a sticker pack. -->
+    <string name="StickerManagement_menu_install_pack">Įdiegti</string>
+    <!-- Sticker pack list dropdown menu label for the button to uninstall a sticker pack. -->
+    <string name="StickerManagement_menu_remove_pack">Šalinti</string>
+    <!-- Sticker management screen dropdown menu label for the button to enter multi-select mode. -->
+    <string name="StickerManagement_menu_select_packs">Select sticker packs</string>
+
+    <!-- Accessibility label for the button to download a sticker pack. The placeholder is the sticker pack name. -->
+    <string name="StickerManagement_accessibility_download_pack">Atsisiųsti %1$s lipdukų paketą</string>
+    <!-- Accessibility label for the icon that is displayed after a sticker pack has been downloaded. The placeholder is the sticker pack name. -->
+    <string name="StickerManagement_accessibility_downloaded_checkmark">Varnelė, kad atsisiųsta</string>
+    <!-- Accessibility label for the sticker pack drag and drop handle used to reorder the list. -->
+    <string name="StickerManagement_accessibility_drag_handle">Nutempimo rankenėlė</string>
+    <!-- Accessibility label for the button to download a sticker pack. -->
+    <string name="StickerManagement_accessibility_download">Atsisiųsti</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="StickerManagement_accessibility_open_top_bar_menu">Open menu</string>
+    <!-- Accessibility label for opening the context menu for a sticker pack row item. -->
+    <string name="StickerManagement_accessibility_open_context_menu">Atverti kontekstinį meniu</string>
+    <!-- Accessibility label for opening the context menu for a sticker pack row item. -->
+    <string name="StickerManagement_accessibility_exit_multi_select_mode">Exit selection mode and clear selections</string>
 
     <!-- StickerManagementAdapter -->
-    <string name="StickerManagementAdapter_installed_stickers">Įdiegti lipdukai</string>
-    <string name="StickerManagementAdapter_stickers_you_received">Jūsų gauti lipdukai</string>
-    <string name="StickerManagementAdapter_signal_artist_series">Signal menininkų serija</string>
-    <string name="StickerManagementAdapter_no_stickers_installed">Nėra jokių įdiegtų lipdukų</string>
-    <string name="StickerManagementAdapter_stickers_from_incoming_messages_will_appear_here">Čia bus rodomi lipdukai iš gaunamų žinučių</string>
     <string name="StickerManagementAdapter_untitled">Be pavadinimo</string>
-    <!-- Message shown when the author of the sticker pack is unknown -->
-    <string name="StickerManagementAdapter_unknown">Nežinoma</string>
 
     <!-- StickerPackPreviewActivity -->
     <string name="StickerPackPreviewActivity_untitled">Be pavadinimo</string>
@@ -2907,6 +3075,8 @@
     <string name="SubmitDebugLogActivity_copy_this_url_and_add_it_to_your_issue">Nukopijuokite šį URL ir pridėkite jį į savo pranešimą apie klaidą ar palaikymo el. laišką:\n\n<b>%1$s</b></string>
     <string name="SubmitDebugLogActivity_share">Bendrinti</string>
     <string name="SubmitDebugLogActivity_this_log_will_be_posted_publicly_online_for_contributors">Šis žurnalas bus viešai paskelbtas internete talkininkams peržiūrėti. Prieš išsiųsdami, galite jį panagrinėti.</string>
+    <!-- Banner message shown while submitting debug log -->
+    <string name="SubmitDebugLogActivity_your_log_will_be_posted_online">Kai spustelėsite „Pateikti“, jūsų žurnalas bus 30-čiai dienų paskelbtas internete unikaliu neskelbiamu URL adresu. Galite, iš pradžių, įsirašyti jį savo įrenginyje.</string>
 
     <!-- SupportEmailUtil -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_support_email" translatable="false">support@signal.org</string> -->
@@ -2975,6 +3145,10 @@
     <string name="ThreadRecord_message_history_has_been_merged">Tavo pranešimų istorija buvo sujungta</string>
     <!--  Displayed in the conversation list when identities have been merged. The first placeholder is a phone number, and the second is a person\'s name -->
     <string name="ThreadRecord_s_belongs_to_s">%1$s priklauso %2$s</string>
+    <!-- Displayed in the conversation list when a person has been blocked -->
+    <string name="ThreadRecord_blocked">Užblokuotas</string>
+    <!-- Displayed in the conversation list when a group has been blocked -->
+    <string name="ThreadRecord_blocked_group">Užblokuotas</string>
 
     <!-- ApkUpdateNotifications -->
     <string name="ApkUpdateNotifications_prompt_install_title">Molly atnaujinimas</string>
@@ -3076,10 +3250,6 @@
     <!-- MessageDisplayHelper -->
     <string name="MessageDisplayHelper_message_encrypted_for_non_existing_session">Žinutė šifruota seansui, kurio nėra</string>
 
-    <!-- MmsMessageRecord -->
-    <string name="MmsMessageRecord_bad_encrypted_mms_message">Blogai šifruota MMS žinutė</string>
-    <string name="MmsMessageRecord_mms_message_encrypted_for_non_existing_session">MMS žinutė užšifruota seansui, kurio nėra</string>
-
     <!-- MuteDialog -->
     <string name="MuteDialog_mute_notifications">Nutildyti pranešimus</string>
 
@@ -3092,8 +3262,6 @@
     <string name="MediaPreviewActivity_you">Jūs</string>
     <string name="MediaPreviewActivity_unssuported_media_type">Nepalaikomas medijos tipas</string>
     <string name="MediaPreviewActivity_draft">Juodraštis</string>
-    <string name="MediaPreviewActivity_signal_needs_the_storage_permission_in_order_to_write_to_external_storage_but_it_has_been_permanently_denied">Norint įrašyti į išorinę saugyklą, Molly reikia saugyklos leidimo, tačiau jis buvo visam laikui uždraustas. Pereikite į programėlės nustatymus, pasirinkite „Leidimai“ ir įjunkite „Saugyklą“.</string>
-    <string name="MediaPreviewActivity_unable_to_write_to_external_storage_without_permission">Nepavyksta įrašyti į išorinę saugyklą be leidimų</string>
     <string name="MediaPreviewActivity_media_delete_confirmation_title">Ištrinti žinutę?</string>
     <string name="MediaPreviewActivity_media_delete_confirmation_message">Tai visiems laikams ištrins šią žinutę.</string>
     <string name="MediaPreviewActivity_s_to_s">%1$s naudotojui %2$s</string>
@@ -3204,14 +3372,54 @@
     <!-- Notification channel name for notifications sent when a device has been linked -->
     <string name="NotificationChannel_new_linked_device">Naujas susietas įrenginys</string>
 
-    <!-- ProfileEditNameFragment -->
-
     <!-- QuickResponseService -->
     <string name="QuickResponseService_quick_response_unavailable_when_Signal_is_locked">Spartusis atsakymas neprieinamas, kai Molly yra užrakinta!</string>
     <string name="QuickResponseService_problem_sending_message">Problemos siunčiant žinutę!</string>
 
-    <!-- A small toast notification to let the user know their image/video/audio was downloaded and saved to their device, accessible in other apps. -->
-    <string name="SaveAttachmentTask_saved">Įrašas išsaugotas</string>
+    <!-- A toast notification that is shown when the app does not have sufficient permissions to save media files to the device storage. -->
+    <string name="SaveAttachment_unable_to_write_to_sd_card_exclamation">Nepavyksta įrašyti į atmintį!</string>
+
+    <!-- A toast notification that is shown after image/video/audio media was successfully downloaded and saved to the device storage, accessible in other apps. -->
+    <plurals name="SaveAttachment_saved_success">
+        <item quantity="one">Įrašas išsaugotas</item>
+        <item quantity="few">Įrašas išsaugotas</item>
+        <item quantity="many">Įrašas išsaugotas</item>
+        <item quantity="other">Įrašas išsaugotas</item>
+    </plurals>
+
+    <!-- A toast notification that is shown after some image/video/audio media was successfully downloaded and saved to the device storage, but some failed to save
+         %1$s is the number of items that failed to save and %2$s is the total number of items that the user requested to save. -->
+    <plurals name="SaveAttachment_saved_success_n_failures">
+        <item quantity="one">Įrašas išsaugotas (%1$s iš %2$s nepavyko)</item>
+        <item quantity="few">Įrašas išsaugotas (%1$s iš %2$s nepavyko)</item>
+        <item quantity="many">Įrašas išsaugotas (%1$s iš %2$s nepavyko)</item>
+        <item quantity="other">Įrašas išsaugotas (%1$s iš %2$s nepavyko)</item>
+    </plurals>
+
+    <!-- A toast notification that is shown after all of the requested image/video/audio media failed to save to the device storage. -->
+    <plurals name="SaveAttachment_error_while_saving_attachments_to_sd_card">
+        <item quantity="one">Klaida, įrašant priedą į atmintį!</item>
+        <item quantity="few">Klaida, įrašant priedus į atmintį!</item>
+        <item quantity="many">Klaida, įrašant priedus į atmintį!</item>
+        <item quantity="other">Klaida, įrašant priedus į atmintį!</item>
+    </plurals>
+
+    <!-- Dialog title asking to save media to your phone\'s storage -->
+    <string name="AttachmentSaver__save_to_phone">Išsaugoti telefone?</string>
+
+    <!-- Dialog message explaining that media will be saved to your phone and can potentially be accessed by other phones. -->
+    <plurals name="AttachmentSaver__this_media_will_be_saved">
+        <item quantity="one">Šis įrašas bus išsaugotas jūsų telefono saugykloje. Priklausomai nuo jūsų telefono leidimų, jį galės pasiekti kitos programos.</item>
+        <item quantity="few">Šis įrašas bus išsaugotas jūsų telefono saugykloje. Priklausomai nuo jūsų telefono leidimų, jį galės pasiekti kitos programos.</item>
+        <item quantity="many">Šis įrašas bus išsaugotas jūsų telefono saugykloje. Priklausomai nuo jūsų telefono leidimų, jį galės pasiekti kitos programos.</item>
+        <item quantity="other">Šis įrašas bus išsaugotas jūsų telefono saugykloje. Priklausomai nuo jūsų telefono leidimų, jį galės pasiekti kitos programos.</item>
+    </plurals>
+
+    <!-- Message shown when the app requests permission to save media to the device storage, but that permission has been permanently denied by the user. -->
+    <string name="AttachmentSaver__signal_needs_the_storage_permission_in_order_to_write_to_external_storage_but_it_has_been_permanently_denied">Norint įrašyti į išorinę saugyklą, Molly reikia saugyklos leidimo, tačiau jis buvo visam laikui uždraustas. Pereikite į programėlės nustatymus, pasirinkite „Leidimai“ ir įjunkite „Saugyklą“.</string>
+
+    <!-- Message explaining that it is not possible to save media to the device storage after the user denied the system save to storage permission. -->
+    <string name="AttachmentSaver__unable_to_write_to_external_storage_without_permission">Nepavyksta įrašyti į išorinę saugyklą be leidimų</string>
 
     <!-- SearchToolbar -->
     <string name="SearchToolbar_search">Ieškoti</string>
@@ -3456,7 +3664,8 @@
     <string name="ConversationUpdateItem_update_contact">Atnaujinti adresatą</string>
     <!-- Update item button text to show to block a recipient from requesting to join via group link -->
     <string name="ConversationUpdateItem_block_request">Blokuoti prašymą</string>
-    <string name="ConversationUpdateItem_no_groups_in_common_review_requests_carefully">Nėra jokių bendrų grupių. Atidžiai peržiūrėkite prašymus.</string>
+    <!-- Text shown in conversation header that the account messaging the user does not have any groups in common with them -->
+    <string name="ConversationUpdateItem_no_groups_in_common_review_requests_carefully">Nėra bendrų grupių</string>
     <string name="ConversationUpdateItem_no_contacts_in_this_group_review_requests_carefully">Šioje grupėje nėra jokių adresatų. Atidžiai peržiūrėkite prašymus.</string>
     <string name="ConversationUpdateItem_view">Rodyti</string>
     <string name="ConversationUpdateItem_the_disappearing_message_time_will_be_set_to_s_when_you_message_them">Kai rašysite jiems žinutes, išnykstančių žinučių laikas bus nustatytas į %1$s.</string>
@@ -3476,6 +3685,11 @@
     <!-- audio_view -->
     <string name="audio_view__play_pause_accessibility_description">Atkurti … Pristabdyti</string>
     <string name="audio_view__download_accessibility_description">Atsisiųsti</string>
+
+    <!-- document_view -->
+    <string name="document_view__download_accessibility_description">Atsisiųsti</string>
+    <string name="document_view__upload_accessibility_description">Įkelti</string>
+    <string name="document_view__cancel_accessibility_description">Atšaukti</string>
 
     <!-- QuoteView -->
     <string name="QuoteView_audio">Garso įrašai</string>
@@ -3799,6 +4013,7 @@
     <string name="DebugLogsPromptDialogFragment__no_thanks">Ne, ačiū</string>
 
     <!-- ReactWithAnyEmojiBottomSheetDialogFragment -->
+    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recents">Paskiausi</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__this_message">Ši žinutė</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recently_used">Paskiausi</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__smileys_and_people">Šypsenėlės ir žmonės</string>
@@ -3811,6 +4026,17 @@
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__flags">Vėliavos</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__emoticons">Jaustukai</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__no_results_found">Nerasta jokių rezultatų</string>
+
+    <!-- GifQuickSearchOption -->
+    <string name="GifQuickSearchOption__recents">Paskiausi</string>
+    <string name="GifQuickSearchOption__trending">Populiaru</string>
+    <string name="GifQuickSearchOption__celebrate">Šventė</string>
+    <string name="GifQuickSearchOption__love">Meilė</string>
+    <string name="GifQuickSearchOption__thumbs_up">Patinka</string>
+    <string name="GifQuickSearchOption__surprised">Nustebęs</string>
+    <string name="GifQuickSearchOption__excited">Linksmas</string>
+    <string name="GifQuickSearchOption__sad">Liūdnas</string>
+    <string name="GifQuickSearchOption__angry">Piktas</string>
 
     <!-- arrays.xml -->
     <string name="arrays__use_default">Naudoti numatytąjį</string>
@@ -3964,6 +4190,8 @@
     <string name="preferences__language">Kalba</string>
     <string name="preferences__signal_messages_and_calls">Signal žinutės ir skambučiai</string>
     <string name="preferences__advanced_pin_settings">Išplėstiniai PIN kodo nustatymai</string>
+    <!-- Title of toolbar for the advanced pin settings screen -->
+    <string name="preferences__advanced_pin_settings_title">Išplėstiniai PIN kodo nustatymai</string>
     <string name="preferences__free_private_messages_and_calls">Nemokamos privačios žinutės ir skambučiai Signal naudotojams</string>
     <string name="preferences__submit_debug_log">Pateikti derinimo žurnalą</string>
     <string name="preferences__delete_account">Ištrinti paskyrą</string>
@@ -4072,6 +4300,7 @@
     <string name="preferences_connection_failed">Prisijungimas nepavyko</string>
     <string name="preferences_couldnt_connect_to_the_proxy">Nepavyko prisijungti prie įgaliotojo serverio. Patikrinkite įgaliotojo serverio adresą ir bandykite dar kartą.</string>
     <string name="preferences_you_are_connected_to_the_proxy">Jūs esate prisijungę prie įgaliotojo serverio. Įgaliotąjį serverį bet kuriuo metu galite išjungti Nustatymuose.</string>
+    <!-- Title of alert dialog after a successful connection to the proxy -->
     <string name="preferences_success">Pavyko</string>
     <string name="preferences_failed_to_connect">Nepavyko prisijungti</string>
     <string name="preferences_enter_proxy_address">Įveskite įgaliotojo serverio adresą</string>
@@ -4411,6 +4640,8 @@
     <string name="conversation_list_fragment__fab_content_description">Naujas pokalbis</string>
     <string name="conversation_list_fragment__open_camera_description">Atverti kamerą</string>
     <string name="conversation_list_fragment__no_chats_yet_get_started_by_messaging_a_friend">Kol kas pokalbių nėra.\nPradėkite, bendraudami su draugais.</string>
+    <!-- Message shown when there are no archived chats to display -->
+    <string name="conversation_list_fragment__archived_chats_will_appear_here">Čia bus rodomi suarchyvuoti pokalbiai.</string>
     <!-- Message shown when there are no chats in the chat folder to display -->
     <string name="conversation_list_fragment__no_chats_to_display">Nėra pokalbių, kuriuos galima parodyti</string>
     <!-- Button text that will open up chat folder settings -->
@@ -4631,6 +4862,13 @@
     <string name="KbsMegaphone__pins_keep_information_thats_stored_with_signal_encrytped">PIN kodai šifruotu pavidalu saugo informaciją, kuri yra laikoma Signal.</string>
     <string name="KbsMegaphone__create_pin">Susikurti PIN kodą</string>
 
+    <!-- Title for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__update_signal_pin">Atnaujinkite „Signal“ PIN kodą</string>
+    <!-- Message for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__message">Atnaujinkite savo „Signal“ PIN kodą, kad užbaigtumėte paskyros registravimą.</string>
+    <!-- Button text for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__update_pin">Atnaujinti PIN kodą</string>
+
     <!-- CallNotificationBuilder -->
     <!-- Displayed in a notification when a Signal voice call is ringing -->
     <string name="CallNotificationBuilder__incoming_signal_voice_call">Gaunamasis „Molly“ balso skambutis</string>
@@ -4693,6 +4931,7 @@
     <string name="BackupDialog_copied_to_clipboard">Nukopijuota į iškarpinę</string>
     <string name="BackupDialog_no_file_picker_available">Neprieinamas joks failų parinkiklis.</string>
     <string name="BackupDialog_enter_backup_passphrase_to_verify">Norėdami patikrinti, įveskite atsarginės kopijos slaptafrazę</string>
+    <!-- Confirmation button text on an alert dialog to verify whether the entered backup phrase was correct -->
     <string name="BackupDialog_verify">Patvirtinti</string>
     <string name="BackupDialog_you_successfully_entered_your_backup_passphrase">Jūs sėkmingai įvedėte savo atsarginės kopijos slaptafrazę</string>
     <string name="BackupDialog_passphrase_was_not_correct">Slaptafrazė buvo neteisinga</string>
@@ -4717,6 +4956,7 @@
     <string name="RegistrationActivity_code_support_subject">Molly registracija - Patvirtinimo kodas, skirtas „Android“</string>
     <string name="RegistrationActivity_incorrect_code">Neteisingas kodas</string>
     <string name="BackupUtil_never">Niekada</string>
+    <!-- Subtext below last backup time when we do not know when the last backup was -->
     <string name="BackupUtil_unknown">Nežinoma</string>
     <!-- Phone number heading displayed as a screen title -->
     <string name="preferences_app_protection__phone_number">Telefono numeris</string>
@@ -4771,6 +5011,14 @@
     <string name="RegistrationActivity_you_have_made_too_many_attempts_please_try_again_later">Atlikote per daug bandymų. Vėliau bandykite dar kartą.</string>
     <string name="RegistrationActivity_error_connecting_to_service">Klaida, jungiantis prie paslaugos</string>
     <string name="preferences_chats__backups">Atsarginės kopijos</string>
+
+    <!-- Button label to indicate that a feature is in beta mode -->
+    <string name="Beta__beta_title">Beta</string>
+    <!-- Content description for info icon -->
+    <string name="Beta__info">Informacija</string>
+    <!-- Text in header describing that the feature is a beta feature and prone to frequent changes -->
+    <string name="Beta__this_is_beta">This is a beta feature that we will be adding functionality to on an ongoing basis.</string>
+
     <!-- Title text shown when Signal is locked and needs to be unlocked -->
     <string name="prompt_passphrase_activity__unlock_signal">Atrakinti „Molly“</string>
     <!-- Description text explaining how to unlock Signal -->
@@ -4901,6 +5149,7 @@
     <string name="DeviceTransferSetup__try_turning_wifi_off_and_on_on_both_devices">Pabandykite abiejuose įrenginiuose išjungti ir vėl įjungti belaidį (Wi-Fi) ryšį.</string>
     <string name="DeviceTransferSetup__make_sure_both_devices_are_in_transfer_mode">Įsitikinkite, kad abu įrenginiai yra perkėlimo veiksenoje.</string>
     <string name="DeviceTransferSetup__go_to_support_page">Pereikite į palaikymo puslapį</string>
+    <!-- Button text when a device transfer could not occur and to try again -->
     <string name="DeviceTransferSetup__try_again">Bandykite dar kartą</string>
     <string name="DeviceTransferSetup__waiting_for_other_device">Laukiama kito įrenginio</string>
     <string name="DeviceTransferSetup__tap_continue_on_your_other_device_to_start_the_transfer">Norėdami pradėti perkėlimą, kitame įrenginyje bakstelėkite „Tęsti“.</string>
@@ -5044,10 +5293,10 @@
     <string name="ReviewCardDialogFragment__no_other_groups_in_common">Nėra kitų bendrų grupių.</string>
     <string name="ReviewCardDialogFragment__no_groups_in_common">Nėra bendrų grupių.</string>
     <plurals name="ReviewCardDialogFragment__d_other_groups_in_common">
-        <item quantity="one">%1$d bendra grupė</item>
-        <item quantity="few">%1$d bendros grupės</item>
-        <item quantity="many">%1$d bendrų grupių</item>
-        <item quantity="other">%1$d bendra grupė</item>
+        <item quantity="one">%1$d kita bendra grupė</item>
+        <item quantity="few">%1$d kitos bendros grupės</item>
+        <item quantity="many">%1$d kitos bendros grupės</item>
+        <item quantity="other">%1$d kitų bendrų grupių</item>
     </plurals>
     <plurals name="ReviewCardDialogFragment__d_groups_in_common">
         <item quantity="one">%1$d bendra grupė</item>
@@ -5422,6 +5671,7 @@
 
     <!-- ChangeNumberVerifyFragment -->
     <string name="ChangeNumberVerifyFragment__change_number">Keisti numerį</string>
+    <!-- Text shown when verifying a new phone number where %1$s is the number being changed -->
     <string name="ChangeNumberVerifyFragment__verifying_s">Patvirtinamas %1$s</string>
     <string name="ChangeNumberVerifyFragment__captcha_required">Reikia saugos kodo</string>
 
@@ -5811,6 +6061,7 @@
     <string name="ConversationSettingsFragment__permissions">Leidimai</string>
     <string name="ConversationSettingsFragment__requests_and_invites">Prašymai ir pakvietimai</string>
     <string name="ConversationSettingsFragment__group_link">Grupės nuoroda</string>
+    <!-- Option in conversation settings to add a user as a contact -->
     <string name="ConversationSettingsFragment__add_as_a_contact">Pridėti kaip adresatą</string>
     <string name="ConversationSettingsFragment__unmute">Įjungti garsą</string>
     <!-- The subtitle for a settings item that describes how long the user\'s chat is muted. If a chat is muted, you will not receive notifications unless @mentioned. The placeholder represents a time (e.g. 10pm, March 4, etc). -->
@@ -5819,6 +6070,8 @@
     <string name="ConversationSettingsFragment__copied_phone_number_to_clipboard">Telefono numeris nukopijuotas į iškarpinę.</string>
     <string name="ConversationSettingsFragment__phone_number">Telefono numeris</string>
     <string name="ConversationSettingsFragment__get_badges">Gauk ženklelių savo profiliui už paramą „Signal“. Bakstelėk ženklelį ir sužinok daugiau.</string>
+    <!-- Error message shown when the user is trying to open a media that is not sent yet. -->
+    <string name="ConversationSettingsFragment__this_media_is_not_sent_yet">Šis įrašas dar neišsiųstas.</string>
 
     <!-- PermissionsSettingsFragment -->
     <string name="PermissionsSettingsFragment__add_members">Pridėti narius</string>
@@ -5871,6 +6124,8 @@
     <string name="NewConversationActivity__s_has_been_removed">%1$s pašalintas (-a)</string>
     <!-- Snackbar message after blocking a contact -->
     <string name="NewConversationActivity__s_has_been_blocked">%1$s užblokuotas (-a)</string>
+    <!-- Snackbar message when blocking a contact has failed -->
+    <string name="NewConversationActivity__block_failed">Block failed</string>
     <!-- Dialog title when remove target contact is in system contacts -->
     <string name="NewConversationActivity__unable_to_remove_s">Nepavyko pašalinti %1$s</string>
     <!-- Dialog message when remove target contact is in system contacts -->
@@ -5926,6 +6181,7 @@
     <string name="ShareInterstitialActivity__share">Bendrinti</string>
 
     <!-- DSLSettingsToolbar -->
+    <!-- Content description describing the back arrow on toolbars -->
     <string name="DSLSettingsToolbar__navigate_up">Naršyti aukštyn</string>
     <string name="MultiselectForwardFragment__forward_to">Kam persiųsti</string>
     <!-- Displayed when sharing content to people via the fragment -->
@@ -5936,6 +6192,7 @@
     <string name="MultiselectForwardFragment__videos_will_be_trimmed">Vaizdo įrašai bus apkarpyti į 30 sek. klipus ir siunčiami kaip kelios istorijos.</string>
     <!-- Displayed when user selects a video that cannot be sent as a story -->
     <string name="MultiselectForwardFragment__videos_sent_to_stories_cant">Vaizdo įrašai, siunčiami į istorijas, negali būti ilgesni kaip 30 sek.</string>
+    <!-- Body in alert dialog telling users that messages are now sent immediately -->
     <string name="MultiselectForwardFragment__forwarded_messages_are_now">Dabar, persiunčiamos žinutės yra išsiunčiamos nedelsiant.</string>
     <plurals name="MultiselectForwardFragment_send_d_messages">
         <item quantity="one">Išsiųsta %1$d žinutė</item>
@@ -5991,6 +6248,24 @@
     <string name="MediaReviewFragment__photo_set_to_high_quality">Nustatyta aukšta nuotraukos kokybė</string>
     <!-- Small notification presented to the user when they set their still image to be sent in standard (lower than high) visual quality. -->
     <string name="MediaReviewFragment__photo_set_to_standard_quality">Nustatyta standartinė nuotraukos kokybė</string>
+    <!-- Accessibility label describing the add media button on the Media review screen -->
+    <string name="MediaReviewFragment__add_media_accessibility_label">Pridėti įrašą</string>
+    <!-- Accessibility label describing the brush and pen button on the Media review screen -->
+    <string name="MediaReviewFragment__brush_pen_accessibility_label">Teptukas ir rašiklis</string>
+    <!-- Accessibility label describing the crop and rotate button on the Media review screen -->
+    <string name="MediaReviewFragment__crop_rotate_accessibility_label">Apkirpti ir pasukti</string>
+    <!-- Accessibility label describing the change media quality button on the Media review screen -->
+    <string name="MediaReviewFragment__change_media_quality_accessibility_label">Keisti įrašo kokybę</string>
+    <!-- Accessibility label describing the save media button on the Media review screen -->
+    <string name="MediaReviewFragment__save_media_accessibility_label">Išsaugoti įrašą</string>
+    <!-- Accessibility label describing the toggle emoji keyboard button on the Media review screen -->
+    <string name="MediaReviewFragment__emoji_toggle_accessibility_label">Perjungti šypsenėlių klaviatūrą</string>
+    <!-- Accessibility label describing the toggle view once button on the Media review screen -->
+    <string name="MediaReviewFragment__view_once_toggle_accessibility_label">Perjungti vienkartinę peržiūrą</string>
+    <!-- Accessibility label describing the send media button on the Media review screen -->
+    <string name="MediaReviewFragment__send_media_accessibility_label">Siųsti įrašą</string>
+    <!-- Accessibility label describing the finish adding a message button on the Media review screen dialog -->
+    <string name="MediaReviewFragment__finish_adding_a_message_accessibility_label">Užbaigti žinutės pridėjimą</string>
     <!-- Small notification presented to the user when they set multiple media items to be sent in high visual quality. -->
     <plurals name="MediaReviewFragment__items_set_to_high_quality">
         <item quantity="one">Nustatyta aukšta %1$d elemento kokybė</item>
@@ -6039,7 +6314,7 @@
     <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
     <string name="MediaCaptureFragment_device_link_dialog_title">Susieti įrenginį?</string>
     <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">It looks like you\'re trying to link a Signal device. Tap continue and then tap \"Link a New Device\" and scan the QR code again.</string>
+    <string name="MediaCaptureFragment_it_looks_like_youre_trying">Atrodo, kad bandote susieti „Signal“ įrenginį. Bakstelėkite „Tęsti“, tada bakstelėkite „Susieti naują įrenginį“ ir nuskaitykite QR kodą dar kartą.</string>
     <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
     <string name="MediaCaptureFragment_device_link_dialog_continue">Tęsti</string>
 
@@ -6134,6 +6409,7 @@
 
     <string name="MySupportPreference__s_per_month">%1$s/mėnesį</string>
     <string name="MySupportPreference__renews_s">Atnaujinama %1$s</string>
+    <!-- Subtitle shown when processing a donation transaction -->
     <string name="MySupportPreference__processing_transaction">Apdorojama operacija…</string>
     <!-- Displayed on "My Support" screen when user badge failed to be added to their account -->
     <string name="MySupportPreference__couldnt_add_badge_s">Nepavyko pridėti ženklelio. %1$s</string>
@@ -6244,7 +6520,7 @@
     <string name="DonationsErrors__your_payment_is_still">Tavo parama vis dar apdorojama. Tai gali užtrukti kelias minutes, priklausomai nuo interneto ryšio.</string>
     <string name="DonationsErrors__failed_to_cancel_subscription">Nepavyko nutraukti prenumeratos</string>
     <string name="DonationsErrors__subscription_cancellation_requires_an_internet_connection">Prenumeratos nutraukimui reikia interneto ryšio.</string>
-    <string name="ViewBadgeBottomSheetDialogFragment__your_device_doesn_t_support_google_pay_so_you_can_t_subscribe_to_earn_a_badge_you_can_still_support_signal_by_making_a_donation_on_our_website">Tavo įrenginys nepalaiko „Google Pay“, todėl negali prenumeruoti ir gauti ženklelio. Tačiau gali palaikyti „Signal“ ir skirti paramą mūsų interneto svetainėje.</string>
+    <string name="ViewBadgeBottomSheetDialogFragment__your_device_doesn_t_support">Jūsų įrenginys nepalaiko paramos programėlėje, todėl negalite prenumeruoti ir gauti ženklelio. Tačiau galite palaikyti „Signal“ ir skirti paramą mūsų interneto svetainėje.</string>
     <string name="NetworkFailure__network_error_check_your_connection_and_try_again">Tinklo klaida. Patikrinkite interneto ryšį ir bandykite dar kartą.</string>
     <string name="NetworkFailure__retry">Bandyti dar kartą</string>
     <!-- Displayed as a dialog title when the selected recipient for a gift doesn\'t support gifting -->
@@ -6484,6 +6760,16 @@
 
     <!-- Description shown for the Signal Release Notes channel -->
     <string name="ReleaseNotes__signal_release_notes_and_news">Signal laidos informacija ir naujienos</string>
+    <!-- Text description shown for the Signal Release Notes channel explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__this_is_official_chat_period">Tai oficialus ir vienintelis pokalbis su „Signal“.</string>
+    <!-- Text description shown for the Signal Release Notes channel explaining what the channel is for -->
+    <string name="ReleaseNotes__keep_up_to_date_period">Sekite naujienas ir informaciją apie naujas versijas.</string>
+    <!-- Text description in Signal Release channel details explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__this_is_official_chat">Tai oficialus ir vienintelis pokalbis su „Signal“</string>
+    <!-- Text description in Signal Release channel details explaining what the channel is for -->
+    <string name="ReleaseNotes__keep_up_to_date">Sekite naujienas ir informaciją apie naujas versijas</string>
+    <!-- Subtitle for the Signal Release channel explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__official_only_chat">Oficialus ir vienintelis pokalbis su „Signal“</string>
 
     <!-- Donation receipts activity title -->
     <string name="DonationReceiptListFragment__all_activity">Visa veikla</string>
@@ -6546,7 +6832,7 @@
     <string name="StoriesLandingItem__info">Informacija</string>
     <!-- Label when a story is pending sending -->
     <string name="StoriesLandingItem__sending">Siunčiama…</string>
-    <!-- Label when multiple stories are pending sending -->
+    <!-- Label when multiple stories are pending sending where %1$d is the number of stories being sent -->
     <string name="StoriesLandingItem__sending_d">Siunčiama %1$d…</string>
     <!-- Label when a story fails to send due to networking -->
     <string name="StoriesLandingItem__send_failed">Išsiuntimas nepavyko</string>
@@ -6615,6 +6901,8 @@
     <string name="StoryViewerPageFragment__send_failed">Siuntimas nepavyko. Bakstelėk ir bandyk dar kartą</string>
     <!-- Label for the reply button in story viewer, which will launch the group story replies bottom sheet. -->
     <string name="StoryViewerPageFragment__reply_to_group">Atsakyti grupei</string>
+    <!-- Content description for the any reaction button in reply to story composer, which will launch the emojis bottom sheet. -->
+    <string name="StoryViewerPageFragment_any_reaction_content_description">Daugiau reakcijų</string>
     <!-- Displayed when a story has no views -->
     <string name="StoryViewsFragment__no_views_yet">Peržiūrų kol kas nėra</string>
     <!-- Displayed when user has disabled receipts -->
@@ -7198,34 +7486,6 @@
     <string name="ExternalNavigationHelper__leave_signal_to_confirm_payment">Išeiti iš „Signal“ paramos patvirtinimui?</string>
     <string name="ExternalNavigationHelper__once_this_payment_is_confirmed">Kai ji bus patvirtinta, grįžk į „Signal“ užbaigti paramos apdorojimo.</string>
 
-    <!-- IdealBank -->
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__abn_amro">ABN AMRO</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__asn_bank">ASN Bank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__bunq">bunq</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__ing">ING</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__knab">Knab</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__n26">N26</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__rabobank">Rabobank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__regiobank">RegioBank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__revolut">Revolut</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__sns_bank">SNS Bank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__triodos_bank">Triodos Bank</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__van_lanschot">Van Lanschot Kempen</string>
-    <!-- iDEAL bank name -->
-    <string name="IdealBank__yoursafe">Yoursafe</string>
-
     <!-- BankTransferMandateFragment -->
     <!-- Title of screen displaying the bank transfer mandate -->
     <string name="BankTransferMandateFragment__bank_transfer">Banko pavedimas</string>
@@ -7286,7 +7546,7 @@
     <!-- Default label for bank selection -->
     <string name="IdealTransferDetailsFragment__choose_your_bank">Pasirink savo banką</string>
     <!-- Dialog title shown when using iDEAL payment for setting up a monthly donation -->
-    <string name="IdealTransferDetailsFragment__confirm_your_donation_with_s">Patvirtinkite savo paramą su %1$s</string>
+    <string name="IdealTransferDetailsFragment__confirm_your_donation_with_ideal">Confirm your donation with iDEAL</string>
     <!-- Dialog warning shown when using iDEAL payment for setting up a monthly donation. Placeholder is donation amount.Z -->
     <string name="IdealTransferDetailsFragment__to_setup_your_recurring_donation">Jei norite nustatyti pasikartojančią paramą, bakstelėkite „Tęsti“, kad patvirtintumėte 0,01 € mokestį iš savo banko. Ši suma bus automatiškai grąžinta ir galėsime iš jūsų sąskaitos nurašyti po %1$s paramą kas mėnesį.</string>
     <!-- Dialog button shown when using iDEAL payment for setting up a monthly donation to continue with the donation -->
@@ -7563,6 +7823,8 @@
     <string name="CameraControls_capture_button_accessibility_label">Fotografavimo mygtukas</string>
     <!-- Accessibility label describing the continue button on the camera screen -->
     <string name="CameraControls_continue_button_accessibility_label">Mygtukas tęsti</string>
+    <!-- Accessibility label describing the flash Mode toggle button on the camera screen -->
+    <string name="CameraControls_toggle_flash_mode_accessibility_label">Perjungti blykstės režimą</string>
 
     <!-- CallPreference -->
     <!-- Generic group call in call info -->
@@ -7976,11 +8238,13 @@
     <!-- Status title for banner when user is actively restoring media from a backup -->
     <string name="BackupStatus__restoring_media">Įrašai atkuriami</string>
     <!-- Status title for banner when user has paused restore media from a backup -->
-    <string name="BackupStatus__restore_paused">Atkūrimas pristabdytas</string>
+    <string name="BackupStatus__restore_paused">Media restore paused</string>
     <!-- Status title for banner when user has completed restoring restore media from a backup -->
     <string name="BackupStatus__restore_complete">Atkūrimas užbaigtas</string>
     <!-- Status action label for seeing more details about storage space -->
     <string name="BackupStatus__details">Išsamesnė informacija</string>
+    <!-- Status action label for resume restore from a paused state -->
+    <string name="BackupStatus__resume">Resume</string>
 
     <!-- Status subtitle for banner when restoring media pauses for Wi-Fi -->
     <string name="BackupStatus__status_waiting_for_wifi">Laukiama belaidžio ryšio (Wi-Fi)…</string>
@@ -8012,6 +8276,11 @@
     <string name="BackupStatusRow__your_last_backup_latest_version">Paskutinės atsarginės kopijos sukurti nepavyko. Įsitikinkite, kad naudojate naujausią „Signal“ versiją, ir bandykite dar kartą.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">Sužinoti daugiau</string>
+
+    <!-- Dialog title to prompt resuming media restore over cellular -->
+    <string name="ResumeRestoreCellular_resume_using_cellular_title">Resume using cellular data?</string>
+    <!-- Dialog message to prompt resuming media restore over cellular -->
+    <string name="ResumeRestoreCellular_resume_using_cellular_message">Restoring your media using cellular data may result in data charges. You can connect to a Wi-Fi network to automatically resume.</string>
 
     <!-- BackupsTypeSettingsFragment -->
     <!-- Displayed as the user\'s payment method as a label in a preference row -->
@@ -8114,8 +8383,8 @@
     <string name="RemoteBackupsSettingsFragment__payment_history">Mokėjimų istorija</string>
     <!-- Section header for backup information -->
     <string name="RemoteBackupsSettingsFragment__backup_details">Informacija apie atsarginę kopiją</string>
-    <!-- Toggle row label to allow the restoration of a backup to occur while on cellular connection -->
-    <string name="RemoteBackupsSettingsFragment__restore_using_cellular">Atkurti naudojant mobilųjį ryšį</string>
+    <!-- Row label to allow the restoration of a backup to occur while on cellular connection -->
+    <string name="RemoteBackupsSettingsFragment__resume_download">Resume download</string>
     <!-- Row label for backup size -->
     <string name="RemoteBackupsSettingsFragment__backup_size">Atsarginės kopijos dydis</string>
     <!-- Row label for backup frequency -->
@@ -8228,11 +8497,11 @@
     <!-- Linear progress dialog text shown when preparing a backup -->
     <string name="RemoteBackupsSettingsFragment__preparing_backup">Ruošiama atsarginė kopija…</string>
     <!-- Linear progress dialog text shown when processing messages for backup. First placeholder is completed count, second is approximate total count, third is percent completed. -->
-    <plurals name="RemoteBackupsSettingsFragment__processing_d_of_d_d_messages">
-        <item quantity="one">Apdorojama %1$d žinutė iš %2$d (%3$d %%)</item>
-        <item quantity="few">Apdorojamos %1$d žinutės iš %2$d (%3$d %%)</item>
-        <item quantity="many">Apdorojama %1$d žinutės iš %2$d (%3$d %%)</item>
-        <item quantity="other">Apdorojama %1$d žinučių iš %2$d (%3$d %%)</item>
+    <plurals name="RemoteBackupsSettingsFragment__processing_messages_progress_text">
+        <item quantity="one">Apdorojama %1$s žinutė iš %2$s (%3$d %%)</item>
+        <item quantity="few">Apdorojamos %1$s žinutės iš %2$s (%3$d %%)</item>
+        <item quantity="many">Apdorojama %1$s žinutės iš %2$s (%3$d %%)</item>
+        <item quantity="other">Apdorojama %1$s žinučių iš %2$s (%3$d %%)</item>
     </plurals>
     <!-- Displayed in row when backup is available for download and users subscription has expired. First placeholder is data size e.g. 12MB, second is days before expiration -->
     <plurals name="RemoteBackupsSettingsFragment__you_have_s_of_backup_data">
@@ -8241,6 +8510,8 @@
         <item quantity="many">Turite %1$s atsarginės kopijos duomenų, kurių nėra šiame įrenginyje. Atsarginė kopija bus ištrinta, kai prenumerata baigsis po %2$d d.</item>
         <item quantity="other">Turite %1$s atsarginės kopijos duomenų, kurių nėra šiame įrenginyje. Atsarginė kopija bus ištrinta, kai prenumerata baigsis po %2$d d.</item>
     </plurals>
+    <!-- Display in a row when backup is available for download but the user has canceled the restore. Place holder is data size e.g. 12MB -->
+    <string name="RemoteBackupsSettingsFragment__you_have_s_of_backup_data_not_on_device">You have %1$s of backup data that’s not on this device. </string>
     <!-- Displayed in row when backup is available for download to let user start download -->
     <string name="RemoteBackupsSettingsFragment__download">Atsisiųsti</string>
     <!-- Dialog title for skipping download of backed up media -->
@@ -8252,6 +8523,10 @@
         <item quantity="many">Jei pasirinksite praleisti atsisiuntimą, likę įrašai ir priedai iš atsarginės kopijos bus ištrinti po %1$d d.</item>
         <item quantity="other">Jei pasirinksite praleisti atsisiuntimą, likę įrašai ir priedai iš atsarginės kopijos bus ištrinti po %1$d d.</item>
     </plurals>
+    <!-- Dialog title for skipping download of in progress initial restore of backed up media -->
+    <string name="RemoteBackupsSettingsFragment__skip_restore_question">Praleisti atkūrimą?</string>
+    <!-- Dialog message for skipping download of in progress initial restore of backed up media -->
+    <string name="RemoteBackupsSettingsFragment__skip_restore_message">If you skip restore the remaining media and attachments in your backup can be downloaded at a later time.</string>
     <!-- Positive dialog action to skip download -->
     <string name="RemoteBackupsSettingsFragment__skip">Praleisti</string>
     <!-- Dialog title for network error while trying to disable backups -->
@@ -8282,6 +8557,10 @@
     <string name="SubscriptionNotFoundBottomSheet__got_it">Supratau</string>
     <!-- Action button label to contact support -->
     <string name="SubscriptionNotFoundBottomSheet__contact_support">Susisiekti su aptarnavimo komanda</string>
+
+    <!-- MessageBackupsFlowFragment -->
+    <!-- Body for network failure dialog in message backups checkout flow -->
+    <string name="MessageBackupsFlowFragment__a_network_failure_occurred">Įvyko tinklo gedimas. Bandykite dar kartą vėliau.</string>
 
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->
@@ -8326,6 +8605,19 @@
     <string name="MessageBackupsKeyRecordScreen__continue">Tęsti</string>
     <!-- Sheet secondary action button label -->
     <string name="MessageBackupsKeyRecordScreen__see_key_again">Rodyti raktą dar kartą</string>
+
+    <!-- Confirm key title -->
+    <string name="MessageBackupsKeyVerifyScreen__confirm_your_backup_key">Patvirtinkite atsarginės kopijos raktą</string>
+    <!-- Confirm your key subtitle -->
+    <string name="MessageBackupsKeyVerifyScreen__enter_the_backup_key_that_you_just_recorded">Įveskite ką tik įrašytą atsarginės kopijos raktą</string>
+    <!-- Confirm your key text entry hint text -->
+    <string name="MessageBackupsKeyVerifyScreen__backup_key">Atsarginės kopijos raktas</string>
+    <!-- Confirm your key text entry error text -->
+    <string name="MessageBackupsKeyVerifyScreen__incorrect_backup_key">Neteisingas atsarginės kopijos raktas</string>
+    <!-- Confirm your key button text to return to record key screen. -->
+    <string name="MessageBackupsKeyVerifyScreen__see_key_again">Rodyti raktą dar kartą</string>
+    <!-- Confirm your key button text to move onto next screen in flow -->
+    <string name="MessageBackupsKeyVerifyScreen__next">Kitas</string>
 
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
@@ -8451,11 +8743,30 @@
     <!-- Text field error when the backup key is invalid -->
     <string name="EnterBackupKey_invalid_backup_key_error">Negaliojantis atsarginės kopijos raktas</string>
     <!-- Dialog title shown during registration and trying to restore a remote backup -->
-    <string name="EnterBackupKey_backup_not_found">Backup not found</string>
+    <string name="EnterBackupKey_backup_not_found">Atsarginė kopija nerasta</string>
     <!-- Dialog message shown during registration and trying to restore a remote backup -->
-    <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">The backup key you entered is correct, but there is no backup associated with it. If you still have your old phone, make sure backups are enabled and that a backup has been completed and try again.</string>
+    <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">Įvestas atsarginės kopijos raktas yra teisingas, tačiau su juo nesusieta jokia atsarginė kopija. Jei vis dar turite senąjį telefoną, įsitikinkite, kad atsarginės kopijos yra įjungtos ir atsarginė kopija buvo sukurta – tada bandykite dar kartą.</string>
     <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
     <string name="EnterBackupKey_skip_restore">Praleisti atkūrimą</string>
+    <!-- Dialog title text when encountering backup restore network error -->
+    <string name="EnterBackupKey_cant_restore_backup">Nepavyko atkurti atsarginės kopijos</string>
+    <!-- Dialog body text when encountering backup restore network error -->
+    <string name="EnterBackupKey_your_backup_cant_be_restored_right_now">Šiuo metu negalima atkurti jūsų atsarginės kopijos. Patikrinkite interneto ryšį ir bandykite dar kartą. </string>
+    <!-- Dialog button text to contact support on network error -->
+    <string name="EnterBackupKey_contact_support">Susisiekti su aptarnavimo komanda</string>
+
+    <!-- Email subject when contacting support on a restore backup network issue -->
+    <string name="EnterBackupKey_network_failure_support_email">„Signal“ „Android“ atsarginės kopijos atkūrimo tinklo klaida</string>
+  <!-- Removed by excludeNonTranslatables <string name="EnterBackupKey_network_failure_support_email_filter" translatable="false">Signal Android Backup restore network error</string> -->
+
+    <!-- Title of dialog asking to submit debuglogs -->
+    <string name="ContactSupportDialog_submit_debug_log">Pateikti derinimo žurnalą?</string>
+    <!-- Body of dialog explaining what debug logs are and that they are optional to submit -->
+    <string name="ContactSupportDialog_your_debug_logs">Turėdami derinimo žurnalus greičiau išspręsime jūsų problemą. Žurnalų pateikti neprivaloma.</string>
+    <!-- Button option to submit debug log when contacting support -->
+    <string name="ContactSupportDialog_submit_with_debug">Pateikti su derinimo žurnalu</string>
+    <!-- Button option to not submit debug log when contacting support -->
+    <string name="ContactSupportDialog_submit_without_debug">Pateikti be derinimo žurnalo</string>
 
     <!-- Title for restore via qr screen -->
     <string name="RestoreViaQr_title">Nuskaitykite šį kodą senuoju telefonu</string>
@@ -8514,6 +8825,27 @@
     <string name="NoBackupToRestore_step3">Įjunkite atsargines kopijas ir palaukite, kol bus sukurta atsarginė kopija</string>
     <!-- No backup to Restore tonal cta to skip restore -->
     <string name="NoBackupToRestore_skip_restore">Praleisti atkūrimą</string>
+
+    <!-- Accessibility label for close search button in MainToolbar -->
+    <string name="MainToolbar__close_search_content_description">Uždaryti paiešką</string>
+    <!-- Accessibility label for clear search query in MainToolbar -->
+    <string name="MainToolbar__clear_search_content_description">Išvalyti paiešką</string>
+    <!-- Accessibility label for more options button in MainToolbar -->
+    <string name="MainToolbar__more_options_content_description">Daugiau parinkčių</string>
+    <!-- Accessibility label for more options button in MainToolbar -->
+    <string name="MainToolbar__notification_profile_content_description">Pranešimų profilis</string>
+    <!-- Accessibility label for more options button in MainToolbar -->
+    <string name="MainToolbar__proxy_content_description">Įgaliotasis serveris</string>
+
+    <!-- Accessibility label for a button displayed in the toolbar to return to the previous screen. -->
+    <string name="DefaultTopAppBar__navigate_up_content_description">Naršyti aukštyn</string>
+
+    <!-- Accessibility label describing the action that occurs when clicking a checkbox. -->
+    <string name="SignalCheckbox_accessibility_on_click_label">Perjungti</string>
+    <!-- Accessibility label describing a checked checkbox. -->
+    <string name="SignalCheckbox_accessibility_checked_description">Ticked</string>
+    <!-- Accessibility label describing an unchecked checkbox. -->
+    <string name="SignalCheckbox_accessibility_unchecked_description">Unticked</string>
 
     <!-- EOF -->
 </resources>

@@ -167,4 +167,10 @@
     <string name="UnifiedPushNotificationBuilder__registration_failed">Помилка реєстрації у вашого дистриб’ютора UnifiedPush. Це може бути через проблему з мережею або відсутність вимоги від вашого дистриб’ютора.</string>
     <string name="MollySocketLink_scan_the_qr_code">Відскануйте QR-код, який відображається на домашній сторінці вашого сервера MollySocket або в консолі.</string>
     <string name="MollySocketLink_try_scanning_another_image_containing_a_mollysocket_qr_code">Спробуйте відсканувати інше зображення, яке містить QR-код MollySocket.</string>
+    <string name="app_icon_label_music">Музика</string>
+    <string name="app_icon_label_zen">Це було</string>
+    <string name="app_icon_label_moon">Місяць</string>
+    <string name="preferences_appearance__use_system_colors_for_the_app_theme">Використовуйте системні кольори для теми програми</string>
+    <string name="preferences__follow_system">Слідкуйте за системою</string>
+    <string name="preferences_appearance__dynamic_colors">Динамічні кольори</string>
 </resources>

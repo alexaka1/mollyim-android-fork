@@ -96,6 +96,7 @@ import org.thoughtcrime.securesms.storage.StorageSyncModels
 import org.thoughtcrime.securesms.util.IdentityUtil
 import org.thoughtcrime.securesms.util.ProfileUtil
 import org.thoughtcrime.securesms.util.RemoteConfig
+import org.thoughtcrime.securesms.util.SignalE164Util
 import org.thoughtcrime.securesms.util.Util
 import org.thoughtcrime.securesms.wallpaper.ChatWallpaper
 import org.thoughtcrime.securesms.wallpaper.ChatWallpaperFactory
@@ -336,7 +337,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
 
     private val ID_PROJECTION = arrayOf(ID)
 
-    private val SEARCH_PROJECTION = arrayOf(
+    private val SEARCH_PROJECTION_WITHOUT_SELF_REMAP = arrayOf(
       ID,
       SYSTEM_JOINED_NAME,
       E164,
@@ -492,6 +493,8 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     }
 
     Log.d(TAG, "[getAndPossiblyMerge] Requires a transaction.")
+    val e164 = e164?.let { SignalE164Util.formatAsE164(it) }
+    require(aci != null || pni != null || e164 != null) { "E164 was improperly formatted!" }
 
     val db = writableDatabase
     lateinit var result: ProcessPnpTupleResult
@@ -722,20 +725,21 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     return RecipientReader(cursor)
   }
 
-  fun getRecords(ids: Collection<RecipientId>): Map<RecipientId, RecipientRecord> {
-    val queries = SqlUtil.buildCollectionQuery(
+  fun getExistingRecords(ids: Collection<RecipientId>): Map<RecipientId, RecipientRecord> {
+    val query = SqlUtil.buildFastCollectionQuery(
       column = ID,
       values = ids.map { it.serialize() }
     )
 
-    val foundRecords = queries.flatMap { query ->
-      readableDatabase.query(TABLE_NAME, null, query.where, query.whereArgs, null, null, null).readToList { cursor ->
-        RecipientTableCursorUtil.getRecord(context, cursor)
-      }
-    }
+    val foundRecords = readableDatabase
+      .select()
+      .from(TABLE_NAME)
+      .where(query.where, query.whereArgs)
+      .run()
+      .readToList { cursor -> RecipientTableCursorUtil.getRecord(context, cursor) }
 
     val foundIds = foundRecords.map { record -> record.id }
-    val remappedRecords = ids.filterNot { it in foundIds }.map(::findRemappedIdRecord)
+    val remappedRecords = ids.filterNot { it in foundIds }.mapNotNull { findRemappedIdRecord(it) }
 
     return (foundRecords + remappedRecords).associateBy { it.id }
   }
@@ -748,20 +752,24 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       return if (cursor != null && cursor.moveToNext()) {
         RecipientTableCursorUtil.getRecord(context, cursor)
       } else {
-        findRemappedIdRecord(id)
+        findRemappedIdRecordOrThrow(id)
       }
     }
   }
 
-  private fun findRemappedIdRecord(id: RecipientId): RecipientRecord {
+  private fun findRemappedIdRecord(id: RecipientId): RecipientRecord? {
     val remapped = RemappedRecords.getInstance().getRecipient(id)
 
     return if (remapped.isPresent) {
       Log.w(TAG, "Missing recipient for $id, but found it in the remapped records as ${remapped.get()}")
       getRecord(remapped.get())
     } else {
-      throw MissingRecipientException(id)
+      null
     }
+  }
+
+  private fun findRemappedIdRecordOrThrow(id: RecipientId): RecipientRecord {
+    return findRemappedIdRecord(id) ?: throw MissingRecipientException(id)
   }
 
   fun getRecordForSync(id: RecipientId): RecipientRecord? {
@@ -1119,10 +1127,14 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
 
     writableDatabase.withinTransaction {
       for ((originalE164, updatedE164) in mapping) {
-        writableDatabase.update(TABLE_NAME)
-          .values(E164 to updatedE164)
-          .where("$E164 = ?", originalE164)
-          .run(SQLiteDatabase.CONFLICT_IGNORE)
+        try {
+          writableDatabase.update(TABLE_NAME)
+            .values(E164 to updatedE164)
+            .where("$E164 = ?", originalE164)
+            .run()
+        } catch (_: SQLiteConstraintException) {
+          Log.w(TAG, "Unable to update e164 due to constraint, ignoring")
+        }
       }
     }
   }
@@ -1198,25 +1210,22 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       .where(
         """
         $STORAGE_SERVICE_ID NOT NULL AND (
-            ($TYPE = ? AND ($ACI_COLUMN NOT NULL OR $PNI_COLUMN NOT NULL) AND $ID != ?)
+            ($TYPE = ${RecipientType.INDIVIDUAL.id} AND ($ACI_COLUMN NOT NULL OR $PNI_COLUMN NOT NULL) AND $ID != ${Recipient.self().id.toLong()})
             OR
-            $TYPE = ?
+            $TYPE = ${RecipientType.GV1.id}
             OR
-            $DISTRIBUTION_LIST_ID NOT NULL AND $DISTRIBUTION_LIST_ID IN (
+            ($TYPE = ${RecipientType.DISTRIBUTION_LIST.id} AND $DISTRIBUTION_LIST_ID NOT NULL AND $DISTRIBUTION_LIST_ID IN (
               SELECT ${DistributionListTables.ListTable.ID}
               FROM ${DistributionListTables.ListTable.TABLE_NAME}
-            )
+            ))
             OR
-            $CALL_LINK_ROOM_ID NOT NULL AND $CALL_LINK_ROOM_ID IN (
+            ($TYPE = ${RecipientType.CALL_LINK.id} AND $CALL_LINK_ROOM_ID NOT NULL AND $CALL_LINK_ROOM_ID IN (
               SELECT ${CallLinkTable.ROOM_ID}
               FROM ${CallLinkTable.TABLE_NAME}
               WHERE (${CallLinkTable.ADMIN_KEY} NOT NULL OR ${CallLinkTable.DELETION_TIMESTAMP} > 0) AND ${CallLinkTable.ROOT_KEY} NOT NULL
-            )
+            ))
         )
-        """,
-        RecipientType.INDIVIDUAL.id,
-        Recipient.self().id,
-        RecipientType.GV1.id
+        """
       )
       .run()
       .use { cursor ->
@@ -1849,7 +1858,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     }
   }
 
-  fun setProfileAvatar(id: RecipientId, profileAvatar: String?) {
+  fun setProfileAvatar(id: RecipientId, profileAvatar: String?, forceNotify: Boolean = false) {
     val contentValues = ContentValues(1).apply {
       put(PROFILE_AVATAR, profileAvatar)
     }
@@ -1859,6 +1868,8 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
         rotateStorageId(id)
         StorageSyncHelper.scheduleSyncForDataChange()
       }
+    } else if (forceNotify) {
+      AppDependencies.databaseObserver.notifyRecipientChanged(id)
     }
   }
 
@@ -2361,7 +2372,10 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     val recipientId = getByAci(aci).getOrNull() ?: return
     val record = getRecord(recipientId)
 
-    if (record.pni == null && record.e164 == null) {
+    val pni = record.pni
+    val e164 = record.e164?.takeIf { SignalE164Util.isPotentialE164(it) }
+
+    if (pni == null && e164 == null) {
       return
     }
 
@@ -2376,7 +2390,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       .where("$ID = ?", record.id)
       .run()
 
-    getAndPossiblyMerge(null, record.pni, record.e164)
+    getAndPossiblyMerge(null, pni, e164)
   }
 
   fun processIndividualCdsLookup(aci: ACI?, pni: PNI, e164: String): RecipientId {
@@ -3277,32 +3291,72 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       }
   }
 
-  fun getSignalContacts(includeSelf: Boolean): Cursor? {
-    return getSignalContacts(includeSelf, "$SORT_NAME, $SYSTEM_JOINED_NAME, $SEARCH_PROFILE_NAME, $USERNAME, $E164")
+  fun getSignalContacts(includeSelfMode: IncludeSelfMode): Cursor {
+    return getSignalContacts(includeSelfMode, "$SORT_NAME, $SYSTEM_JOINED_NAME, $SEARCH_PROFILE_NAME, $USERNAME, $E164")
   }
 
-  fun getSignalContactsCount(includeSelf: Boolean): Int {
-    return getSignalContacts(includeSelf)?.count ?: 0
+  fun getSignalContactsCount(includeSelfMode: IncludeSelfMode): Int {
+    return getSignalContacts(includeSelfMode).count
   }
 
-  private fun getSignalContacts(includeSelf: Boolean, orderBy: String? = null): Cursor? {
+  private fun searchProjection(includeSelfMode: IncludeSelfMode): Array<String> {
+    return when (includeSelfMode) {
+      is IncludeSelfMode.IncludeWithRemap -> {
+        val selfId = Recipient.self().id.toLong()
+        arrayOf(
+          ID,
+          """CASE WHEN ${TABLE_NAME}.$ID = $selfId THEN '${includeSelfMode.noteToSelfTitle}' ELSE $SYSTEM_JOINED_NAME END AS $SYSTEM_JOINED_NAME""",
+          E164,
+          EMAIL,
+          SYSTEM_PHONE_LABEL,
+          SYSTEM_PHONE_TYPE,
+          REGISTERED,
+          ABOUT,
+          ABOUT_EMOJI,
+          EXTRAS,
+          GROUPS_IN_COMMON,
+          """CASE WHEN ${TABLE_NAME}.$ID = $selfId THEN '${includeSelfMode.noteToSelfTitle}' ELSE COALESCE(NULLIF($PROFILE_JOINED_NAME, ''), NULLIF($PROFILE_GIVEN_NAME, '')) END AS $SEARCH_PROFILE_NAME""",
+          """
+            CASE WHEN ${TABLE_NAME}.$ID = $selfId THEN '${includeSelfMode.noteToSelfTitle.lowercase()}' ELSE
+            LOWER(
+              COALESCE(
+                NULLIF($NICKNAME_JOINED_NAME, ''),
+                NULLIF($NICKNAME_GIVEN_NAME, ''),
+                NULLIF($SYSTEM_JOINED_NAME, ''),
+                NULLIF($SYSTEM_GIVEN_NAME, ''),
+                NULLIF($PROFILE_JOINED_NAME, ''),
+                NULLIF($PROFILE_GIVEN_NAME, ''),
+                NULLIF($USERNAME, '')
+              )
+            ) END AS $SORT_NAME
+          """
+        )
+      }
+
+      IncludeSelfMode.IncludeWithoutRemap,
+      IncludeSelfMode.Exclude -> SEARCH_PROJECTION_WITHOUT_SELF_REMAP
+    }
+  }
+
+  private fun getSignalContacts(includeSelfMode: IncludeSelfMode, orderBy: String? = null): Cursor {
     val searchSelection = ContactSearchSelection.Builder()
       .withRegistered(true)
       .withGroups(false)
-      .excludeId(if (includeSelf) null else Recipient.self().id)
+      .excludeId(if (includeSelfMode.includeSelf) null else Recipient.self().id)
       .build()
     val selection = searchSelection.where
     val args = searchSelection.args
-    return readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, selection, args, null, null, orderBy)
+
+    return readableDatabase.query(TABLE_NAME, searchProjection(includeSelfMode), selection, args, null, null, orderBy)
   }
 
   fun querySignalContacts(contactSearchQuery: ContactSearchQuery): Cursor? {
-    val query = SqlUtil.buildCaseInsensitiveGlobPattern(contactSearchQuery.query)
+    val query = SqlUtil.buildCaseInsensitiveGlobPattern(contactSearchQuery.query.trim())
 
     val searchSelection = ContactSearchSelection.Builder()
       .withRegistered(true)
       .withGroups(false)
-      .excludeId(if (contactSearchQuery.includeSelf) null else Recipient.self().id)
+      .excludeId(if (contactSearchQuery.includeSelfMode.includeSelf) null else Recipient.self().id)
       .withSearchQuery(query)
       .build()
     val selection = searchSelection.where
@@ -3318,7 +3372,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
 
     return if (contactSearchQuery.contactSearchSortOrder == ContactSearchSortOrder.RECENCY) {
       val ambiguous = listOf(ID)
-      val projection = SEARCH_PROJECTION.map {
+      val projection = searchProjection(contactSearchQuery.includeSelfMode).map {
         if (it in ambiguous) "$TABLE_NAME.$it" else it
       } + "${ThreadTable.TABLE_NAME}.${ThreadTable.DATE}"
 
@@ -3334,16 +3388,16 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
         args
       )
     } else {
-      readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, selection, args, null, null, orderBy)
+      readableDatabase.query(TABLE_NAME, searchProjection(contactSearchQuery.includeSelfMode), selection, args, null, null, orderBy)
     }
   }
 
-  fun querySignalContactLetterHeaders(inputQuery: String, includeSelf: Boolean, includePush: Boolean, includeSms: Boolean): Map<RecipientId, String> {
+  fun querySignalContactLetterHeaders(inputQuery: String, includeSelfMode: IncludeSelfMode, includePush: Boolean, includeSms: Boolean): Map<RecipientId, String> {
     val searchSelection = ContactSearchSelection.Builder()
       .withRegistered(includePush)
       .withNonRegistered(includeSms)
       .withGroups(false)
-      .excludeId(if (includeSelf) null else Recipient.self().id)
+      .excludeId(if (includeSelfMode.includeSelf) null else Recipient.self().id)
       .withSearchQuery(inputQuery)
       .build()
 
@@ -3353,7 +3407,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
           _id,
           UPPER(SUBSTR($SORT_NAME, 0, 2)) AS letter_header
         FROM (
-          SELECT ${SEARCH_PROJECTION.joinToString(", ")}
+          SELECT ${searchProjection(includeSelfMode).joinToString(", ")}
           FROM recipient
           WHERE ${searchSelection.where}
           ORDER BY $SORT_NAME, $SYSTEM_JOINED_NAME, $SEARCH_PROFILE_NAME, $E164
@@ -3377,55 +3431,15 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     }
   }
 
-  fun getNonSignalContacts(): Cursor? {
-    val searchSelection = ContactSearchSelection.Builder().withNonRegistered(true)
-      .withGroups(false)
-      .build()
-    val selection = searchSelection.where
-    val args = searchSelection.args
-    val orderBy = "$SYSTEM_JOINED_NAME, $E164"
-    return readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, selection, args, null, null, orderBy)
-  }
-
-  fun queryNonSignalContacts(inputQuery: String): Cursor? {
-    val query = SqlUtil.buildCaseInsensitiveGlobPattern(inputQuery)
-    val searchSelection = ContactSearchSelection.Builder()
-      .withNonRegistered(true)
-      .withGroups(false)
-      .withSearchQuery(query)
-      .build()
-    val selection = searchSelection.where
-    val args = searchSelection.args
-    val orderBy = "$SYSTEM_JOINED_NAME, $E164"
-    return readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, selection, args, null, null, orderBy)
-  }
-
-  fun getNonGroupContacts(includeSelf: Boolean): Cursor? {
+  fun getNonGroupContacts(includeSelfMode: IncludeSelfMode): Cursor? {
     val searchSelection = ContactSearchSelection.Builder()
       .withRegistered(true)
       .withNonRegistered(true)
       .withGroups(false)
-      .excludeId(if (includeSelf) null else Recipient.self().id)
+      .excludeId(if (includeSelfMode.includeSelf) null else Recipient.self().id)
       .build()
     val orderBy = orderByPreferringAlphaOverNumeric(SORT_NAME) + ", " + E164
-    return readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, searchSelection.where, searchSelection.args, null, null, orderBy)
-  }
-
-  fun queryNonGroupContacts(inputQuery: String, includeSelf: Boolean): Cursor? {
-    val query = SqlUtil.buildCaseInsensitiveGlobPattern(inputQuery)
-
-    val searchSelection = ContactSearchSelection.Builder()
-      .withRegistered(true)
-      .withNonRegistered(true)
-      .withGroups(false)
-      .excludeId(if (includeSelf) null else Recipient.self().id)
-      .withSearchQuery(query)
-      .build()
-    val selection = searchSelection.where
-    val args = searchSelection.args
-    val orderBy = orderByPreferringAlphaOverNumeric(SORT_NAME) + ", " + E164
-
-    return readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, selection, args, null, null, orderBy)
+    return readableDatabase.query(TABLE_NAME, searchProjection(includeSelfMode), searchSelection.where, searchSelection.args, null, null, orderBy)
   }
 
   fun getGroupMemberContacts(): Cursor? {
@@ -3435,7 +3449,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       .build()
 
     val orderBy = orderByPreferringAlphaOverNumeric(SORT_NAME) + ", " + E164
-    return readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, searchSelection.where, searchSelection.args, null, null, orderBy)
+    return readableDatabase.query(TABLE_NAME, searchProjection(IncludeSelfMode.Exclude), searchSelection.where, searchSelection.args, null, null, orderBy)
   }
 
   fun queryGroupMemberContacts(inputQuery: String): Cursor? {
@@ -3450,10 +3464,10 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     val args = searchSelection.args
     val orderBy = orderByPreferringAlphaOverNumeric(SORT_NAME) + ", " + E164
 
-    return readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, selection, args, null, null, orderBy)
+    return readableDatabase.query(TABLE_NAME, searchProjection(IncludeSelfMode.Exclude), selection, args, null, null, orderBy)
   }
 
-  fun queryAllContacts(inputQuery: String): Cursor? {
+  fun queryAllContacts(inputQuery: String, includeSelfMode: IncludeSelfMode): Cursor? {
     val query = SqlUtil.buildCaseInsensitiveGlobPattern(inputQuery)
     val selection =
       """
@@ -3466,18 +3480,18 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
         )
       """
     val args = SqlUtil.buildArgs(0, query, query, query, query)
-    return readableDatabase.query(TABLE_NAME, SEARCH_PROJECTION, selection, args, null, null, null)
+    return readableDatabase.query(TABLE_NAME, searchProjection(includeSelfMode), selection, args, null, null, null)
   }
 
   /**
    * Gets the query used for performing the all contacts search so that it can be injected as a subquery.
    */
-  fun getAllContactsSubquery(inputQuery: String): SqlUtil.Query {
+  fun getAllContactsSubquery(inputQuery: String, includeSelfMode: IncludeSelfMode): SqlUtil.Query {
     val query = SqlUtil.buildCaseInsensitiveGlobPattern(inputQuery)
 
     //language=sql
     val subquery = """SELECT $ID FROM (
-      SELECT ${SEARCH_PROJECTION.joinToString(",")} FROM $TABLE_NAME
+      SELECT ${searchProjection(includeSelfMode).joinToString(",")} FROM $TABLE_NAME
       WHERE $BLOCKED = ? AND $HIDDEN = ? AND
       (
           $SORT_NAME GLOB ? OR 
@@ -3498,7 +3512,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
 
     //language=sql
     val subquery = """
-      SELECT ${SEARCH_PROJECTION.joinToString(", ")} FROM $TABLE_NAME
+      SELECT ${searchProjection(IncludeSelfMode.Exclude).joinToString(", ")} FROM $TABLE_NAME
       WHERE $BLOCKED = ? AND $HIDDEN = ? AND $REGISTERED != ? AND NOT EXISTS (SELECT 1 FROM ${ThreadTable.TABLE_NAME} WHERE ${ThreadTable.TABLE_NAME}.${ThreadTable.ACTIVE} = 1 AND ${ThreadTable.TABLE_NAME}.${ThreadTable.RECIPIENT_ID} = $TABLE_NAME.$ID LIMIT 1)
       AND (
           $SORT_NAME GLOB ? OR 
@@ -3603,32 +3617,38 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
         PROFILE_SHARING to 0
       )
 
-      val e164Query = SqlUtil.buildFastCollectionQuery(E164, blockedE164s)
-      db.update(TABLE_NAME)
-        .values(blockValues)
-        .where(e164Query.where, e164Query.whereArgs)
-        .run()
-
-      val aciQuery = SqlUtil.buildFastCollectionQuery(ACI_COLUMN, blockedAcis.map { it.toString() })
-      db.update(TABLE_NAME)
-        .values(blockValues)
-        .where(aciQuery.where, aciQuery.whereArgs)
-        .run()
-
-      val groupIds: List<GroupId.V1> = blockedGroupIds.mapNotNull { raw ->
-        try {
-          GroupId.v1(raw)
-        } catch (e: BadGroupIdException) {
-          Log.w(TAG, "[applyBlockedUpdate] Bad GV1 ID!")
-          null
-        }
+      if (blockedE164s.isNotEmpty()) {
+        val e164Query = SqlUtil.buildFastCollectionQuery(E164, blockedE164s)
+        db.update(TABLE_NAME)
+          .values(blockValues)
+          .where(e164Query.where, e164Query.whereArgs)
+          .run()
       }
 
-      val groupIdQuery = SqlUtil.buildFastCollectionQuery(GROUP_ID, groupIds.map { it.toString() })
-      db.update(TABLE_NAME)
-        .values(blockValues)
-        .where(groupIdQuery.where, groupIdQuery.whereArgs)
-        .run()
+      if (blockedAcis.isNotEmpty()) {
+        val aciQuery = SqlUtil.buildFastCollectionQuery(ACI_COLUMN, blockedAcis.map { it.toString() })
+        db.update(TABLE_NAME)
+          .values(blockValues)
+          .where(aciQuery.where, aciQuery.whereArgs)
+          .run()
+      }
+
+      if (blockedGroupIds.isNotEmpty()) {
+        val groupIds: List<GroupId.V1> = blockedGroupIds.mapNotNull { raw ->
+          try {
+            GroupId.v1(raw)
+          } catch (e: BadGroupIdException) {
+            Log.w(TAG, "[applyBlockedUpdate] Bad GV1 ID!")
+            null
+          }
+        }
+
+        val groupIdQuery = SqlUtil.buildFastCollectionQuery(GROUP_ID, groupIds.map { it.toString() })
+        db.update(TABLE_NAME)
+          .values(blockValues)
+          .where(groupIdQuery.where, groupIdQuery.whereArgs)
+          .run()
+      }
     }
 
     AppDependencies.recipientCache.clear()
@@ -3743,8 +3763,15 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     }
   }
 
-  fun manuallyShowAvatar(recipientId: RecipientId) {
-    updateExtras(recipientId) { b: RecipientExtras.Builder -> b.manuallyShownAvatar(true) }
+  fun clearHasGroupsInCommon(recipientId: RecipientId) {
+    if (update(recipientId, contentValuesOf(GROUPS_IN_COMMON to 0))) {
+      Log.i(TAG, "Reset $recipientId to have no groups in common.")
+      Recipient.live(recipientId).refresh()
+    }
+  }
+
+  fun manuallyUpdateShowAvatar(recipientId: RecipientId, showAvatar: Boolean) {
+    updateExtras(recipientId) { b: RecipientExtras.Builder -> b.manuallyShownAvatar(showAvatar) }
   }
 
   fun getCapabilities(id: RecipientId): RecipientRecord.Capabilities? {
@@ -4026,7 +4053,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       PNI_COLUMN to pni?.toString(),
       PNI_SIGNATURE_VERIFIED to pniVerified.toInt(),
       STORAGE_SERVICE_ID to Base64.encodeWithPadding(StorageSyncHelper.generateKey()),
-      AVATAR_COLOR to AvatarColorHash.forAddress((aci ?: pni)?.toString(), e164).serialize()
+      AVATAR_COLOR to AvatarColorHash.forAddress((aci ?: pni), e164).serialize()
     )
 
     if (pni != null || aci != null) {
@@ -4083,7 +4110,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       }
 
       if (isInsert) {
-        put(AVATAR_COLOR, AvatarColorHash.forAddress(contact.proto.signalAci?.toString() ?: contact.proto.signalPni?.toString(), contact.proto.e164).serialize())
+        put(AVATAR_COLOR, AvatarColorHash.forAddress(contact.proto.signalAci ?: contact.proto.signalPni, contact.proto.e164).serialize())
       }
     }
   }
@@ -4415,9 +4442,18 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
 
   data class ContactSearchQuery(
     val query: String,
-    val includeSelf: Boolean,
+    val includeSelfMode: IncludeSelfMode,
     val contactSearchSortOrder: ContactSearchSortOrder = ContactSearchSortOrder.NATURAL
   )
+
+  sealed interface IncludeSelfMode {
+    val includeSelf: Boolean
+      get() = this is IncludeWithRemap || this == IncludeWithoutRemap
+
+    data object Exclude : IncludeSelfMode
+    data object IncludeWithoutRemap : IncludeSelfMode
+    data class IncludeWithRemap(val noteToSelfTitle: String) : IncludeSelfMode
+  }
 
   @VisibleForTesting
   internal class ContactSearchSelection private constructor(val where: String, val args: Array<String>) {

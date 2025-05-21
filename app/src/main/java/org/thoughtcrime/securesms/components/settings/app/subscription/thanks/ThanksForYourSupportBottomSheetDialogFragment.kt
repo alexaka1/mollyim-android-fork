@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.text.method.LinkMovementMethodCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
@@ -19,15 +18,30 @@ import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.animation.AnimationCompleteListener
 import org.thoughtcrime.securesms.badges.BadgeImageView
+import org.thoughtcrime.securesms.badges.models.Badge
 import org.thoughtcrime.securesms.components.FixedRoundedCornerBottomSheetDialogFragment
 import org.thoughtcrime.securesms.components.settings.app.AppSettingsActivity
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.util.SpanUtil
+import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.fragments.findListener
 import org.thoughtcrime.securesms.util.visible
 
 class ThanksForYourSupportBottomSheetDialogFragment : FixedRoundedCornerBottomSheetDialogFragment() {
+
+  companion object {
+    private val TAG = Log.tag(ThanksForYourSupportBottomSheetDialogFragment::class.java)
+    const val SHEET_TAG = "ThanksForYourSupportBottomSheet"
+
+    fun create(badge: Badge): ThanksForYourSupportBottomSheetDialogFragment {
+      val args = ThanksForYourSupportBottomSheetDialogFragmentArgs.Builder(badge).build().toBundle()
+      val sheet = ThanksForYourSupportBottomSheetDialogFragment()
+
+      sheet.arguments = args
+      return sheet
+    }
+  }
 
   override val peekHeightPercentage: Float = 1f
 
@@ -72,7 +86,7 @@ class ThanksForYourSupportBottomSheetDialogFragment : FixedRoundedCornerBottomSh
           .append(
             SpanUtil.clickable(
               getString(R.string.SubscribeThanksForYourSupportBottomSheetDialogFragment__become_a_montly_sustainer),
-              ContextCompat.getColor(requireContext(), R.color.signal_accent_primary)
+              ThemeUtil.getThemedColor(requireContext(), R.attr.signal_accent_primary)
             ) {
               requireActivity().finish()
               requireActivity().startActivity(AppSettingsActivity.subscriptions(requireContext()))
@@ -151,10 +165,6 @@ class ThanksForYourSupportBottomSheetDialogFragment : FixedRoundedCornerBottomSh
     } else {
       findListener<Callback>()?.onBoostThanksSheetDismissed()
     }
-  }
-
-  companion object {
-    private val TAG = Log.tag(ThanksForYourSupportBottomSheetDialogFragment::class.java)
   }
 
   interface Callback {

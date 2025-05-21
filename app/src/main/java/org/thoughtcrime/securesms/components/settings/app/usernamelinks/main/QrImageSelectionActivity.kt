@@ -5,7 +5,6 @@
 
 package org.thoughtcrime.securesms.components.settings.app.usernamelinks.main
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -17,11 +16,20 @@ import androidx.appcompat.app.AppCompatDelegate
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.mediasend.Media
 import org.thoughtcrime.securesms.mediasend.v2.gallery.MediaGalleryFragment
+import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme
+import org.thoughtcrime.securesms.util.DynamicTheme
 
 /**
  * Select qr code from gallery instead of using camera. Used in usernames and when linking devices
  */
 class QrImageSelectionActivity : AppCompatActivity(), MediaGalleryFragment.Callbacks {
+
+  private val theme: DynamicTheme = DynamicNoActionBarTheme()
+
+  override fun onResume() {
+    super.onResume()
+    theme.onResume(this)
+  }
 
   override fun attachBaseContext(newBase: Context) {
     delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
@@ -30,11 +38,11 @@ class QrImageSelectionActivity : AppCompatActivity(), MediaGalleryFragment.Callb
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    theme.onCreate(this)
     window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN)
     setContentView(R.layout.username_qr_image_selection_activity)
   }
 
-  @SuppressLint("LogTagInlined")
   override fun onMediaSelected(media: Media) {
     setResult(RESULT_OK, Intent().setData(media.uri))
     finish()

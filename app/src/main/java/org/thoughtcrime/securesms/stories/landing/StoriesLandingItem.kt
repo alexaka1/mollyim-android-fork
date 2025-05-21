@@ -25,6 +25,7 @@ import org.thoughtcrime.securesms.stories.dialogs.StoryContextMenu
 import org.thoughtcrime.securesms.util.ContextUtil
 import org.thoughtcrime.securesms.util.DateUtils
 import org.thoughtcrime.securesms.util.SpanUtil
+import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.adapter.mapping.LayoutFactory
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingAdapter
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingModel
@@ -66,8 +67,18 @@ object StoriesLandingItem {
         data == newItem.data &&
         !hasStatusChange(newItem) &&
         !hasThumbChange(newItem) &&
+        !hasSelfProfileChange(newItem) &&
         (data.sendingCount == newItem.data.sendingCount && data.failureCount == newItem.data.failureCount) &&
         data.storyViewState == newItem.data.storyViewState
+    }
+
+    private fun hasSelfProfileChange(newItem: Model): Boolean {
+      if (!data.storyRecipient.isMyStory || !newItem.data.storyRecipient.isMyStory) {
+        return false
+      }
+      val old = data.individualRecipient
+      val new = Recipient.self()
+      return old.hasAvatar != new.hasAvatar || old.profileAvatarFileDetails != new.profileAvatarFileDetails || old.profileName.toString() != new.profileName.toString()
     }
 
     override fun getChangePayload(newItem: Model): Any? {
@@ -190,7 +201,7 @@ object StoriesLandingItem {
       if (model.data.secondaryStory != null) {
         val secondaryRecord = model.data.secondaryStory.messageRecord as MmsMessageRecord
         val secondaryThumb = secondaryRecord.slideDeck.thumbnailSlide?.uri
-        storyOutline.setBackgroundColor(ContextCompat.getColor(context, R.color.signal_background_primary))
+        storyOutline.setBackgroundColor(ThemeUtil.getThemedColor(context, R.attr.signal_background_primary))
 
         @Suppress("CascadeIf")
         if (secondaryRecord.storyType.isTextStory) {

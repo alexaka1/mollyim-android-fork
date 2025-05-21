@@ -4,7 +4,6 @@ import android.text.SpannableStringBuilder
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -14,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
+import com.google.android.material.R as MaterialR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import org.signal.core.util.concurrent.LifecycleDisposable
@@ -47,6 +47,7 @@ import org.thoughtcrime.securesms.subscription.Subscription
 import org.thoughtcrime.securesms.util.Material3OnScrollHelper
 import org.thoughtcrime.securesms.util.Projection
 import org.thoughtcrime.securesms.util.SpanUtil
+import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingAdapter
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
 import org.whispersystems.signalservice.api.subscriptions.ActiveSubscription
@@ -97,10 +98,10 @@ class DonateToSignalFragment :
   private val binding by ViewBinderDelegate(DonateToSignalFragmentBinding::bind)
 
   private val supportTechSummary: CharSequence by lazy {
-    SpannableStringBuilder(SpanUtil.color(ContextCompat.getColor(requireContext(), R.color.signal_colorOnSurfaceVariant), requireContext().getString(R.string.DonateToSignalFragment__private_messaging)))
+    SpannableStringBuilder(SpanUtil.color(ThemeUtil.getThemedColor(requireContext(), MaterialR.attr.colorOnSurfaceVariant), requireContext().getString(R.string.DonateToSignalFragment__private_messaging)))
       .append(" ")
       .append(
-        SpanUtil.readMore(requireContext(), ContextCompat.getColor(requireContext(), R.color.signal_colorPrimary)) {
+        SpanUtil.readMore(requireContext(), ThemeUtil.getThemedColor(requireContext(), MaterialR.attr.colorPrimary)) {
           findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToSubscribeLearnMoreBottomSheetDialog())
         }
       )
@@ -111,9 +112,9 @@ class DonateToSignalFragment :
   }
 
   override fun getMaterial3OnScrollHelper(toolbar: Toolbar?): Material3OnScrollHelper {
-    return object : Material3OnScrollHelper(requireActivity(), toolbar!!, viewLifecycleOwner) {
-      override val activeColorSet: ColorSet = ColorSet(R.color.transparent, R.color.signal_colorBackground)
-      override val inactiveColorSet: ColorSet = ColorSet(R.color.transparent, R.color.signal_colorBackground)
+    return object : Material3OnScrollHelper(activity = requireActivity(), views = listOf(toolbar!!), lifecycleOwner = viewLifecycleOwner) {
+      override val activeColorSet: ColorSet = ColorSet.from(requireContext(), R.color.transparent, MaterialR.attr.colorSurface)
+      override val inactiveColorSet = activeColorSet
     }
   }
 
@@ -165,7 +166,7 @@ class DonateToSignalFragment :
 
         is DonateToSignalAction.DisplayGatewaySelectorDialog -> {
           Log.d(TAG, "Presenting gateway selector for ${action.inAppPayment.id}")
-          val navAction = DonateToSignalFragmentDirections.actionDonateToSignalFragmentToGatewaySelectorBottomSheetDialog(action.inAppPayment)
+          val navAction = DonateToSignalFragmentDirections.actionDonateToSignalFragmentToGatewaySelectorBottomSheetDialog(action.inAppPayment.id)
 
           findNavController().safeNavigate(navAction)
         }
@@ -173,8 +174,7 @@ class DonateToSignalFragment :
         is DonateToSignalAction.CancelSubscription -> {
           val navAction = DonateToSignalFragmentDirections.actionDonateToSignalFragmentToStripePaymentInProgressFragment(
             InAppPaymentProcessorAction.CANCEL_SUBSCRIPTION,
-            null,
-            InAppPaymentType.RECURRING_DONATION
+            null
           )
 
           findNavController().safeNavigate(navAction)
@@ -184,16 +184,14 @@ class DonateToSignalFragment :
           if (action.inAppPayment.data.paymentMethodType == InAppPaymentData.PaymentMethodType.PAYPAL) {
             val navAction = DonateToSignalFragmentDirections.actionDonateToSignalFragmentToPaypalPaymentInProgressFragment(
               InAppPaymentProcessorAction.UPDATE_SUBSCRIPTION,
-              action.inAppPayment,
-              action.inAppPayment.type
+              action.inAppPayment.id
             )
 
             findNavController().safeNavigate(navAction)
           } else {
             val navAction = DonateToSignalFragmentDirections.actionDonateToSignalFragmentToStripePaymentInProgressFragment(
               InAppPaymentProcessorAction.UPDATE_SUBSCRIPTION,
-              action.inAppPayment,
-              action.inAppPayment.type
+              action.inAppPayment.id
             )
 
             findNavController().safeNavigate(navAction)
@@ -339,6 +337,8 @@ class DonateToSignalFragment :
           }
         )
       }
+
+      space(24.dp)
     }
   }
 
@@ -352,7 +352,7 @@ class DonateToSignalFragment :
         R.string.DonateToSignalFragment__your_payment_is_still_being_processed_onetime
       }
     } else {
-      if (state.monthlyDonationState.activeSubscription?.paymentMethod == ActiveSubscription.PAYMENT_METHOD_SEPA_DEBIT) {
+      if (state.monthlyDonationState.activeSubscription?.paymentMethod == ActiveSubscription.PaymentMethod.SEPA_DEBIT) {
         R.string.DonateToSignalFragment__bank_transfers_usually_take_1_business_day_to_process_monthly
       } else if (state.monthlyDonationState.nonVerifiedMonthlyDonation != null) {
         R.string.DonateToSignalFragment__your_ideal_payment_is_still_processing
@@ -477,8 +477,7 @@ class DonateToSignalFragment :
     findNavController().safeNavigate(
       DonateToSignalFragmentDirections.actionDonateToSignalFragmentToStripePaymentInProgressFragment(
         InAppPaymentProcessorAction.PROCESS_NEW_IN_APP_PAYMENT,
-        inAppPayment,
-        inAppPayment.type
+        inAppPayment.id
       )
     )
   }
@@ -487,22 +486,21 @@ class DonateToSignalFragment :
     findNavController().safeNavigate(
       DonateToSignalFragmentDirections.actionDonateToSignalFragmentToPaypalPaymentInProgressFragment(
         InAppPaymentProcessorAction.PROCESS_NEW_IN_APP_PAYMENT,
-        inAppPayment,
-        inAppPayment.type
+        inAppPayment.id
       )
     )
   }
 
   override fun navigateToCreditCardForm(inAppPayment: InAppPaymentTable.InAppPayment) {
-    findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToCreditCardFragment(inAppPayment))
+    findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToCreditCardFragment(inAppPayment.id))
   }
 
   override fun navigateToIdealDetailsFragment(inAppPayment: InAppPaymentTable.InAppPayment) {
-    findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToIdealTransferDetailsFragment(inAppPayment))
+    findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToIdealTransferDetailsFragment(inAppPayment.id))
   }
 
   override fun navigateToBankTransferMandate(inAppPayment: InAppPaymentTable.InAppPayment) {
-    findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToBankTransferMandateFragment(inAppPayment))
+    findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToBankTransferMandateFragment(inAppPayment.id))
   }
 
   override fun onPaymentComplete(inAppPayment: InAppPaymentTable.InAppPayment) {
@@ -523,7 +521,7 @@ class DonateToSignalFragment :
   }
 
   override fun navigateToDonationPending(inAppPayment: InAppPaymentTable.InAppPayment) {
-    findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToDonationPendingBottomSheet(inAppPayment))
+    findNavController().safeNavigate(DonateToSignalFragmentDirections.actionDonateToSignalFragmentToDonationPendingBottomSheet(inAppPayment.id))
   }
 
   override fun exitCheckoutFlow() {

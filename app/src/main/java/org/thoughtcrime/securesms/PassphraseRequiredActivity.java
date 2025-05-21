@@ -128,10 +128,10 @@ public abstract class PassphraseRequiredActivity extends PassphraseActivity impl
       return STATE_UI_BLOCKING_UPGRADE;
     } else if (!TextSecurePreferences.hasPromptedPushRegistration(this)) {
       return STATE_WELCOME_PUSH_SCREEN;
-    } else if (SignalStore.storageService().getNeedsAccountRestore()) {
-      return STATE_ENTER_SIGNAL_PIN;
     } else if (userCanTransferOrRestore()) {
       return STATE_TRANSFER_OR_RESTORE;
+    } else if (SignalStore.storageService().getNeedsAccountRestore()) {
+      return STATE_ENTER_SIGNAL_PIN;
     } else if (userMustSetProfileName()) {
       return STATE_CREATE_PROFILE_NAME;
     } else if (userMustCreateSignalPin()) {
@@ -155,7 +155,8 @@ public abstract class PassphraseRequiredActivity extends PassphraseActivity impl
 
   private boolean userMustCreateSignalPin() {
     return !SignalStore.registration().isRegistrationComplete() &&
-           !SignalStore.svr().hasOptedInWithAccess() &&
+           !SignalStore.svr().hasPin() &&
+           !SignalStore.account().isLinkedDevice() &&
            !SignalStore.svr().lastPinCreateFailed() &&
            !SignalStore.svr().hasOptedOut();
   }

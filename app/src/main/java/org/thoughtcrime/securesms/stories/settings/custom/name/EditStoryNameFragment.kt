@@ -5,7 +5,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,6 +15,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.database.model.DistributionListId
+import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.ViewUtil
 import org.thoughtcrime.securesms.util.views.CircularProgressMaterialButton
 
@@ -43,7 +43,7 @@ class EditStoryNameFragment : Fragment(R.layout.stories_edit_story_name_fragment
     lifecycleDisposable.bindTo(viewLifecycleOwner)
 
     val toolbar: Toolbar = view.findViewById(R.id.toolbar)
-    toolbar.navigationIcon?.colorFilter = SimpleColorFilter(ContextCompat.getColor(requireContext(), R.color.signal_icon_tint_primary))
+    toolbar.navigationIcon?.colorFilter = SimpleColorFilter(ThemeUtil.getThemedColor(requireContext(), R.attr.signal_icon_tint_primary))
     toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
     storyNameWrapper = view.findViewById(R.id.story_name_wrapper)
@@ -59,8 +59,8 @@ class EditStoryNameFragment : Fragment(R.layout.stories_edit_story_name_fragment
     }
 
     storyName.doAfterTextChanged {
-      saveButton.isEnabled = !it.isNullOrEmpty()
-      saveButton.alpha = if (it.isNullOrEmpty()) 0.5f else 1f
+      saveButton.isEnabled = !it.isNullOrBlank() && it.toString().trim() != initialName
+      saveButton.alpha = if (!saveButton.isEnabled) 0.5f else 1f
       storyNameWrapper.error = null
     }
 
@@ -68,6 +68,8 @@ class EditStoryNameFragment : Fragment(R.layout.stories_edit_story_name_fragment
     saveButton.setOnClickListener {
       onSaveClicked()
     }
+    saveButton.isEnabled = false
+    saveButton.alpha = 0.5f
 
     ViewUtil.focusAndShowKeyboard(storyName)
   }

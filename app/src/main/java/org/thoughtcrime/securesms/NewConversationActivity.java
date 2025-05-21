@@ -42,6 +42,7 @@ import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.calls.YouAreAlreadyInACallSnackbar;
 import org.thoughtcrime.securesms.components.menu.ActionItem;
 import org.thoughtcrime.securesms.components.menu.SignalContextMenu;
+import org.thoughtcrime.securesms.components.settings.app.AppSettingsActivity;
 import org.thoughtcrime.securesms.contacts.management.ContactsManagementRepository;
 import org.thoughtcrime.securesms.contacts.management.ContactsManagementViewModel;
 import org.thoughtcrime.securesms.contacts.paged.ChatType;
@@ -130,7 +131,7 @@ public class NewConversationActivity extends ContactSelectionActivity
 
         AlertDialog progress = SimpleProgressDialog.show(this);
 
-        SimpleTask.run(getLifecycle(), () -> RecipientRepository.lookupNewE164(this, number), result -> {
+        SimpleTask.run(getLifecycle(), () -> RecipientRepository.lookupNewE164(number), result -> {
           progress.dismiss();
 
           if (result instanceof RecipientRepository.LookupResult.Success) {
@@ -215,7 +216,7 @@ public class NewConversationActivity extends ContactSelectionActivity
   }
 
   private void handleInvite() {
-    startActivity(new Intent(this, InviteActivity.class));
+    startActivity(AppSettingsActivity.invite(this));
   }
 
   @Override
@@ -286,7 +287,7 @@ public class NewConversationActivity extends ContactSelectionActivity
     return new ActionItem(
         R.drawable.ic_chat_message_24,
         getString(R.string.NewConversationActivity__message),
-        R.color.signal_colorOnSurface,
+        com.google.android.material.R.attr.colorOnSurface,
         () -> {
           Disposable disposable = ConversationIntents.createBuilder(this, recipient.getId(), -1L)
                                                      .subscribe(builder -> startActivity(builder.build()));
@@ -305,7 +306,7 @@ public class NewConversationActivity extends ContactSelectionActivity
       return new ActionItem(
           R.drawable.ic_phone_right_24,
           getString(R.string.NewConversationActivity__audio_call),
-          R.color.signal_colorOnSurface,
+          com.google.android.material.R.attr.colorOnSurface,
           () -> CommunicationActions.startVoiceCall(this, recipient, () -> {
             YouAreAlreadyInACallSnackbar.show(findViewById(android.R.id.content));
           })
@@ -323,7 +324,7 @@ public class NewConversationActivity extends ContactSelectionActivity
     return new ActionItem(
         R.drawable.ic_video_call_24,
         getString(R.string.NewConversationActivity__video_call),
-        R.color.signal_colorOnSurface,
+        com.google.android.material.R.attr.colorOnSurface,
         () -> CommunicationActions.startVideoCall(this, recipient, () -> {
           YouAreAlreadyInACallSnackbar.show(findViewById(android.R.id.content));
         })
@@ -338,7 +339,7 @@ public class NewConversationActivity extends ContactSelectionActivity
     return new ActionItem(
         R.drawable.ic_minus_circle_20, // TODO [alex] -- correct asset
         getString(R.string.NewConversationActivity__remove),
-        R.color.signal_colorOnSurface,
+        com.google.android.material.R.attr.colorOnSurface,
         () -> displayRemovalDialog(recipient)
     );
   }
@@ -352,7 +353,7 @@ public class NewConversationActivity extends ContactSelectionActivity
     return new ActionItem(
         R.drawable.ic_block_tinted_24,
         getString(R.string.NewConversationActivity__block),
-        R.color.signal_colorError,
+        com.google.android.material.R.attr.colorError,
         () -> BlockUnblockDialog.showBlockFor(this,
                                               this.getLifecycle(),
                                               recipient,
@@ -361,6 +362,8 @@ public class NewConversationActivity extends ContactSelectionActivity
                                                   handleManualRefresh();
                                                   displaySnackbar(R.string.NewConversationActivity__s_has_been_blocked, recipient.getDisplayName(this));
                                                   contactsFragment.reset();
+                                                }, (throwable) -> {
+                                                  displaySnackbar(R.string.NewConversationActivity__block_failed);
                                                 }));
                                               })
     );
