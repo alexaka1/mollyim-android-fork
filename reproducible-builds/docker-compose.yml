@@ -3,7 +3,7 @@ services:
     image: reproducible-molly
     build:
       context: ..
-    command: :app:assembleRelease :app:bundleRelease --no-daemon --debug
+    command: :app:assembleRelease :app:bundleRelease --no-daemon --stacktrace --info
     volumes:
       - ./certs:/molly/app/certs:ro
       - ./outputs:/molly/app/build/outputs
